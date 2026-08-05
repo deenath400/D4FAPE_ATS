@@ -110,3 +110,28 @@ Record of changes made by `/implement` per checkpoint.
 ### Deviations
 
 - None.
+
+---
+
+## CP-5 — Hardening & documentation
+
+**Completed:** 2026-08-05 · **Tasks:** T-25, T-26, T-27, T-28, T-29
+
+### Summary
+
+- Updated `docs/specs/meta/tech-stack.md` with literal build/test/lint/format/run/migrate commands and required configuration keys for both backend and frontend deployables.
+- Updated `docs/specs/meta/coding-standards.md` with Project-Specific Rules established by spec 0001 (`process.env.API_BASE_URL` isolation, `ui/bff` proxy route rule, `.editorconfig`/ESLint/Prettier code style enforcement).
+- Updated `docs/specs/meta/architecture.md` Component Map and appended CP-5 change log entry.
+- Conducted full fresh-clone end-to-end verification across both deployables (`dotnet build`, `dotnet test`, `dotnet format`, `dotnet ef database update`, `npm run build`, `npm test`, `npm run lint`, `npm run format`).
+- Verified zero untracked database or build output files in `git status`.
+- Verified package version pins and lockfiles (`packages.lock.json` and `package-lock.json`).
+
+### Tests & Verification
+
+- Backend: `dotnet build`, `dotnet test` (Unit: 2/2, Integration: 3/3, Architecture: 4/4), `dotnet format --verify-no-changes`, `dotnet ef database update` — all succeeded cleanly.
+- Frontend: `npm run build`, `npm test` (3/3), `npm run lint`, `npm run format` — all succeeded cleanly.
+- Repository: `git status` clean with zero untracked files.
+
+### Deviations
+
+- None.

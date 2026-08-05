@@ -9,14 +9,15 @@ public static class DbServiceCollectionExtensions
 {
     public static IServiceCollection AddDbCore(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("Default");
-        if (string.IsNullOrWhiteSpace(connectionString))
+        services.AddDbContext<AppDbContext>((sp, options) =>
         {
-            throw new InvalidOperationException("Missing required configuration key 'ConnectionStrings:Default'.");
-        }
+            var config = sp.GetRequiredService<IConfiguration>();
+            var connectionString = config.GetConnectionString("Default");
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new InvalidOperationException("Missing required configuration key 'ConnectionStrings:Default'.");
+            }
 
-        services.AddDbContext<AppDbContext>(options =>
-        {
             options.UseSqlite(connectionString)
                    .AddInterceptors(new SqlitePragmaConnectionInterceptor());
         });

@@ -187,29 +187,29 @@ literal and exits successfully in documented order from a fresh clone; `coding-s
 and `architecture.md` reflect what shipped; `git status` after a full install/build/run/
 migrate cycle on both deployables is clean.*
 
-- [ ] **T-25** — Fill `tech-stack.md` Commands and Required Configuration tables
+- [x] **T-25** — Fill `tech-stack.md` Commands and Required Configuration tables
   - Files: `docs/specs/meta/tech-stack.md`
   - Covers: AC-24, AC-25
   - Depends on: T-13, T-14 (all commands must exist and work first)
 
-- [ ] **T-26** — Update `coding-standards.md`: remove superseded prose rules, add
+- [x] **T-26** — Update `coding-standards.md`: remove superseded prose rules, add
   Project-Specific Rules citing 0001
   - Files: `docs/specs/meta/coding-standards.md`
   - Covers: FR-15
   - Depends on: T-12, T-14
 
-- [ ] **T-27** — Update `architecture.md` Component Map and Change Log
+- [x] **T-27** — Update `architecture.md` Component Map and Change Log
   - Files: `docs/specs/meta/architecture.md`
   - Covers: — (required by the Plan stage's own instructions, not a spec AC)
   - Depends on: all prior tasks in this checkpoint's siblings
 
-- [ ] **T-28** — Fresh-clone end-to-end verification: install, build, run, migrate, test,
+- [x] **T-28** — Fresh-clone end-to-end verification: install, build, run, migrate, test,
   lint, format on both deployables; confirm `git status` clean
   - Files: — (verification pass; no new files)
   - Covers: AC-1, AC-25
   - Depends on: T-25
 
-- [ ] **T-29** — Final pinned-version and lockfile audit across both deployables
+- [x] **T-29** — Final pinned-version and lockfile audit across both deployables
   - Files: `backend/**/*.csproj`, `backend/**/packages.lock.json`, `frontend/package.json`,
     `frontend/package-lock.json` (review only — edits only if a drift is found)
   - Covers: AC-3, AC-4, AC-5, AC-6, NFR-2, NFR-3

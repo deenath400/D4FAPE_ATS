@@ -125,8 +125,10 @@ Mirrors the Layering Rules section of `architecture.md` — keep the two consist
 Appended by `/implement` when a spec establishes a project-wide convention. One line each,
 citing the originating spec.
 
-- <none yet>
+- `process.env.API_BASE_URL` may only be accessed inside `src/lib/server/backend-invoke.ts` (est. 0001).
+- All browser-originated calls to backend endpoints pass through `ui/bff` proxy route handlers (est. 0001).
+- Indentation, style, and code formatting enforced by `.editorconfig` / Roslyn code style (backend) and ESLint / Prettier (frontend) (est. 0001).
 
 ## Related Specs
 
-None — this is the first artifact in the repository.
+- `0001` (Project Scaffolding and Walking Skeleton)

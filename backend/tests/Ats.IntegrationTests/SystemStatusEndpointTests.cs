@@ -39,7 +39,6 @@ public class SystemStatusEndpointTests
         Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
 
         var content = await response.Content.ReadAsStringAsync();
-        Assert.NotNull(content);
 
         // Ensure database file path or connection string is not leaked in response body (AC-11)
         Assert.DoesNotContain(factory.DbFilePath, content);

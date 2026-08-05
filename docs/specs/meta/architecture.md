@@ -65,10 +65,15 @@ graph TD
 
 | Component | Responsibility | Owning specs |
 |---|---|---|
-| `ui/portal` | Public candidate surface: registration, job search, apply, CV upload, own status | — |
+| `infra/build` | Repository build, version pinning, lockfile and lint/format infrastructure | 0001 |
+| `ui/portal` | Public candidate surface: landing page system status, registration, job search, apply | 0001 |
+| `ui/bff` | Frontend BFF layer: proxy route handlers and shared backend invoke function | 0001 |
 | `ui/staff` | Authenticated recruiter and hiring-manager workspace: requisitions, pipeline, decisions | — |
-| `api/<area>` | HTTP boundary — routing, request DTOs, authorization policies. One area per feature | — |
+| `api/system` | Backend HTTP boundary: unauthenticated system status endpoint & composition root | 0001 |
+| `api/<area>` | HTTP boundary — routing, request DTOs, authorization policies | — |
+| `service/system` | Backend system status service and database health check | 0001 |
 | `service/<area>` | Business rules and transaction boundaries. The only caller of `db/*` | — |
+| `db/core` | EF Core context, SQLite WAL/busy-timeout interceptor, health check, migrations | 0001 |
 | `db/<area>` | EF Core entities, configurations, migrations, query implementations | — |
 | `shared/auth` | Identity store, JWT issuance and validation, role and claim policy definitions | — |
 | `shared/storage` | CV and attachment persistence behind an interface; backing store TBD | — |
@@ -146,6 +151,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-05 | 0001 | CP-2: Built backend service & API layers, system status endpoint, unit & integration tests |
 | 2026-08-05 | 0001 | CP-3: Scaffolded frontend Next.js application, ESLint FR-16 rules, BFF proxy route & shared invoke function |
 | 2026-08-05 | 0001 | CP-4: Built portal landing page, ServerStatusSection, ClientStatusPanel, and Vitest component tests |
+| 2026-08-05 | 0001 | CP-5: Hardened tech stack commands, updated architecture snapshot and coding standards |
 
 ## Related Specs
 
