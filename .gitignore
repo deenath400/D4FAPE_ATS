@@ -18,6 +18,9 @@ obj/
 /data/
 data/
 
+# CV attachments & other backend app-data (candidate PII, 0004 NFR-2)
+app-data/
+
 # Secrets & local configuration (AC-2)
 *.local.json
 .env

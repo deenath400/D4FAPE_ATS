@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 0 / 46 tasks · checkpoint CP-1 of 4
+**Progress:** 11 / 46 tasks · checkpoint CP-1 of 4 done, CP-2 next
 
 ---
 
@@ -24,57 +24,57 @@ one checkpoint per invocation, then stops for review.
 *Exit condition: `dotnet build` succeeds, the migration applies cleanly against a fresh
 database, and all CP-1 unit tests pass.*
 
-- [ ] **T-01** — `IFileStorage` interface
+- [x] **T-01** — `IFileStorage` interface
   - Files: `backend/src/Shared/Storage/IFileStorage.cs`
   - Covers: —
   - Depends on: —
 
-- [ ] **T-02** — `LocalDiskFileStorage` implementation
+- [x] **T-02** — `LocalDiskFileStorage` implementation
   - Files: `backend/src/Shared/Storage/LocalDiskFileStorage.cs`
   - Covers: FR-7, NFR-2
   - Depends on: T-01
 
-- [ ] **T-03** — `Application` entity
+- [x] **T-03** — `Application` entity
   - Files: `backend/src/Db/Applications/Application.cs`
   - Covers: FR-13
   - Depends on: —
 
-- [ ] **T-04** — `CvAttachment` entity
+- [x] **T-04** — `CvAttachment` entity
   - Files: `backend/src/Db/Applications/CvAttachment.cs`
   - Covers: FR-7
   - Depends on: —
 
-- [ ] **T-05** — EF Core configurations (`ApplicationConfiguration`, `CvAttachmentConfiguration`), including the unique `(CandidateId, RequisitionId)` and `ApplicationId` indexes
+- [x] **T-05** — EF Core configurations (`ApplicationConfiguration`, `CvAttachmentConfiguration`), including the unique `(CandidateId, RequisitionId)` and `ApplicationId` indexes
   - Files: `backend/src/Db/Configurations/ApplicationConfiguration.cs`, `backend/src/Db/Configurations/CvAttachmentConfiguration.cs`
   - Covers: FR-5, NFR-2
   - Depends on: T-03, T-04
 
-- [ ] **T-06** — Wire `AppDbContext`: `DbSet<Application>`, `DbSet<CvAttachment>`, apply both configurations
+- [x] **T-06** — Wire `AppDbContext`: `DbSet<Application>`, `DbSet<CvAttachment>`, apply both configurations
   - Files: `backend/src/Db/AppDbContext.cs`
   - Covers: —
   - Depends on: T-05
 
-- [ ] **T-07** — Migration `AddApplicationsAndCvAttachments`
+- [x] **T-07** — Migration `AddApplicationsAndCvAttachments`
   - Files: `backend/src/Db/Migrations/<timestamp>_AddApplicationsAndCvAttachments.cs`, `.Designer.cs`, `backend/src/Db/Migrations/AppDbContextModelSnapshot.cs`
   - Covers: FR-13
   - Depends on: T-06
 
-- [ ] **T-08** — Add `Storage:CvBasePath` and `Applications:MaxCvSizeBytes` to `appsettings.json`
+- [x] **T-08** — Add `Storage:CvBasePath` and `Applications:MaxCvSizeBytes` to `appsettings.json`
   - Files: `backend/src/Api/appsettings.json`
   - Covers: FR-3, FR-7
   - Depends on: —
 
-- [ ] **T-09** — Ignore the backend's app-data directory (CV files are candidate PII)
+- [x] **T-09** — Ignore the backend's app-data directory (CV files are candidate PII)
   - Files: `.gitignore`
   - Covers: NFR-2
   - Depends on: —
 
-- [ ] **T-10** — Unit tests: `Application`/`CvAttachment` entity invariants
+- [x] **T-10** — Unit tests: `Application`/`CvAttachment` entity invariants
   - Files: `backend/tests/Ats.UnitTests/Application/ApplicationEntityTests.cs`
   - Covers: AC-1, AC-22, NFR-1
   - Depends on: T-03, T-04
 
-- [ ] **T-11** — Unit tests: `LocalDiskFileStorage` save/open/delete round-trip and path-traversal rejection
+- [x] **T-11** — Unit tests: `LocalDiskFileStorage` save/open/delete round-trip and path-traversal rejection
   - Files: `backend/tests/Ats.UnitTests/Storage/LocalDiskFileStorageTests.cs`
   - Covers: FR-7, NFR-2
   - Depends on: T-02

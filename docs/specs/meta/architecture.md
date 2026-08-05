@@ -77,9 +77,10 @@ graph TD
 | `service/<area>` | Business rules and transaction boundaries. The only caller of `db/*` | — |
 | `db/core` | EF Core context, SQLite WAL/busy-timeout interceptor, health check, migrations | 0001, 0002 |
 | `db/requisition` | `Requisition`/`Stage` entities, EF Core configurations, migration — each Requisition owns an independent Stage set (FR-14) | 0003 |
+| `db/application` | `Application`/`CvAttachment` entities, EF Core configurations, migration — unique `(CandidateId, RequisitionId)` index enforces one Application per pair | 0004 |
 | `db/<area>` | EF Core entities, configurations, migrations, query implementations | — |
 | `shared/auth` | Identity store, JWT issuance and validation, role and claim policy definitions | 0002 |
-| `shared/storage` | CV and attachment persistence behind an interface; backing store TBD | — |
+| `shared/storage` | CV and attachment persistence behind `IFileStorage`; local-disk-backed (`LocalDiskFileStorage`), base path configurable | 0004 |
 
 Both `ui/portal` and `ui/staff` live inside the one Next.js application as separate route
 groups. They are distinct components because their auth posture differs: `ui/portal` serves
@@ -96,6 +97,9 @@ erDiagram
   ApplicationUser ||--o{ RefreshToken : owns
   ApplicationUser ||--o{ ApplicationRole : has
   Requisition ||--o{ Stage : owns
+  Requisition ||--o{ Application : receives
+  ApplicationUser ||--o{ Application : submits
+  Application ||--|| CvAttachment : has
 ```
 
 ## Cross-Cutting Concerns
@@ -161,6 +165,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-05 | 0003 | CP-2: Built `RequisitionService`, staff `RequisitionEndpoints` and anonymous `PublicRequisitionEndpoints`, `PagedResult<T>` pagination envelope, and unit/integration test coverage |
 | 2026-08-05 | 0003 | CP-3: Gave `ui/staff` its first real code — `/staff` route segment, `middleware.ts` role gating (closes 0002 E-9), requisition list/create/edit/lifecycle pages; added `ui/portal` `/jobs` search + detail pages |
 | 2026-08-05 | 0003 | CP-4: Hardening — dedicated NFR-1 (pageSize clamp) and NFR-2 (public reads never open a transaction) verification tests; spec closed out, all 42 tasks complete |
+| 2026-08-06 | 0004 | CP-1: Added `Application`/`CvAttachment` entities, EF Core configurations, `AddApplicationsAndCvAttachments` migration, and `shared/storage`'s first implementation (`IFileStorage`/`LocalDiskFileStorage`), resolving the "backing store TBD" note |
 
 ## Related Specs
 

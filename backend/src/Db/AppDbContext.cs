@@ -1,6 +1,7 @@
 namespace Ats.Db;
 
 using System;
+using Ats.Db.Applications;
 using Ats.Db.Configurations;
 using Ats.Db.Requisitions;
 using Ats.Shared.Auth;
@@ -17,6 +18,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<Requisition> Requisitions => Set<Requisition>();
     public DbSet<Stage> Stages => Set<Stage>();
+    public DbSet<Application> Applications => Set<Application>();
+    public DbSet<CvAttachment> CvAttachments => Set<CvAttachment>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -24,6 +27,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
         builder.ApplyConfiguration(new RefreshTokenConfiguration());
         builder.ApplyConfiguration(new RequisitionConfiguration());
         builder.ApplyConfiguration(new StageConfiguration());
+        builder.ApplyConfiguration(new ApplicationConfiguration());
+        builder.ApplyConfiguration(new CvAttachmentConfiguration());
 
         SeedRoles(builder);
     }
