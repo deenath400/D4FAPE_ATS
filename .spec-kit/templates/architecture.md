@@ -4,7 +4,7 @@
 
 > The orientation document. A developer or agent reads this file and nothing else, and knows
 > what exists and how it fits together. Detail belongs in the per-spec artifacts; see
-> `.claude/spec-kit/meta-maintenance.md` for what may and may not live here.
+> `.spec-kit/meta-maintenance.md` for what may and may not live here.
 >
 > Maintained by `/implement` via surgical edits. Never regenerate this file.
 

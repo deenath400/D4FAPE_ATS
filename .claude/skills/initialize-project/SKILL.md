@@ -1,6 +1,6 @@
 ---
 name: initialize-project
-description: Bootstrap the spec-driven workflow in this repository — interviews the user (or analyses existing code) and writes the project blueprint under docs/specs/meta/ plus the spec index and root CLAUDE.md. Run once, before the first /specify. Use when the user asks to initialize the project, set up specs, create the blueprint, or when /specify is run and docs/specs/meta/ does not exist.
+description: Bootstrap the spec-driven workflow in this repository — interviews the user (or analyses existing code) and writes the project blueprint under docs/specs/meta/ plus the spec index and root AGENTS.md. Run once, before the first /specify. Use when the user asks to initialize the project, set up specs, create the blueprint, or when /specify is run and docs/specs/meta/ does not exist.
 ---
 
 # /initialize-project
