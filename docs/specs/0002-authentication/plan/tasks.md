@@ -21,17 +21,17 @@ Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/impl
 
 *Exit condition: EF Core migrations apply cleanly to SQLite `app.db`, entity unit tests pass, `dotnet build` succeeds.*
 
-- [ ] **T-01** — Create Identity & RefreshToken domain entities and configuration
+- [x] **T-01** — Create Identity & RefreshToken domain entities and configuration
   - Files: `backend/src/Shared/Auth/ApplicationUser.cs`, `backend/src/Shared/Auth/ApplicationRole.cs`, `backend/src/Shared/Auth/RefreshToken.cs`, `backend/src/Shared/Auth/AuthConstants.cs`, `backend/src/Db/Configurations/RefreshTokenConfiguration.cs`
   - Covers: AC-1, AC-17, AC-18
   - Depends on: —
 
-- [ ] **T-02** — Inherit `IdentityDbContext` in `AppDbContext` and generate EF Core migration
+- [x] **T-02** — Inherit `IdentityDbContext` in `AppDbContext` and generate EF Core migration
   - Files: `backend/src/Db/AppDbContext.cs`, `backend/src/Db/Migrations/*_AddAuthenticationAndRefreshTokens.cs`
   - Covers: AC-17
   - Depends on: T-01
 
-- [ ] **T-03** — Seed default identity roles and write unit tests for `RefreshToken` invariants
+- [x] **T-03** — Seed default identity roles and write unit tests for `RefreshToken` invariants
   - Files: `backend/src/Db/AppDbContext.cs`, `backend/tests/Ats.UnitTests/Auth/RefreshTokenTests.cs`
   - Covers: AC-1, AC-18
   - Depends on: T-01, T-02

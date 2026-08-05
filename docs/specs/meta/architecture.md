@@ -73,9 +73,9 @@ graph TD
 | `api/<area>` | HTTP boundary — routing, request DTOs, authorization policies | — |
 | `service/system` | Backend system status service and database health check | 0001 |
 | `service/<area>` | Business rules and transaction boundaries. The only caller of `db/*` | — |
-| `db/core` | EF Core context, SQLite WAL/busy-timeout interceptor, health check, migrations | 0001 |
+| `db/core` | EF Core context, SQLite WAL/busy-timeout interceptor, health check, migrations | 0001, 0002 |
 | `db/<area>` | EF Core entities, configurations, migrations, query implementations | — |
-| `shared/auth` | Identity store, JWT issuance and validation, role and claim policy definitions | — |
+| `shared/auth` | Identity store, JWT issuance and validation, role and claim policy definitions | 0002 |
 | `shared/storage` | CV and attachment persistence behind an interface; backing store TBD | — |
 
 Both `ui/portal` and `ui/staff` live inside the one Next.js application as separate route
@@ -90,11 +90,9 @@ Entities and relationships only. Columns live in each spec's `plan/erd.md`.
 
 ```mermaid
 erDiagram
+  ApplicationUser ||--o{ RefreshToken : owns
+  ApplicationUser ||--o{ ApplicationRole : has
 ```
-
-Empty by design — no entity exists yet. The first spec introduces the first entities and adds
-them here. Do not populate this from the glossary in `project.md`; those are candidate terms,
-not committed tables.
 
 ## Cross-Cutting Concerns
 
@@ -152,6 +150,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-05 | 0001 | CP-3: Scaffolded frontend Next.js application, ESLint FR-16 rules, BFF proxy route & shared invoke function |
 | 2026-08-05 | 0001 | CP-4: Built portal landing page, ServerStatusSection, ClientStatusPanel, and Vitest component tests |
 | 2026-08-05 | 0001 | CP-5: Hardened tech stack commands, updated architecture snapshot and coding standards |
+| 2026-08-05 | 0002 | CP-1: Added ASP.NET Core Identity domain entities, RefreshToken schema, and EF Core migration |
 
 ## Related Specs
 
