@@ -84,3 +84,29 @@ Record of changes made by `/implement` per checkpoint.
 ### Deviations
 
 - None.
+
+---
+
+## CP-4 — Frontend landing page & tests
+
+**Completed:** 2026-08-05 · **Tasks:** T-19, T-20, T-21, T-22, T-23, T-24
+
+### Summary
+
+- Created `SystemStatusDto` type in `frontend/src/lib/types/system-status.ts`.
+- Implemented `StatusSkeleton` component in `src/components/StatusSkeleton.tsx` for visual pulse loading.
+- Implemented async Server Component `ServerStatusSection` in `src/components/ServerStatusSection.tsx` performing direct server-to-server invocation via `invokeBackend` with inline error handling.
+- Implemented Client Component `ClientStatusPanel` in `src/components/ClientStatusPanel.tsx` retrieving status via browser fetch to `/api/bff/system-status` with explicit loading, error, and success states.
+- Implemented public candidate portal landing page in `src/app/(portal)/page.tsx` composing and visually distinguishing both status sections.
+- Created `ClientStatusPanel` component tests in `frontend/tests/client-status-panel.test.tsx` and Vitest setup file `tests/setup.ts`.
+
+### Tests & Verification
+
+- `npm run build`: Succeeded with zero type errors.
+- `npm run lint`: Passed with zero ESLint warnings or errors.
+- `npm run format`: Passed with zero Prettier formatting issues.
+- `npm test` (`vitest`): Passed 3/3 component tests.
+
+### Deviations
+
+- None.

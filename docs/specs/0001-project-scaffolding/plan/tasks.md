@@ -150,32 +150,32 @@ locally (backend running).*
 *Exit condition: landing page renders both status sections against a running backend;
 `npm test` passes; loading/error/success states are all reachable.*
 
-- [ ] **T-19** — Shared DTO type
+- [x] **T-19** — Shared DTO type
   - Files: `frontend/src/lib/types/system-status.ts`
   - Covers: FR-7
   - Depends on: T-14
 
-- [ ] **T-20** — Loading skeleton component
+- [x] **T-20** — Loading skeleton component
   - Files: `frontend/src/components/StatusSkeleton.tsx`
   - Covers: AC-16
   - Depends on: T-14
 
-- [ ] **T-21** — Server-rendered status section (no Suspense, inline await/catch)
+- [x] **T-21** — Server-rendered status section (no Suspense, inline await/catch)
   - Files: `frontend/src/components/ServerStatusSection.tsx`
   - Covers: FR-17, AC-16, AC-28, AC-30
   - Depends on: T-16, T-19, T-20
 
-- [ ] **T-22** — Client-rendered status panel (loading/error/success via `useState`/`useEffect`)
+- [x] **T-22** — Client-rendered status panel (loading/error/success via `useState`/`useEffect`)
   - Files: `frontend/src/components/ClientStatusPanel.tsx`
   - Covers: FR-7, AC-12, AC-13, AC-15, AC-16
   - Depends on: T-17, T-19, T-20
 
-- [ ] **T-23** — Landing page composing and labelling both sections
+- [x] **T-23** — Landing page composing and labelling both sections
   - Files: `frontend/src/app/(portal)/page.tsx`
   - Covers: FR-7, AC-29
   - Depends on: T-21, T-22
 
-- [ ] **T-24** — Component test for `ClientStatusPanel`
+- [x] **T-24** — Component test for `ClientStatusPanel`
   - Files: `frontend/tests/client-status-panel.test.tsx`
   - Covers: AC-19
   - Depends on: T-22
