@@ -11,8 +11,15 @@ Claude Code, GitHub Copilot, Cursor, and Google Antigravity.
 3. **`docs/specs/meta/tech-stack.md`** — frameworks, and the literal build/test/lint commands.
 4. **`docs/specs/index.md`** — one row per feature spec, with current status.
 
-If `docs/specs/` does not exist yet, the project has not been initialised. Run
-`/initialize-project` before anything else.
+The blueprint was initialised on 2026-08-05. In one line: an applicant tracking system with a
+public candidate portal — Next.js/TypeScript frontend calling an ASP.NET Core (.NET 10)
+modular-monolith API, EF Core over SQLite, self-hosted ASP.NET Core Identity + JWT,
+single-tenant. Nothing is scaffolded yet, so `tech-stack.md` lists every command as
+`not yet defined`; the spec that scaffolds each side fills them in.
+
+`docs/specs/meta/architecture.md` is binding on design decisions and
+`docs/specs/meta/coding-standards.md` on every line you write. If `docs/specs/` is ever
+missing, the project has not been initialised — run `/initialize-project` before anything else.
 
 ## Feature work goes through the spec workflow
 
