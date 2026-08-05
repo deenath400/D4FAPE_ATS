@@ -1,9 +1,11 @@
 namespace Ats.Service;
 
 using Ats.Db;
+using Ats.Service.Application;
 using Ats.Service.Auth;
 using Ats.Service.Requisition;
 using Ats.Shared.Auth;
+using Ats.Shared.Storage;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +33,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ISystemStatusService, SystemStatusService>();
         services.AddScoped<IRequisitionService, RequisitionService>();
+        services.AddSingleton<IFileStorage, LocalDiskFileStorage>();
+        services.AddScoped<IApplicationService, ApplicationService>();
 
         return services;
     }

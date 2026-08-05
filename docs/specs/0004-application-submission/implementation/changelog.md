@@ -87,3 +87,76 @@ Done.
 - `appsettings.json`'s `Storage:CvBasePath` default (`./app-data/cv-attachments`) is untested end-to-end (no endpoint writes there yet); `LocalDiskFileStorageTests` exercises the class against an isolated temp path instead.
 
 ---
+
+## CP-2 — Service & API · 2026-08-06
+
+**Tasks completed:** T-12, T-13, T-14, T-15, T-16, T-17, T-18, T-19, T-20, T-21, T-22, T-23, T-24
+
+**Files created**
+
+| Path | Purpose |
+|---|---|
+| `backend/src/Service/Application/IApplicationService.cs` | Service contract — `SubmitAsync`, `ListMineAsync`, `ListForRequisitionAsync`, `GetCvAsync` |
+| `backend/src/Service/Application/Dtos/ApplicationDto.cs` | Submission response + embedded `ApplicationCvSummaryDto` |
+| `backend/src/Service/Application/Dtos/CandidateApplicationListItemDto.cs` | Candidate "mine" list item |
+| `backend/src/Service/Application/Dtos/StaffApplicationListItemDto.cs` | Staff list item + embedded `StaffApplicationCandidateDto` |
+| `backend/src/Service/Application/Dtos/CvDownloadResult.cs` | Stream + metadata for a CV download |
+| `backend/src/Service/Application/ApplicationService.cs` | Implementation — Requisition-published check, CV type/size/magic-byte validation, duplicate pre-check, storage write, insert, race-fallback cleanup, the three read methods |
+| `backend/src/Api/ApplicationEndpoints.cs` | All four endpoints: `POST /api/requisitions/{id}/applications`, `GET /api/requisitions/{id}/applications`, `GET /api/applications/mine`, `GET /api/applications/{id}/cv` |
+| `backend/tests/Ats.UnitTests/Application/ApplicationServiceTests.cs` | `ApplicationService` — every validation, authorization, and duplicate branch (24 tests) |
+| `backend/tests/Ats.IntegrationTests/Application/ApplicationEndpointsTests.cs` | HTTP-level tests for all four endpoints, every documented status code (21 tests) |
+
+**Files modified**
+
+| Path | Change |
+|---|---|
+| `backend/src/Service/ServiceCollectionExtensions.cs` | Registered `IFileStorage`/`LocalDiskFileStorage` (Singleton) and `IApplicationService`/`ApplicationService` (Scoped) |
+| `backend/src/Api/Program.cs` | Added `app.MapApplicationEndpoints();` after `MapPublicRequisitionEndpoints()` |
+| `backend/tests/Ats.IntegrationTests/CustomWebApplicationFactory.cs` | Added a per-test temp `Storage:CvBasePath` (`Path.GetTempPath()/ats_test_cv_<guid>`), cleaned up in `Dispose` alongside the existing per-test SQLite file cleanup |
+
+**Decisions made during implementation**
+
+| # | Decision | Why |
+|---|---|---|
+| I-3 | Aliased the entity type as `ApplicationEntity` (`using ApplicationEntity = Ats.Db.Applications.Application;`) in `ApplicationService.cs` | Mirrors the `RequisitionEntity` alias `RequisitionService.cs` already uses for the identical situation — the containing namespace (`Ats.Service.Application`) shares its simple name with the entity type (`Application`). A build was run to confirm the bare name resolves correctly via the file's own `using Ats.Db.Applications;` without escalating to the sibling-namespace collision, but the alias is kept for clarity and consistency with the established project pattern. |
+| I-4 | `ListMineAsync`/`ListForRequisitionAsync` build an intermediate anonymous-type projection, `OrderByDescending` on its scalar `SubmittedAtUtc` property, then `Select`/project into the final DTO record afterward, instead of ordering directly on a property read off an already-constructed DTO (as the LLD's prose implied) | EF Core's SQLite provider cannot translate `OrderByDescending(dto => dto.SubmittedAtUtc)` when `dto` is a `record` constructed earlier in the same query (`InvalidOperationException` at query-compile time, confirmed by running the test suite) — ORDER BY must apply to a plain scalar column reference. Behavior (descending by submission date) is unchanged; only the LINQ shape differs from the LLD's illustrative one-liner. |
+| I-5 | `POST_applications_NoFile_Returns400` sends a well-formed multipart body with one unrelated text part rather than a truly empty `MultipartFormDataContent` | A zero-part multipart body is itself malformed per RFC 7578 and made ASP.NET Core's form parser throw `BadHttpRequestException` before the handler ran at all (observed 500, not 400) — the well-formed-but-`cv`-less body is what actually exercises the intended `cv == null` validation branch (AC-2). |
+
+**Deviations from the LLD**
+
+None requiring an `lld.md` patch — I-3/I-4/I-5 above are implementation-detail necessities (compiler/EF-Core/HTTP-client constraints), not changes to the designed behaviour, contract, or data shape. All four endpoints, all DTO shapes, and all `Result`→HTTP mappings match `api.md`/`lld.md` §3–4 exactly, including the accepted plan decisions (file-validation errors both return 400; `.DisableAntiforgery()` on the submit endpoint).
+
+**Verification run**
+
+```
+$ dotnet build
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+Time Elapsed 00:00:02.19
+
+$ dotnet test tests/Ats.ArchitectureTests --no-build
+Passed!  - Failed: 0, Passed: 4, Skipped: 0, Total: 4, Duration: 67 ms - Ats.ArchitectureTests.dll (net10.0)
+
+$ dotnet test tests/Ats.UnitTests
+Passed!  - Failed: 0, Passed: 96, Skipped: 0, Total: 96, Duration: 2 s - Ats.UnitTests.dll (net10.0)
+
+$ dotnet test tests/Ats.IntegrationTests
+Passed!  - Failed: 0, Passed: 59, Skipped: 0, Total: 59, Duration: 12 s - Ats.IntegrationTests.dll (net10.0)
+```
+
+96 unit tests = 74 from CP-1 + 22 new (`ApplicationServiceTests`). 59 integration tests = 38 from CP-1 + 21 new (`ApplicationEndpointsTests`: 20 `[Fact]`/`[Theory]` methods, one Theory contributing 2 cases).
+
+**Meta updates applied**
+
+- `architecture.md`: added `service/application` and `api/application` rows to the Component Map (owning spec 0004); one Change Log row appended.
+- `tech-stack.md`: no change this checkpoint.
+- `coding-standards.md`: no change.
+
+**Known gaps carried into the next checkpoint**
+
+- No frontend code exists yet — `ui/portal`'s apply flow and "My Applications" page, and `ui/staff`'s per-Requisition Applications list, ship in CP-3.
+- `ui/bff`'s proxy route is still text-body-only; CP-3's T-25 must land before any frontend code can submit a CV or download one without corrupting the bytes.
+- `dotnet format --verify-no-changes` reports pre-existing failures unrelated to this checkpoint (CRLF line endings in `tests/Ats.UnitTests/SystemStatusServiceTests.cs` from before 0004, and file-encoding findings on two `0002`/CP-1-era migration files) — none of CP-2's new or modified files appear in that output.
+
+---

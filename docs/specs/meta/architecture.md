@@ -71,9 +71,11 @@ graph TD
 | `ui/staff` | Authenticated recruiter and hiring-manager workspace: requisitions, pipeline, decisions | 0003 |
 | `api/system` | Backend HTTP boundary: system status & auth endpoints, composition root | 0001, 0002 |
 | `api/requisition` | Staff CRUD/lifecycle endpoints (`RecruiterOnly`/`StaffOnly`) plus anonymous public search/detail endpoints under `/api/public/requisitions` | 0003 |
+| `api/application` | Candidate submission (`CandidateOnly`, multipart), Candidate own-list/CV-download, Staff Requisition-scoped list (`StaffOnly`) | 0004 |
 | `api/<area>` | HTTP boundary — routing, request DTOs, authorization policies | — |
 | `service/system` | Backend system status, auth service, and database health check | 0001, 0002 |
 | `service/requisition` | Requisition lifecycle state machine (draft/published/closed transition guards), content validation, keyword search + pagination | 0003 |
+| `service/application` | Submission eligibility (Requisition must be `published`), one-Application-per-Candidate-per-Requisition rule, CV type/size/magic-byte validation, CV-access authorization | 0004 |
 | `service/<area>` | Business rules and transaction boundaries. The only caller of `db/*` | — |
 | `db/core` | EF Core context, SQLite WAL/busy-timeout interceptor, health check, migrations | 0001, 0002 |
 | `db/requisition` | `Requisition`/`Stage` entities, EF Core configurations, migration — each Requisition owns an independent Stage set (FR-14) | 0003 |
@@ -166,6 +168,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-05 | 0003 | CP-3: Gave `ui/staff` its first real code — `/staff` route segment, `middleware.ts` role gating (closes 0002 E-9), requisition list/create/edit/lifecycle pages; added `ui/portal` `/jobs` search + detail pages |
 | 2026-08-05 | 0003 | CP-4: Hardening — dedicated NFR-1 (pageSize clamp) and NFR-2 (public reads never open a transaction) verification tests; spec closed out, all 42 tasks complete |
 | 2026-08-06 | 0004 | CP-1: Added `Application`/`CvAttachment` entities, EF Core configurations, `AddApplicationsAndCvAttachments` migration, and `shared/storage`'s first implementation (`IFileStorage`/`LocalDiskFileStorage`), resolving the "backing store TBD" note |
+| 2026-08-06 | 0004 | CP-2: Built `ApplicationService` (submission eligibility, CV validation, duplicate handling) and `ApplicationEndpoints` (Candidate submit/list/CV-download, Staff Requisition-scoped list); unit & integration test coverage |
 
 ## Related Specs
 

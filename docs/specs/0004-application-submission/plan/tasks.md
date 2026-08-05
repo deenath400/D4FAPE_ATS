@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 11 / 46 tasks · checkpoint CP-1 of 4 done, CP-2 next
+**Progress:** 24 / 46 tasks · checkpoints CP-1, CP-2 of 4 done, CP-3 next
 
 ---
 
@@ -84,67 +84,67 @@ database, and all CP-1 unit tests pass.*
 *Exit condition: all four endpoints return the documented shapes and status codes; unit and
 integration tests pass; `dotnet build` succeeds.*
 
-- [ ] **T-12** — `IApplicationService` contract
+- [x] **T-12** — `IApplicationService` contract
   - Files: `backend/src/Service/Application/IApplicationService.cs`
   - Covers: —
   - Depends on: T-06
 
-- [ ] **T-13** — DTOs: `ApplicationDto`, `CandidateApplicationListItemDto`, `StaffApplicationListItemDto`, `CvDownloadResult`
+- [x] **T-13** — DTOs: `ApplicationDto`, `CandidateApplicationListItemDto`, `StaffApplicationListItemDto`, `CvDownloadResult`
   - Files: `backend/src/Service/Application/Dtos/ApplicationDto.cs`, `CandidateApplicationListItemDto.cs`, `StaffApplicationListItemDto.cs`, `CvDownloadResult.cs`
   - Covers: —
   - Depends on: T-12
 
-- [ ] **T-14** — `ApplicationService.SubmitAsync` — Requisition-published check, CV validation (type/size/magic-byte), duplicate pre-check, storage write, insert, race-fallback cleanup
+- [x] **T-14** — `ApplicationService.SubmitAsync` — Requisition-published check, CV validation (type/size/magic-byte), duplicate pre-check, storage write, insert, race-fallback cleanup
   - Files: `backend/src/Service/Application/ApplicationService.cs`
   - Covers: AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-9, NFR-1, NFR-3, E-1, E-4, E-7
   - Depends on: T-02, T-07, T-13
 
-- [ ] **T-15** — `ApplicationService.ListMineAsync`
+- [x] **T-15** — `ApplicationService.ListMineAsync`
   - Files: `backend/src/Service/Application/ApplicationService.cs`
   - Covers: AC-12, AC-13
   - Depends on: T-14
 
-- [ ] **T-16** — `ApplicationService.ListForRequisitionAsync`
+- [x] **T-16** — `ApplicationService.ListForRequisitionAsync`
   - Files: `backend/src/Service/Application/ApplicationService.cs`
   - Covers: AC-16, AC-18, E-5
   - Depends on: T-14
 
-- [ ] **T-17** — `ApplicationService.GetCvAsync`
+- [x] **T-17** — `ApplicationService.GetCvAsync`
   - Files: `backend/src/Service/Application/ApplicationService.cs`
   - Covers: AC-14, AC-15, AC-20, AC-21, NFR-2, E-6
   - Depends on: T-14
 
-- [ ] **T-18** — Register `IApplicationService` and `IFileStorage`/`LocalDiskFileStorage` in DI
+- [x] **T-18** — Register `IApplicationService` and `IFileStorage`/`LocalDiskFileStorage` in DI
   - Files: `backend/src/Service/ServiceCollectionExtensions.cs`
   - Covers: —
   - Depends on: T-02, T-14, T-15, T-16, T-17
 
-- [ ] **T-19** — `ApplicationEndpoints`: `POST /api/requisitions/{id}/applications`, `GET /api/requisitions/{id}/applications`
+- [x] **T-19** — `ApplicationEndpoints`: `POST /api/requisitions/{id}/applications`, `GET /api/requisitions/{id}/applications`
   - Files: `backend/src/Api/ApplicationEndpoints.cs`
   - Covers: AC-1–AC-11, AC-16–AC-19
   - Depends on: T-18
 
-- [ ] **T-20** — `ApplicationEndpoints`: `GET /api/applications/mine`, `GET /api/applications/{id}/cv`
+- [x] **T-20** — `ApplicationEndpoints`: `GET /api/applications/mine`, `GET /api/applications/{id}/cv`
   - Files: `backend/src/Api/ApplicationEndpoints.cs`
   - Covers: AC-12, AC-13, AC-14, AC-15, AC-20, AC-21
   - Depends on: T-19
 
-- [ ] **T-21** — Map `ApplicationEndpoints` in `Program.cs`
+- [x] **T-21** — Map `ApplicationEndpoints` in `Program.cs`
   - Files: `backend/src/Api/Program.cs`
   - Covers: —
   - Depends on: T-20
 
-- [ ] **T-22** — Add a per-test temp `Storage:CvBasePath` to `CustomWebApplicationFactory`, cleaned up in `Dispose`
+- [x] **T-22** — Add a per-test temp `Storage:CvBasePath` to `CustomWebApplicationFactory`, cleaned up in `Dispose`
   - Files: `backend/tests/Ats.IntegrationTests/CustomWebApplicationFactory.cs`
   - Covers: —
   - Depends on: T-21
 
-- [ ] **T-23** — Unit tests: `ApplicationService` — every validation, authorization, and duplicate branch
+- [x] **T-23** — Unit tests: `ApplicationService` — every validation, authorization, and duplicate branch
   - Files: `backend/tests/Ats.UnitTests/Application/ApplicationServiceTests.cs`
   - Covers: AC-1–AC-9, AC-12–AC-21, NFR-1, NFR-2, E-1, E-4, E-5, E-6, E-7
   - Depends on: T-17
 
-- [ ] **T-24** — Integration tests: all four endpoints, every documented status code
+- [x] **T-24** — Integration tests: all four endpoints, every documented status code
   - Files: `backend/tests/Ats.IntegrationTests/Application/ApplicationEndpointsTests.cs`
   - Covers: AC-1–AC-21
   - Depends on: T-22
