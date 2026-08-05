@@ -58,3 +58,29 @@ Record of changes made by `/implement` per checkpoint.
 ### Deviations
 
 - None.
+
+---
+
+## CP-3 — Frontend scaffold & BFF
+
+**Completed:** 2026-08-05 · **Tasks:** T-14, T-15, T-16, T-17, T-18
+
+### Summary
+
+- Scaffolded Next.js 15 (App Router), React 19, TypeScript (strict mode), Tailwind CSS, PostCSS, ESLint, Prettier, and Vitest in `frontend/`.
+- Configured ESLint (`eslint.config.mjs`) with custom rule enforcing FR-16: `process.env.API_BASE_URL` may only be read in `src/lib/server/backend-invoke.ts`.
+- Configured Prettier (`.prettierrc.json`, `.prettierignore`) and verified zero formatting violations across frontend code.
+- Created `frontend/.env.example` documenting `API_BASE_URL` with no default value.
+- Implemented `invokeBackend` in `src/lib/server/backend-invoke.ts` handling `process.env.API_BASE_URL` verification, `cache: "no-store"` requests, `BackendInvokeError` error wrapping (without disclosing backend origin), and token attachment placeholder seam for spec 0002.
+- Implemented proxy route handler in `src/app/api/bff/system-status/route.ts` relaying `/api/system/status` responses to browser clients with generic 502 error mapping.
+- Created empty `ui/staff` route group placeholder `src/app/(staff)/.gitkeep`.
+
+### Tests & Verification
+
+- `npm ci && npm run build`: Succeeded with zero type errors and zero build errors.
+- `npm run lint`: Passed with zero ESLint warnings or errors.
+- `npm run format`: Passed with zero Prettier formatting issues.
+
+### Deviations
+
+- None.

@@ -116,7 +116,7 @@ both pass; the backend serves `GET /api/system/status` locally.*
 reports zero violations; the proxy route and invoke function compile and are reachable
 locally (backend running).*
 
-- [ ] **T-14** — Frontend project scaffold: package manifest, TypeScript, Next config,
+- [x] **T-14** — Frontend project scaffold: package manifest, TypeScript, Next config,
   Tailwind, ESLint (incl. the FR-16 rules), Prettier
   - Files: `frontend/package.json`, `frontend/package-lock.json`, `frontend/tsconfig.json`,
     `frontend/next.config.ts`, `frontend/eslint.config.mjs`, `frontend/.prettierrc.json`,
@@ -125,22 +125,22 @@ locally (backend running).*
   - Covers: FR-4, FR-13, FR-14, NFR-3, AC-3, AC-4, AC-6, AC-14, AC-22, AC-23, AC-26
   - Depends on: T-01
 
-- [ ] **T-15** — Frontend configuration keys
+- [x] **T-15** — Frontend configuration keys
   - Files: `frontend/.env.example`
   - Covers: AC-2
   - Depends on: T-14
 
-- [ ] **T-16** — Shared server-side invoke function
+- [x] **T-16** — Shared server-side invoke function
   - Files: `frontend/src/lib/server/backend-invoke.ts`
   - Covers: FR-16, FR-17, AC-21, AC-27
   - Depends on: T-15
 
-- [ ] **T-17** — Proxy route handler
+- [x] **T-17** — Proxy route handler
   - Files: `frontend/src/app/api/bff/system-status/route.ts`
   - Covers: FR-8, FR-16
   - Depends on: T-16
 
-- [ ] **T-18** — Empty `ui/staff` route group placeholder
+- [x] **T-18** — Empty `ui/staff` route group placeholder
   - Files: `frontend/src/app/(staff)/.gitkeep`
   - Covers: — (Impacted Components requirement, no direct AC)
   - Depends on: T-14
