@@ -266,12 +266,6 @@
           "xunit.extensibility.core": "[2.9.3]"
         }
       },
-      "ats.api": {
-        "type": "Project",
-        "dependencies": {
-          "Ats.Service": "[1.0.0, )"
-        }
-      },
       "ats.db": {
         "type": "Project",
         "dependencies": {
@@ -286,9 +280,6 @@
           "Microsoft.Extensions.Configuration.Abstractions": "[10.0.10, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.10, )"
         }
-      },
-      "ats.shared": {
-        "type": "Project"
       }
     }
   }

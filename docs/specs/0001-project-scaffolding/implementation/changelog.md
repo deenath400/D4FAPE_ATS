@@ -29,3 +29,32 @@ Record of changes made by `/implement` per checkpoint.
 ### Deviations
 
 - None.
+
+---
+
+## CP-2 — Backend service/API layer
+
+**Completed:** 2026-08-05 · **Tasks:** T-06, T-07, T-08, T-09, T-10, T-11, T-12, T-13
+
+### Summary
+
+- Implemented `service/system`: `IVersionProvider`, `SystemStatusResult`, `ISystemStatusService`, `SystemStatusService` (calling `IDatabaseHealthCheck` and `IVersionProvider`), and `ServiceCollectionExtensions.AddSystemService`.
+- Implemented `AssemblyVersionProvider` reading executing assembly version metadata.
+- Implemented `SystemStatusDto` and `DatabaseStatusDto` records.
+- Implemented `SystemStatusEndpoints` mapping `GET /api/system/status` with 200 OK (healthy) and RFC 7807 503 ProblemDetails (degraded) mappings, explicitly anonymous.
+- Built composition root in `Program.cs` with fail-fast configuration check on `ConnectionStrings:Default`, ASP.NET Core ProblemDetails exception handling, and `AddSystemService`.
+- Added `appsettings.json` and `appsettings.Development.json` with local SQLite connection string defaults.
+- Created `Ats.UnitTests` test project with unit tests for `SystemStatusService` using fake health checks.
+- Created `Ats.IntegrationTests` test project with `CustomWebApplicationFactory` using isolated per-test temp SQLite files and real HTTP assertion suites (200 OK, 503 Service Unavailable without path disclosure, and anonymous access).
+- Configured Roslyn code style enforcement (`EnforceCodeStyleInBuild`) in `Directory.Build.props` and generated NuGet lockfiles across all projects.
+
+### Tests & Verification
+
+- `dotnet build`: Succeeded with 0 warnings and 0 errors.
+- `dotnet test tests/Ats.ArchitectureTests --no-build`: Passed 4/4 tests.
+- `dotnet test tests/Ats.UnitTests`: Passed 2/2 tests.
+- `dotnet test tests/Ats.IntegrationTests`: Passed 3/3 tests.
+
+### Deviations
+
+- None.

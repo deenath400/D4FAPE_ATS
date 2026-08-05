@@ -63,48 +63,48 @@ tracked/untracked database or build-output file.*
 succeeds; `dotnet test tests/Ats.UnitTests` and `dotnet test tests/Ats.IntegrationTests`
 both pass; the backend serves `GET /api/system/status` locally.*
 
-- [ ] **T-06** — `service/system`: result type, contract, implementation, DI extension
+- [x] **T-06** — `service/system`: result type, contract, implementation, DI extension
   - Files: `backend/src/Service/SystemStatusResult.cs`,
     `backend/src/Service/ISystemStatusService.cs`, `backend/src/Service/SystemStatusService.cs`,
     `backend/src/Service/IVersionProvider.cs`, `backend/src/Service/ServiceCollectionExtensions.cs`
   - Covers: FR-6
   - Depends on: T-03
 
-- [ ] **T-07** — `api/system` composition root: fail-fast config, ProblemDetails, logging
+- [x] **T-07** — `api/system` composition root: fail-fast config, ProblemDetails, logging
   - Files: `backend/src/Api/Program.cs`, `backend/src/Api/appsettings.json`,
     `backend/src/Api/appsettings.Development.json`
   - Covers: FR-12, AC-2, AC-20
   - Depends on: T-06
 
-- [ ] **T-08** — `SystemStatusEndpoints` minimal API, DTOs, 200/503 mapping
+- [x] **T-08** — `SystemStatusEndpoints` minimal API, DTOs, 200/503 mapping
   - Files: `backend/src/Api/SystemStatusEndpoints.cs`, `backend/src/Api/SystemStatusDto.cs`
   - Covers: FR-6, AC-10, AC-11, AC-27
   - Depends on: T-07
 
-- [ ] **T-09** — `AssemblyVersionProvider`
+- [x] **T-09** — `AssemblyVersionProvider`
   - Files: `backend/src/Api/AssemblyVersionProvider.cs`
   - Covers: FR-6
   - Depends on: T-02
 
-- [ ] **T-10** — Unit tests for `SystemStatusService` with a fake health check
+- [x] **T-10** — Unit tests for `SystemStatusService` with a fake health check
   - Files: `backend/tests/Ats.UnitTests/Ats.UnitTests.csproj`,
     `backend/tests/Ats.UnitTests/SystemStatusServiceTests.cs`
   - Covers: AC-17
   - Depends on: T-06
 
-- [ ] **T-11** — Integration tests: in-process host, own SQLite file per test, 200 and 503 cases
+- [x] **T-11** — Integration tests: in-process host, own SQLite file per test, 200 and 503 cases
   - Files: `backend/tests/Ats.IntegrationTests/Ats.IntegrationTests.csproj`,
     `backend/tests/Ats.IntegrationTests/CustomWebApplicationFactory.cs`,
     `backend/tests/Ats.IntegrationTests/SystemStatusEndpointTests.cs`
   - Covers: AC-18
   - Depends on: T-08
 
-- [ ] **T-12** — Backend lint/format wiring
+- [x] **T-12** — Backend lint/format wiring
   - Files: `backend/Directory.Build.props` (extend), no new files
   - Covers: AC-22, AC-23
   - Depends on: T-02
 
-- [ ] **T-13** — Backend NuGet lockfiles and version pin audit
+- [x] **T-13** — Backend NuGet lockfiles and version pin audit
   - Files: `backend/src/Db/packages.lock.json`, `backend/src/Service/packages.lock.json`,
     `backend/src/Api/packages.lock.json`
   - Covers: AC-3

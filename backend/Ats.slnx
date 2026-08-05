@@ -14,5 +14,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Ats.ArchitectureTests/Ats.ArchitectureTests.csproj" />
+    <Project Path="tests/Ats.IntegrationTests/Ats.IntegrationTests.csproj" />
+    <Project Path="tests/Ats.UnitTests/Ats.UnitTests.csproj" />
   </Folder>
 </Solution>
