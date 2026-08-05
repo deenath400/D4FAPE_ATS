@@ -12,11 +12,13 @@ export function RegisterForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setFieldErrors([]);
 
     try {
       const res = await fetch("/api/bff/proxy/auth/register", {
@@ -37,6 +39,9 @@ export function RegisterForm() {
             problem?.title ||
             "Registration failed. Please check your details and try again.",
         );
+        if (problem?.errors && typeof problem.errors === "object") {
+          setFieldErrors(Object.values(problem.errors).flat() as string[]);
+        }
         setLoading(false);
         return;
       }
@@ -73,7 +78,14 @@ export function RegisterForm() {
           role="alert"
           className="mb-6 p-4 bg-red-950/70 border border-red-800/80 rounded-xl text-red-200 text-sm leading-relaxed"
         >
-          {error}
+          <p>{error}</p>
+          {fieldErrors.length > 0 && (
+            <ul className="mt-2 list-disc list-inside space-y-0.5">
+              {fieldErrors.map((message) => (
+                <li key={message}>{message}</li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 

@@ -114,4 +114,41 @@ describe("RegisterForm", () => {
       ).toBeInTheDocument();
     });
   });
+
+  it("lists the specific validation reasons when password fails Identity rules", async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 400,
+      json: async () => ({
+        title: "Validation",
+        detail: "User registration failed validation.",
+        code: "auth.error",
+        errors: {
+          PasswordTooShort: ["Passwords must be at least 8 characters."],
+          PasswordRequiresUpper: ["Passwords must have at least one uppercase ('A'-'Z')."],
+        },
+      }),
+    } as Response);
+
+    render(<RegisterForm />);
+
+    fireEvent.change(screen.getByLabelText(/first name/i), { target: { value: "Jane" } });
+    fireEvent.change(screen.getByLabelText(/last name/i), { target: { value: "Doe" } });
+    fireEvent.change(screen.getByLabelText(/email address/i), {
+      target: { value: "jane@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: "abc123" } });
+
+    fireEvent.click(screen.getByRole("button", { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("User registration failed validation.")).toBeInTheDocument();
+      expect(
+        screen.getByText("Passwords must be at least 8 characters."),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Passwords must have at least one uppercase ('A'-'Z')."),
+      ).toBeInTheDocument();
+    });
+  });
 });
