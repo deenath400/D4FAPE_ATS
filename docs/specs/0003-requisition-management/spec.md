@@ -2,12 +2,12 @@
 id: 0003
 slug: requisition-management
 title: Requisition Management
-status: implemented
+status: validated
 components: [api/requisition, service/requisition, db/requisition, ui/staff, ui/portal]
 entities: [Requisition, Stage]
 depends_on: [0002]
 created: 2026-08-05
-updated: 2026-08-05
+updated: 2026-08-06
 ---
 
 # Requisition Management
