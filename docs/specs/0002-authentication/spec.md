@@ -2,7 +2,7 @@
 id: 0002
 slug: authentication
 title: User Authentication and Refresh Token Flow
-status: implemented
+status: validated
 components: [shared/auth, api/system, service/system, db/core, ui/bff, ui/portal]
 entities: [User, Role, RefreshToken]
 depends_on: [0001]
