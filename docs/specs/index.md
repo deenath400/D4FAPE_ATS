@@ -10,7 +10,7 @@ Status values: `specified` → `planned` → `implementing` → `implemented` �
 
 | Id | Title | Status | Components | Entities | Summary |
 |---|---|---|---|---|---|
-| 0001 | Project Scaffolding and Walking Skeleton | implemented | infra/build, api/system, service/system, db/core, ui/bff, ui/portal | — | Stands up both deployables with tests and tooling, proving both routes to the backend through a shared server-side invoke function. |
+| 0001 | Project Scaffolding and Walking Skeleton | validated | infra/build, api/system, service/system, db/core, ui/bff, ui/portal | — | Stands up both deployables with tests and tooling, proving both routes to the backend through a shared server-side invoke function. |
 
 ---
 
