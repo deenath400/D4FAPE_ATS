@@ -12,12 +12,13 @@ Status values: `specified` → `planned` → `implementing` → `implemented` �
 |---|---|---|---|---|---|
 | 0001 | Project Scaffolding and Walking Skeleton | validated | infra/build, api/system, service/system, db/core, ui/bff, ui/portal | — | Stands up both deployables with tests and tooling, proving both routes to the backend through a shared server-side invoke function. |
 | 0002 | User Authentication and Refresh Token Flow | validated | shared/auth, api/system, service/system, db/core, ui/bff, ui/portal | User, Role, RefreshToken | Implements backend ASP.NET Core Identity with JWT & refresh token rotation, and frontend NextAuth v5 session proxying. |
+| 0003 | Requisition Management | specified | api/requisition, service/requisition, db/requisition, ui/staff, ui/portal | Requisition, Stage | Recruiters draft, publish, unpublish, and close requisitions behind role policies; candidates browse published ones anonymously on the portal. |
 
 ---
 
 ## Next id
 
-`0003`
+`0004`
 
 Update this after allocating an id, so `/specify` never has to scan the directory twice.
 
