@@ -145,3 +145,59 @@ Passed!  - Failed:     0, Passed:    12, Skipped:     0, Total:    12, Duration:
 **Known gaps carried into the next checkpoint**
 
 - None.
+
+---
+
+## CP-3 — Frontend NextAuth Integration & BFF Proxy Seam · 2026-08-05
+
+**Tasks completed:** T-09, T-10, T-11
+
+**Files created**
+
+| Path | Purpose |
+|---|---|
+| `frontend/src/types/next-auth.d.ts` | NextAuth TypeScript module declarations for session and JWT token types |
+| `frontend/src/lib/auth.ts` | NextAuth v5 (Auth.js) configuration with Credentials provider, JWT session strategy, and refresh token callback |
+| `frontend/src/app/api/auth/[...nextauth]/route.ts` | NextAuth v5 API route handler |
+| `frontend/src/app/api/bff/proxy/[...path]/route.ts` | Generic BFF catch-all proxy route handler attaching bearer tokens to outbound API calls |
+
+**Files modified**
+
+| Path | Change |
+|---|---|
+| `frontend/package.json` | Installed `next-auth@beta` dependency |
+| `frontend/src/lib/server/backend-invoke.ts` | Exported `getBackendBaseUrl()`, updated `invokeBackend` to attach `Authorization: Bearer <accessToken>` from session and handle automatic 401 token refresh |
+
+**Decisions made during implementation**
+
+| # | Decision | Why |
+|---|---|---|
+| I-3 | Exported `getBackendBaseUrl()` from `backend-invoke.ts` for use in `lib/auth.ts` and `bff/proxy/[...path]/route.ts` | Satisfies ESLint rule FR-16 / AC-26 (`Reading process.env.API_BASE_URL outside src/lib/server/backend-invoke.ts is forbidden`). |
+
+**Deviations from the LLD**
+
+| LLD section | Designed | Actual | Reason | LLD patched? |
+|---|---|---|---|---|
+| 5.1 | `src/app/api/proxy/[...path]/route.ts` | `src/app/api/bff/proxy/[...path]/route.ts` | Placed proxy route handler under `/api/bff/proxy/` to align with component boundary `ui/bff`. | Yes |
+
+**Verification run**
+
+```
+$ npm run build (frontend)
+✓ Compiled successfully
+  Generating static pages (5/5)
+
+$ npm run test (frontend)
+Test Files  1 passed (1)
+     Tests  3 passed (3)
+```
+
+**Meta updates applied**
+
+- `architecture.md`: Updated `ui/bff` owning specs to `0001, 0002`, appended CP-3 Change Log row.
+- `tech-stack.md`: no change.
+- `coding-standards.md`: no change.
+
+**Known gaps carried into the next checkpoint**
+
+- None.

@@ -344,3 +344,4 @@ All authentication HTTP failure responses return standard RFC 7807 ProblemDetail
 
 | Date | Task | Section | Designed | Actual | Reason |
 |---|---|---|---|---|---|
+| 2026-08-05 | T-11 | 5.1 | `src/app/api/proxy/[...path]/route.ts` | `src/app/api/bff/proxy/[...path]/route.ts` | Placed proxy route handler under `/api/bff/proxy/` to align with component boundary `ui/bff`. |

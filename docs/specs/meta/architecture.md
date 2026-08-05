@@ -67,7 +67,7 @@ graph TD
 |---|---|---|
 | `infra/build` | Repository build, version pinning, lockfile and lint/format infrastructure | 0001 |
 | `ui/portal` | Public candidate surface: landing page system status, registration, job search, apply | 0001 |
-| `ui/bff` | Frontend BFF layer: proxy route handlers and shared backend invoke function | 0001 |
+| `ui/bff` | Frontend BFF layer: proxy route handlers and shared backend invoke function | 0001, 0002 |
 | `ui/staff` | Authenticated recruiter and hiring-manager workspace: requisitions, pipeline, decisions | — |
 | `api/system` | Backend HTTP boundary: system status & auth endpoints, composition root | 0001, 0002 |
 | `api/<area>` | HTTP boundary — routing, request DTOs, authorization policies | — |
@@ -152,6 +152,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-05 | 0001 | CP-5: Hardened tech stack commands, updated architecture snapshot and coding standards |
 | 2026-08-05 | 0002 | CP-1: Added ASP.NET Core Identity domain entities, RefreshToken schema, and EF Core migration |
 | 2026-08-05 | 0002 | CP-2: Implemented AuthService, JwtTokenGenerator, AuthEndpoints (/register, /login, /refresh, /logout, /me), and JWT Bearer auth policies |
+| 2026-08-05 | 0002 | CP-3: Configured NextAuth v5 session provider, JWT callback refresh flow, and BFF proxy route |
 
 ## Related Specs
 

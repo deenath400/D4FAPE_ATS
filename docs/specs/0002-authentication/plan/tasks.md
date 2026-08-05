@@ -73,17 +73,17 @@ Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/impl
 
 *Exit condition: Next.js builds cleanly with zero type errors (`npm run build`), NextAuth session provider initialized, `backend-invoke.ts` handles token attachment and 401 refresh.*
 
-- [ ] **T-09** — Install NextAuth v5 (Auth.js) and configure session strategy in `src/lib/auth.ts` and route handler
+- [x] **T-09** — Install NextAuth v5 (Auth.js) and configure session strategy in `src/lib/auth.ts` and route handler
   - Files: `frontend/package.json`, `frontend/src/lib/auth.ts`, `frontend/src/app/api/auth/[...nextauth]/route.ts`
   - Covers: AC-8, AC-12, AC-13, AC-24
   - Depends on: T-07
 
-- [ ] **T-10** — Update `src/lib/server/backend-invoke.ts` to attach `Authorization` header and trigger token refresh
+- [x] **T-10** — Update `src/lib/server/backend-invoke.ts` to attach `Authorization` header and trigger token refresh
   - Files: `frontend/src/lib/server/backend-invoke.ts`
   - Covers: AC-14, AC-15, AC-16, AC-24
   - Depends on: T-09
 
-- [ ] **T-11** — Update BFF proxy handler `src/app/api/proxy/[...path]/route.ts` to relay bearer token headers
+- [x] **T-11** — Update BFF proxy handler `src/app/api/proxy/[...path]/route.ts` to relay bearer token headers
   - Files: `frontend/src/app/api/proxy/[...path]/route.ts`
   - Covers: AC-14, AC-15
   - Depends on: T-10
