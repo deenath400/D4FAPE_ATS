@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { isStaffRole } from "@/lib/auth-guards";
+import { isStaffRole, isCandidateRole } from "@/lib/auth-guards";
 
 export function HeaderNav() {
   const { data: session, status } = useSession();
@@ -31,6 +31,11 @@ export function HeaderNav() {
           <Link href="/jobs" className="text-slate-300 hover:text-white transition-all">
             Browse Jobs
           </Link>
+          {isCandidateRole(roles) && (
+            <Link href="/applications" className="text-slate-300 hover:text-white transition-all">
+              My Applications
+            </Link>
+          )}
           {isStaffRole(roles) && (
             <Link
               href="/staff/requisitions"

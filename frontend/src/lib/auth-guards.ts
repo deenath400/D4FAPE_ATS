@@ -26,3 +26,14 @@ export function isStaffRole(roles: readonly string[] | null | undefined): boolea
 export function isRecruiter(roles: readonly string[] | null | undefined): boolean {
   return !!roles?.includes("Recruiter");
 }
+
+/**
+ * True only for a Candidate — the sole role permitted to apply to a Requisition or view its
+ * own Applications (FR-6, spec 0004). Used by `middleware.ts` to gate `/applications/*` and by
+ * the Server Components that render its pages; the backend's `CandidateOnly` policy remains
+ * the real boundary (`coding-standards.md` — UI gating is a convenience, not a security
+ * control).
+ */
+export function isCandidateRole(roles: readonly string[] | null | undefined): boolean {
+  return !!roles?.includes("Candidate");
+}

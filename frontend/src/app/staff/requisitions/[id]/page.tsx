@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { invokeBackend, BackendInvokeError } from "@/lib/server/backend-invoke";
@@ -37,9 +38,17 @@ export default async function StaffRequisitionDetailPage({
     <div className="space-y-8 max-w-2xl">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-white">{requisition.title}</h2>
-        <span className="text-xs uppercase tracking-wider text-slate-400">
-          {requisition.status}
-        </span>
+        <div className="flex items-center gap-4">
+          <Link
+            href={`/staff/requisitions/${requisition.id}/applications`}
+            className="text-sm font-medium text-emerald-400 hover:text-emerald-300"
+          >
+            View Applications
+          </Link>
+          <span className="text-xs uppercase tracking-wider text-slate-400">
+            {requisition.status}
+          </span>
+        </div>
       </div>
 
       <RequisitionLifecycleActions

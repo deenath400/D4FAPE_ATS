@@ -1,0 +1,29 @@
+"use client";
+
+import React from "react";
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  return (
+    <main className="min-h-screen bg-slate-900 text-slate-100 p-6 md:p-12">
+      <div className="max-w-3xl mx-auto">
+        <div className="p-6 rounded-lg border border-red-800/80 bg-red-950/40 text-red-200">
+          <h2 className="text-lg font-semibold mb-2">Unable to load your applications</h2>
+          <p className="text-sm mb-4">{error.message || "An unexpected error occurred."}</p>
+          <button
+            type="button"
+            onClick={() => reset()}
+            className="px-3.5 py-1.5 font-medium bg-red-800 hover:bg-red-700 text-white rounded-lg transition-all text-sm"
+          >
+            Try again
+          </button>
+        </div>
+      </div>
+    </main>
+  );
+}

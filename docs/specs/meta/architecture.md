@@ -66,9 +66,9 @@ graph TD
 | Component | Responsibility | Owning specs |
 |---|---|---|
 | `infra/build` | Repository build, version pinning, lockfile and lint/format infrastructure | 0001 |
-| `ui/portal` | Public candidate surface: landing page system status, registration, job search, apply | 0001, 0003 |
-| `ui/bff` | Frontend BFF layer: proxy route handlers and shared backend invoke function | 0001, 0002 |
-| `ui/staff` | Authenticated recruiter and hiring-manager workspace: requisitions, pipeline, decisions | 0003 |
+| `ui/portal` | Public candidate surface: landing page system status, registration, job search, apply, own Applications list | 0001, 0003, 0004 |
+| `ui/bff` | Frontend BFF layer: proxy route handlers (binary-safe passthrough) and shared backend invoke function | 0001, 0002, 0004 |
+| `ui/staff` | Authenticated recruiter and hiring-manager workspace: requisitions, per-Requisition Applications list, pipeline, decisions | 0003, 0004 |
 | `api/system` | Backend HTTP boundary: system status & auth endpoints, composition root | 0001, 0002 |
 | `api/requisition` | Staff CRUD/lifecycle endpoints (`RecruiterOnly`/`StaffOnly`) plus anonymous public search/detail endpoints under `/api/public/requisitions` | 0003 |
 | `api/application` | Candidate submission (`CandidateOnly`, multipart), Candidate own-list/CV-download, Staff Requisition-scoped list (`StaffOnly`) | 0004 |
@@ -169,6 +169,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-05 | 0003 | CP-4: Hardening — dedicated NFR-1 (pageSize clamp) and NFR-2 (public reads never open a transaction) verification tests; spec closed out, all 42 tasks complete |
 | 2026-08-06 | 0004 | CP-1: Added `Application`/`CvAttachment` entities, EF Core configurations, `AddApplicationsAndCvAttachments` migration, and `shared/storage`'s first implementation (`IFileStorage`/`LocalDiskFileStorage`), resolving the "backing store TBD" note |
 | 2026-08-06 | 0004 | CP-2: Built `ApplicationService` (submission eligibility, CV validation, duplicate handling) and `ApplicationEndpoints` (Candidate submit/list/CV-download, Staff Requisition-scoped list); unit & integration test coverage |
+| 2026-08-06 | 0004 | CP-3: Generalised `ui/bff`'s proxy route to a binary-safe passthrough; gave `ui/portal` an apply flow and "My Applications" page, and `ui/staff` a per-Requisition Applications list; `middleware.ts` now also gates `/applications/*` for the Candidate role |
 
 ## Related Specs
 

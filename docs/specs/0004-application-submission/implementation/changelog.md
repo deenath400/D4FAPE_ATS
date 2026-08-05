@@ -160,3 +160,142 @@ Passed!  - Failed: 0, Passed: 59, Skipped: 0, Total: 59, Duration: 12 s - Ats.In
 - `dotnet format --verify-no-changes` reports pre-existing failures unrelated to this checkpoint (CRLF line endings in `tests/Ats.UnitTests/SystemStatusServiceTests.cs` from before 0004, and file-encoding findings on two `0002`/CP-1-era migration files) — none of CP-2's new or modified files appear in that output.
 
 ---
+
+## CP-3 — Frontend · 2026-08-06
+
+**Tasks completed:** T-25, T-26, T-27, T-28, T-29, T-30, T-31, T-32, T-33, T-34, T-35, T-36, T-37, T-38, T-39, T-40, T-41
+
+**Files created**
+
+| Path | Purpose |
+|---|---|
+| `frontend/src/lib/types/application.ts` | `ApplicationDto`/`CandidateApplicationListItemDto`/`StaffApplicationListItemDto`, mirroring `api.md` §4 |
+| `frontend/src/components/portal/ApplicationForm.tsx` | Client Component: CV file input + multipart submit, four UI states (idle/loading/error/success) |
+| `frontend/src/app/(portal)/jobs/[id]/apply/page.tsx` | Apply page — session/status guards, loads the Requisition, renders `ApplicationForm` |
+| `frontend/src/app/(portal)/jobs/[id]/apply/loading.tsx` | Loading skeleton |
+| `frontend/src/components/portal/ApplicationList.tsx` | Presentational — candidate's own Applications, empty state, CV download link |
+| `frontend/src/app/(portal)/applications/page.tsx` | "My Applications" page |
+| `frontend/src/app/(portal)/applications/loading.tsx` | Loading skeleton |
+| `frontend/src/app/(portal)/applications/error.tsx` | Error state with retry |
+| `frontend/src/components/staff/ApplicationsTable.tsx` | Presentational — staff per-Requisition Applications list, empty state, CV download link |
+| `frontend/src/app/staff/requisitions/[id]/applications/page.tsx` | Staff Applications list page |
+| `frontend/src/app/staff/requisitions/[id]/applications/loading.tsx` | Loading skeleton |
+| `frontend/src/app/staff/requisitions/[id]/applications/error.tsx` | Error state with retry |
+| `frontend/tests/portal/application-form.test.tsx` | `ApplicationForm` — non-PDF validation banner (AC-3), duplicate 409 banner (AC-8), success panel (AC-1), client-side "file required" (AC-2) |
+| `frontend/tests/portal/application-list.test.tsx` | `ApplicationList` — empty state (AC-13), rendered rows with CV link (AC-12) |
+| `frontend/tests/staff/applications-table.test.tsx` | `ApplicationsTable` — rendered rows with CV link (AC-16), empty state (AC-18) |
+
+**Files modified**
+
+| Path | Change |
+|---|---|
+| `frontend/src/app/api/bff/proxy/[...path]/route.ts` | Generalised request/response body passthrough from `text()`/`string` to `arrayBuffer()`/`ArrayBuffer` (binary-safe); forwards `Content-Disposition` from the backend response when present |
+| `frontend/src/lib/auth-guards.ts` | Added `isCandidateRole` |
+| `frontend/src/middleware.ts` | Refactored to a path-prefix dispatch (`/staff/*` → `isStaffRole`, `/applications/*` → `isCandidateRole`); matcher extended to `["/staff/:path*", "/applications/:path*"]` |
+| `frontend/src/app/(portal)/jobs/[id]/page.tsx` | Added a session-aware "Apply" call to action: "Sign In to Apply" (anonymous) / "Apply Now" (Candidate) / nothing (staff) |
+| `frontend/src/components/HeaderNav.tsx` | Added a "My Applications" link, visible only for Candidate sessions |
+| `frontend/src/app/staff/requisitions/[id]/page.tsx` | Added a "View Applications" link next to the status badge |
+| `frontend/tests/lib/auth-guards.test.ts` | Added `describe("isCandidateRole", ...)` — true only for `Candidate`, false for staff roles and no roles |
+
+**Decisions made during implementation**
+
+| # | Decision | Why |
+|---|---|---|
+| I-6 | `ApplicationForm`'s file `<input>` does not carry the HTML `required` attribute; "no file selected" is instead caught in the `onSubmit` handler and surfaces the same inline `role="alert"` banner used for every other error | jsdom's native constraint validation on a `required` input can suppress the `onSubmit` handler entirely under `fireEvent.click`/`fireEvent.submit` in some environments, making AC-2's client-side behaviour untestable through the same assertion path as every other validation error; handling it in JS keeps one error-rendering code path and one test pattern for all four validation branches (AC-2/AC-3/AC-4/AC-8) |
+| I-7 | `middleware.ts` was refactored from a single `isStaffRole` check to a path-prefix dispatch (`/staff/*` vs `/applications/*`) rather than adding a second, parallel `auth()` wrapper | `next-auth`'s `auth()` middleware wrapper matches routes via the exported `config.matcher`, which already needed both prefixes; a second wrapper/file would need its own matcher and there is no supported way to compose two default-exported middleware functions in one `middleware.ts`. The refactor preserves the exact existing `/staff/*` redirect behaviour byte-for-byte (verified by the untouched `requisition-lifecycle-actions`/staff test suite continuing to pass) |
+| I-8 | `ApplicationList`/`ApplicationsTable` build the CV download `href` as `` `/api/bff/proxy${application.cvDownloadUrl}` `` (string concatenation on the backend-relative path the API already returns), rather than hard-coding `/api/bff/proxy/applications/{id}/cv` | Matches `lld.md` §6's comment on `cvDownloadUrl` verbatim ("backend-relative path; frontend prefixes /api/bff/proxy") — the backend, not the frontend, owns the path shape |
+
+**Deviations from the LLD**
+
+None. All four LLD §1 file-manifest entries under "Frontend" were implemented as designed; `ApplicationForm`/`ApplicationList`/`ApplicationsTable` match their §5.1 prop/state tables; the proxy generalisation matches D-4 exactly (`ArrayBuffer` passthrough both directions, `Content-Disposition` forwarded).
+
+**Verification run**
+
+```
+$ npm run build
+> ats-frontend@0.1.0 build
+> npx --no-install next build
+
+   ▲ Next.js 15.1.7
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/9) ...
+   Generating static pages (2/9)
+   Generating static pages (4/9)
+   Generating static pages (6/9)
+ ✓ Generating static pages (9/9)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                Size     First Load JS
+┌ ƒ /                                      1.55 kB         114 kB
+├ ○ /_not-found                            979 B           106 kB
+├ ƒ /api/auth/[...nextauth]                159 B           106 kB
+├ ƒ /api/bff/proxy/[...path]               159 B           106 kB
+├ ƒ /api/bff/system-status                 159 B           106 kB
+├ ƒ /applications                          948 B           113 kB
+├ ƒ /jobs                                  948 B           113 kB
+├ ƒ /jobs/[id]                             948 B           113 kB
+├ ƒ /jobs/[id]/apply                       1.97 kB         114 kB
+├ ○ /login                                 1.47 kB         114 kB
+├ ○ /register                              1.87 kB         114 kB
+├ ƒ /staff/requisitions                    175 B           109 kB
+├ ƒ /staff/requisitions/[id]               1.81 kB         111 kB
+├ ƒ /staff/requisitions/[id]/applications  175 B           109 kB
+└ ○ /staff/requisitions/new                1.37 kB         107 kB
++ First Load JS shared by all              105 kB
+  ├ chunks/4bd1b696-9d53a45aeb6e92ca.js    52.9 kB
+  ├ chunks/517-c5e9dd966e39f1b6.js         50.5 kB
+  └ other shared chunks (total)            1.97 kB
+
+ƒ Middleware                               85 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+$ npm test
+> ats-frontend@0.1.0 test
+> npx --no-install vitest run
+
+ ✓ tests/portal/application-list.test.tsx (2 tests) 165ms
+ ✓ tests/staff/requisition-lifecycle-actions.test.tsx (5 tests) 201ms
+ ✓ tests/portal/job-search-form.test.tsx (4 tests) 158ms
+ ✓ tests/auth/RegisterForm.test.tsx (4 tests) 298ms
+ ✓ tests/auth/LoginForm.test.tsx (3 tests) 305ms
+ ✓ tests/portal/application-form.test.tsx (4 tests) 292ms
+ ✓ tests/staff/requisition-form.test.tsx (4 tests) 346ms
+ ✓ tests/lib/auth-guards.test.ts (11 tests) 6ms
+ ✓ tests/client-status-panel.test.tsx (3 tests) 108ms
+ ✓ tests/auth/HeaderNav.test.tsx (2 tests) 294ms
+ ✓ tests/staff/applications-table.test.tsx (2 tests) 217ms
+
+ Test Files  11 passed (11)
+      Tests  44 passed (44)
+   Start at  01:25:12
+   Duration  4.62s
+
+$ npm run lint
+> ats-frontend@0.1.0 lint
+> npx --no-install next lint
+
+✔ No ESLint warnings or errors
+```
+
+44 Vitest tests = 32 pre-existing (all of `0001`/`0002`/`0003`'s frontend suites: `HeaderNav` 2, `LoginForm` 3, `RegisterForm` 4, `client-status-panel` 3, `job-search-form` 4, `requisition-form` 4, `requisition-lifecycle-actions` 5, `auth-guards` `isStaffRole`/`isRecruiter` 7) + 12 new (`application-form` 4, `application-list` 2, `applications-table` 2, `auth-guards` `isCandidateRole` 4). Every pre-existing test file still passes unmodified except the intentional `auth-guards.test.ts` extension — confirms R-1's mitigation held: the `ui/bff` proxy generalisation (T-25) did not regress any `0001`–`0003` frontend flow.
+
+**Meta updates applied**
+
+- `architecture.md`: no structural change beyond what CP-1/CP-2 already recorded — `ui/portal`, `ui/staff`, and `ui/bff` already carried spec `0004` in their Component Map rows' "Owning specs" column (added at planning time); one Change Log row appended for this checkpoint.
+- `tech-stack.md`: no change this checkpoint.
+- `coding-standards.md`: no change.
+
+**Known gaps carried into the next checkpoint**
+
+- CP-4's hardening tasks (T-42–T-46) remain: NFR-1/NFR-3 dedicated verification tests, the E-1 race regression test, and the `architecture.md`/`tech-stack.md` updates that resolve the "backing store TBD"/"Object storage: TBD" notes formally (CP-1 already resolved the prose, T-45/T-46 close the loop on the checklist).
+- `npm run format` (`prettier --check .`) reports pre-existing failures across most of the repository, including files this checkpoint did not touch (`.prettierrc.json`, `package.json`, `tsconfig.json`, `src/lib/auth.ts`, etc.) and three files this checkpoint did touch or create (`route.ts`, `ApplicationList.tsx`, `application-form.test.tsx`). `git config core.autocrlf` is `true` on this machine, so the working tree checks out CRLF line endings against a Prettier config (and `coding-standards.md`) that expects LF — the same class of pre-existing, environment-level failure CP-2's changelog recorded for `dotnet format`. Not part of CP-3's exit condition (`npm run build` + the full Vitest suite); not fixed here per the "never rewrite unrelated code" guardrail, since a real fix touches line endings repo-wide.
+
+---

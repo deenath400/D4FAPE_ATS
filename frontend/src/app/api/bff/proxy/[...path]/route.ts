@@ -39,27 +39,40 @@ async function proxyRequest(req: NextRequest, pathSegments: string[]) {
     headers.set("authorization", `Bearer ${session.accessToken}`);
   }
 
-  let body: string | undefined = undefined;
+  // Binary-safe passthrough (T-25, `hld.md` D-4). `text()` UTF-8-decodes the body, which
+  // corrupts a binary CV (multipart upload request, PDF download response) in either
+  // direction. `ArrayBuffer` is a strict generalisation of the previous text() behaviour —
+  // every existing JSON caller round-trips through it unchanged.
+  let body: ArrayBuffer | undefined = undefined;
   if (req.method !== "GET" && req.method !== "HEAD") {
-    body = await req.text();
+    body = await req.arrayBuffer();
   }
 
   try {
     const res = await fetch(url, {
       method: req.method,
       headers,
-      body: body || undefined,
+      body,
       cache: "no-store",
     });
 
     const resContentType = res.headers.get("content-type") || "application/json";
-    const resText = await res.text();
+    const resBody = await res.arrayBuffer();
 
-    return new NextResponse(resText, {
+    const responseHeaders: Record<string, string> = {
+      "content-type": resContentType,
+    };
+
+    // Forwarded so a CV download's filename survives the proxy (AC-14, AC-20) — the backend
+    // sets this via `Results.File(...)`, never hand-constructed here.
+    const contentDisposition = res.headers.get("content-disposition");
+    if (contentDisposition) {
+      responseHeaders["content-disposition"] = contentDisposition;
+    }
+
+    return new NextResponse(resBody, {
       status: res.status,
-      headers: {
-        "content-type": resContentType,
-      },
+      headers: responseHeaders,
     });
   } catch {
     return NextResponse.json(

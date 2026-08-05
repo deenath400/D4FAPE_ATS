@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 24 / 46 tasks · checkpoints CP-1, CP-2 of 4 done, CP-3 next
+**Progress:** 41 / 46 tasks · checkpoints CP-1, CP-2, CP-3 of 4 done, CP-4 next
 
 ---
 
@@ -154,87 +154,87 @@ integration tests pass; `dotnet build` succeeds.*
 *Exit condition: `npm run build` succeeds, and the **full** Vitest suite (existing + new) passes
 — not just this spec's new tests, per `hld.md` R-1.*
 
-- [ ] **T-25** — Generalise the `ui/bff` proxy route to binary-safe (`ArrayBuffer`) request/response passthrough and forward `Content-Disposition`
+- [x] **T-25** — Generalise the `ui/bff` proxy route to binary-safe (`ArrayBuffer`) request/response passthrough and forward `Content-Disposition`
   - Files: `frontend/src/app/api/bff/proxy/[...path]/route.ts`
   - Covers: enables AC-1, AC-14, AC-20 (frontend leg)
   - Depends on: T-21
 
-- [ ] **T-26** — Shared TS types mirroring `api.md` §4
+- [x] **T-26** — Shared TS types mirroring `api.md` §4
   - Files: `frontend/src/lib/types/application.ts`
   - Covers: —
   - Depends on: —
 
-- [ ] **T-27** — `isCandidateRole` helper
+- [x] **T-27** — `isCandidateRole` helper
   - Files: `frontend/src/lib/auth-guards.ts`
   - Covers: —
   - Depends on: —
 
-- [ ] **T-28** — Gate `/applications/*` for the `Candidate` role in `middleware.ts`
+- [x] **T-28** — Gate `/applications/*` for the `Candidate` role in `middleware.ts`
   - Files: `frontend/src/middleware.ts`
   - Covers: —
   - Depends on: T-27
 
-- [ ] **T-29** — `ApplicationForm` client component (file input, submit, four UI states)
+- [x] **T-29** — `ApplicationForm` client component (file input, submit, four UI states)
   - Files: `frontend/src/components/portal/ApplicationForm.tsx`
   - Covers: AC-1, AC-2, AC-3, AC-4, AC-8
   - Depends on: T-25, T-26
 
-- [ ] **T-30** — Apply page (session/status guards, loads Requisition, renders `ApplicationForm`) + loading state
+- [x] **T-30** — Apply page (session/status guards, loads Requisition, renders `ApplicationForm`) + loading state
   - Files: `frontend/src/app/(portal)/jobs/[id]/apply/page.tsx`, `frontend/src/app/(portal)/jobs/[id]/apply/loading.tsx`
   - Covers: AC-1, AC-5, AC-6, AC-7
   - Depends on: T-29
 
-- [ ] **T-31** — Add a session-aware "Apply" call to action to the job detail page
+- [x] **T-31** — Add a session-aware "Apply" call to action to the job detail page
   - Files: `frontend/src/app/(portal)/jobs/[id]/page.tsx`
   - Covers: —
   - Depends on: T-30, T-27
 
-- [ ] **T-32** — `ApplicationList` presentational component
+- [x] **T-32** — `ApplicationList` presentational component
   - Files: `frontend/src/components/portal/ApplicationList.tsx`
   - Covers: AC-12, AC-13
   - Depends on: T-26
 
-- [ ] **T-33** — "My Applications" page + loading + error states
+- [x] **T-33** — "My Applications" page + loading + error states
   - Files: `frontend/src/app/(portal)/applications/page.tsx`, `frontend/src/app/(portal)/applications/loading.tsx`, `frontend/src/app/(portal)/applications/error.tsx`
   - Covers: AC-12, AC-13
   - Depends on: T-32, T-28
 
-- [ ] **T-34** — "My Applications" link in `HeaderNav` for Candidate sessions
+- [x] **T-34** — "My Applications" link in `HeaderNav` for Candidate sessions
   - Files: `frontend/src/components/HeaderNav.tsx`
   - Covers: —
   - Depends on: T-27
 
-- [ ] **T-35** — `ApplicationsTable` presentational component
+- [x] **T-35** — `ApplicationsTable` presentational component
   - Files: `frontend/src/components/staff/ApplicationsTable.tsx`
   - Covers: AC-16, AC-17, AC-18
   - Depends on: T-26
 
-- [ ] **T-36** — Staff Applications page + loading + error states
+- [x] **T-36** — Staff Applications page + loading + error states
   - Files: `frontend/src/app/staff/requisitions/[id]/applications/page.tsx`, `frontend/src/app/staff/requisitions/[id]/applications/loading.tsx`, `frontend/src/app/staff/requisitions/[id]/applications/error.tsx`
   - Covers: AC-16, AC-17, AC-18, AC-19
   - Depends on: T-35
 
-- [ ] **T-37** — Add a "View Applications" link to the staff requisition detail page
+- [x] **T-37** — Add a "View Applications" link to the staff requisition detail page
   - Files: `frontend/src/app/staff/requisitions/[id]/page.tsx`
   - Covers: —
   - Depends on: T-36
 
-- [ ] **T-38** — Component tests: `ApplicationForm`
+- [x] **T-38** — Component tests: `ApplicationForm`
   - Files: `frontend/tests/portal/application-form.test.tsx`
   - Covers: AC-1, AC-3, AC-8
   - Depends on: T-29
 
-- [ ] **T-39** — Component tests: `ApplicationList`
+- [x] **T-39** — Component tests: `ApplicationList`
   - Files: `frontend/tests/portal/application-list.test.tsx`
   - Covers: AC-12, AC-13
   - Depends on: T-32
 
-- [ ] **T-40** — Component tests: `ApplicationsTable`
+- [x] **T-40** — Component tests: `ApplicationsTable`
   - Files: `frontend/tests/staff/applications-table.test.tsx`
   - Covers: AC-16, AC-18
   - Depends on: T-35
 
-- [ ] **T-41** — Extend `auth-guards.test.ts` with `isCandidateRole` cases
+- [x] **T-41** — Extend `auth-guards.test.ts` with `isCandidateRole` cases
   - Files: `frontend/tests/lib/auth-guards.test.ts`
   - Covers: —
   - Depends on: T-27
