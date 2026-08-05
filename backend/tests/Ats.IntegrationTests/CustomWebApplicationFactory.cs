@@ -29,7 +29,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         {
             configBuilder.AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["ConnectionStrings:Default"] = $"Data Source={_dbFilePath}"
+                ["ConnectionStrings:Default"] = $"Data Source={_dbFilePath}",
+                ["Jwt:SigningKey"] = "DevelopmentSuperSecretKeyWithAtLeast32BytesLengthForHmacSha256!",
+                ["Jwt:Issuer"] = "D4FAPE-ATS",
+                ["Jwt:Audience"] = "D4FAPE-ATS-App"
             });
         });
     }

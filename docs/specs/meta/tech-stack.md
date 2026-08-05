@@ -68,6 +68,9 @@ section literally, so it must stay accurate.
 |---|---|---|---|
 | `ConnectionStrings:Default` | SQLite file path | Yes | `Data Source=./data/app.db` |
 | `API_BASE_URL` | Backend base URL for Next.js server calls | Yes | `http://localhost:5000` |
+| `Jwt:SigningKey` | Secret key for signing JWT access tokens | Yes | `DevelopmentSuperSecretKeyWithAtLeast32BytesLengthForHmacSha256!` |
+| `Jwt:Issuer` | Valid JWT token issuer string | Yes | `D4FAPE-ATS` |
+| `Jwt:Audience` | Valid JWT token audience string | Yes | `D4FAPE-ATS-App` |
 
 Secrets are never committed. Record the key name and where the value comes from, not the value.
 

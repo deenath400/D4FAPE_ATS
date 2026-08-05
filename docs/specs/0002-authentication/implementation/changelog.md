@@ -71,3 +71,77 @@ Passed!  - Failed:     0, Passed:     8, Skipped:     0, Total:     8, Duration:
 **Known gaps carried into the next checkpoint**
 
 - None.
+
+---
+
+## CP-2 — Backend Authentication Service & Controller Endpoints · 2026-08-05
+
+**Tasks completed:** T-04, T-05, T-06, T-07, T-08
+
+**Files created**
+
+| Path | Purpose |
+|---|---|
+| `backend/src/Shared/Auth/IJwtTokenGenerator.cs` | JWT token generator interface |
+| `backend/src/Shared/Auth/JwtTokenGenerator.cs` | JWT token generator implementation using HMAC-SHA256 |
+| `backend/src/Service/Common/Result.cs` | Generic Service Result pattern handling outcomes and ProblemDetails mappings |
+| `backend/src/Service/Auth/IAuthService.cs` | Authentication application service interface |
+| `backend/src/Service/Auth/AuthService.cs` | Auth service handling candidate registration, login, refresh rotation, and revocation |
+| `backend/src/Service/Auth/Dtos/*.cs` | Request/Response DTOs (`RegisterRequestDto`, `LoginRequestDto`, `RefreshTokenRequestDto`, `AuthResponseDto`, `UserDto`) |
+| `backend/src/Api/AuthEndpoints.cs` | Minimal API endpoint routes (`/api/auth/register`, `/login`, `/refresh`, `/logout`, `/me`, `/staff-test`) |
+| `backend/tests/Ats.UnitTests/Auth/JwtTokenGeneratorTests.cs` | Unit tests for JWT issuance and claim verification |
+| `backend/tests/Ats.UnitTests/Auth/AuthServiceTests.cs` | Unit tests for AuthService workflows and replay revocation |
+| `backend/tests/Ats.IntegrationTests/Auth/AuthEndpointsTests.cs` | Integration tests verifying end-to-end auth HTTP endpoints and authorization policies |
+
+**Files modified**
+
+| Path | Change |
+|---|---|
+| `backend/src/Shared/Ats.Shared.csproj` | Added `Microsoft.AspNetCore.Authentication.JwtBearer` package reference |
+| `backend/src/Service/Ats.Service.csproj` | Added `Microsoft.AspNetCore.Authentication.JwtBearer` package reference |
+| `backend/src/Api/Ats.Api.csproj` | Added `Microsoft.AspNetCore.Authentication.JwtBearer` package reference |
+| `backend/tests/Ats.UnitTests/Ats.UnitTests.csproj` | Added `Moq` and `Microsoft.Data.Sqlite` package references |
+| `backend/src/Service/ServiceCollectionExtensions.cs` | Registered Identity, `IJwtTokenGenerator`, `IAuthService`, and `AuthService` |
+| `backend/src/Api/Program.cs` | Configured JWT Bearer authentication scheme, authorization policies (`CandidateOnly`, `StaffOnly`, `RecruiterOnly`, `HiringManagerOnly`), `UseAuthentication()`, `UseAuthorization()`, and mapped `AuthEndpoints` |
+| `backend/src/Api/appsettings.json` | Added default `Jwt` configuration keys (`Issuer`, `Audience`, `SigningKey`, expiration) |
+| `backend/tests/Ats.IntegrationTests/CustomWebApplicationFactory.cs` | Added default test JWT configuration keys in in-memory test setup |
+| `backend/Directory.Build.props` | Added `CA1000` suppression to `NoWarn` for generic static factory methods |
+
+**Decisions made during implementation**
+
+| # | Decision | Why |
+|---|---|---|
+| I-2 | Implemented `AuthEndpoints.cs` using Minimal APIs matching `SystemStatusEndpoints.cs` in `Ats.Api` | Ensures consistent HTTP endpoint mapping structure across the backend host. |
+
+**Deviations from the LLD**
+
+| LLD section | Designed | Actual | Reason | LLD patched? |
+|---|---|---|---|---|
+| — | — | — | None. | — |
+
+**Verification run**
+
+```
+$ dotnet build
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:06.26
+
+$ dotnet test tests/Ats.UnitTests
+Passed!  - Failed:     0, Passed:    17, Skipped:     0, Total:    17, Duration: 1 s - Ats.UnitTests.dll (net10.0)
+
+$ dotnet test tests/Ats.IntegrationTests
+Passed!  - Failed:     0, Passed:    12, Skipped:     0, Total:    12, Duration: 3 s - Ats.IntegrationTests.dll (net10.0)
+```
+
+**Meta updates applied**
+
+- `architecture.md`: Updated `api/system` and `service/system` owning specs to `0001, 0002`, appended CP-2 Change Log row.
+- `tech-stack.md`: Added required `Jwt:SigningKey`, `Jwt:Issuer`, and `Jwt:Audience` configuration keys.
+- `coding-standards.md`: no change.
+
+**Known gaps carried into the next checkpoint**
+
+- None.

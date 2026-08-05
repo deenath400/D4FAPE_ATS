@@ -42,27 +42,27 @@ Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/impl
 
 *Exit condition: Backend auth controllers return documented HTTP response shapes; unit & integration tests pass with zero compiler warnings.*
 
-- [ ] **T-04** — Implement `IJwtTokenGenerator` and `JwtTokenGenerator` in `shared/auth` with unit tests
+- [x] **T-04** — Implement `IJwtTokenGenerator` and `JwtTokenGenerator` in `shared/auth` with unit tests
   - Files: `backend/src/Shared/Auth/IJwtTokenGenerator.cs`, `backend/src/Shared/Auth/JwtTokenGenerator.cs`, `backend/tests/Ats.UnitTests/Auth/JwtTokenGeneratorTests.cs`
   - Covers: AC-4, AC-23
   - Depends on: T-01
 
-- [ ] **T-05** — Implement `IAuthService` and `AuthService` in `service/system` with unit tests
+- [x] **T-05** — Implement `IAuthService` and `AuthService` in `service/system` with unit tests
   - Files: `backend/src/Service/Auth/IAuthService.cs`, `backend/src/Service/Auth/AuthService.cs`, `backend/src/Service/Auth/Dtos/*.cs`, `backend/tests/Ats.UnitTests/Auth/AuthServiceTests.cs`
   - Covers: AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-18, E-1
   - Depends on: T-03, T-04
 
-- [ ] **T-06** — Create `AuthController` exposing `/api/auth/*` endpoints with RFC 7807 ProblemDetails handling
+- [x] **T-06** — Create `AuthController` exposing `/api/auth/*` endpoints with RFC 7807 ProblemDetails handling
   - Files: `backend/src/Api/Controllers/AuthController.cs`
   - Covers: AC-1, AC-2, AC-4, AC-5, AC-6, AC-8, AC-9, AC-20, AC-21, AC-22, AC-25
   - Depends on: T-05
 
-- [ ] **T-07** — Register Identity, JWT Bearer Auth scheme, and authorization policies in `Program.cs`
+- [x] **T-07** — Register Identity, JWT Bearer Auth scheme, and authorization policies in `Program.cs`
   - Files: `backend/src/Api/Program.cs`
   - Covers: AC-7, AC-10, AC-11, AC-20
   - Depends on: T-06
 
-- [ ] **T-08** — Add integration test suite for authentication endpoints in `tests/Ats.IntegrationTests`
+- [x] **T-08** — Add integration test suite for authentication endpoints in `tests/Ats.IntegrationTests`
   - Files: `backend/tests/Ats.IntegrationTests/Auth/AuthEndpointsTests.cs`
   - Covers: AC-1, AC-2, AC-4, AC-5, AC-6, AC-7, AC-8, AC-9, AC-10, AC-11, AC-20, AC-21, AC-22, AC-23, AC-25, E-1
   - Depends on: T-07

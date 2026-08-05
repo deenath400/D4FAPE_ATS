@@ -69,9 +69,9 @@ graph TD
 | `ui/portal` | Public candidate surface: landing page system status, registration, job search, apply | 0001 |
 | `ui/bff` | Frontend BFF layer: proxy route handlers and shared backend invoke function | 0001 |
 | `ui/staff` | Authenticated recruiter and hiring-manager workspace: requisitions, pipeline, decisions | — |
-| `api/system` | Backend HTTP boundary: unauthenticated system status endpoint & composition root | 0001 |
+| `api/system` | Backend HTTP boundary: system status & auth endpoints, composition root | 0001, 0002 |
 | `api/<area>` | HTTP boundary — routing, request DTOs, authorization policies | — |
-| `service/system` | Backend system status service and database health check | 0001 |
+| `service/system` | Backend system status, auth service, and database health check | 0001, 0002 |
 | `service/<area>` | Business rules and transaction boundaries. The only caller of `db/*` | — |
 | `db/core` | EF Core context, SQLite WAL/busy-timeout interceptor, health check, migrations | 0001, 0002 |
 | `db/<area>` | EF Core entities, configurations, migrations, query implementations | — |
@@ -151,6 +151,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-05 | 0001 | CP-4: Built portal landing page, ServerStatusSection, ClientStatusPanel, and Vitest component tests |
 | 2026-08-05 | 0001 | CP-5: Hardened tech stack commands, updated architecture snapshot and coding standards |
 | 2026-08-05 | 0002 | CP-1: Added ASP.NET Core Identity domain entities, RefreshToken schema, and EF Core migration |
+| 2026-08-05 | 0002 | CP-2: Implemented AuthService, JwtTokenGenerator, AuthEndpoints (/register, /login, /refresh, /logout, /me), and JWT Bearer auth policies |
 
 ## Related Specs
 
