@@ -315,9 +315,11 @@ Plain `FindAsync` / `ToListAsync()` over `_dbContext.Requisitions`, ordered by
 
 1. Resolve `resolvedPageSize = Math.Clamp(pageSize, 1, MaxPageSize)` (config, default 50).
 2. Build `IQueryable<Requisition>` filtered `Status == Published`, `AsNoTracking()`.
-3. If `keyword` is non-empty, `.Where(r => r.Title.Contains(keyword) || r.Description.Contains(keyword))`
-   — SQLite's default `LIKE` translation is ASCII case-insensitive, satisfying "matches the
-   keyword" without an explicit collation (Assumption A-8, HLD R-1).
+3. If `keyword` is non-empty, `.Where(r => EF.Functions.Like(r.Title, $"%{keyword}%") || EF.Functions.Like(r.Description, $"%{keyword}%"))`
+   — `EF.Functions.Like` forces a `LIKE` translation, which SQLite evaluates ASCII
+   case-insensitively by default, satisfying "matches the keyword" without an explicit
+   collation (Assumption A-8, HLD R-1). **Not** `string.Contains`: EF Core's Sqlite provider
+   translates `.Contains()` to `instr()`, which is case-sensitive — see Deviation Log.
 4. `total = await query.CountAsync(ct)`.
 5. `items = await query.OrderByDescending(r => r.CreatedAtUtc).Skip((page - 1) * resolvedPageSize).Take(resolvedPageSize).ToListAsync(ct)`.
 6. Return `Result.Ok(new PagedResult<PublicRequisitionDto>(items, page, resolvedPageSize, total))`.
@@ -331,9 +333,16 @@ invalid one with 400 *before* calling this method (AC-24: "without executing the
 |---|---|---|
 | Success | `Result.Ok(dto)` | 200 (201 for Create, mapped at the endpoint) |
 | Missing requisition | `Result.NotFound("requisition.not-found", ...)` | 404 |
-| Invalid title/description | `Result.Validation(errors)` | 400 |
+| Invalid title/description | `Result.Validation(errors, code, message)` | 400 |
 | Edit while closed | `Result.Conflict("requisition.update.closed", ...)` | 409 |
 | Invalid lifecycle transition | `Result.Conflict("requisition.<action>.invalid-transition", ...)` | 409 |
+
+`Result<T>.Validation(errors, message)` (no code) predates this spec and always falls back to
+`ToProblemResult()`'s generic `"auth.error"` code — insufficient for `api.md`'s
+`requisition.create.validation-failed`/`requisition.update.validation-failed` codes.
+`RequisitionService` uses a new three-argument overload, `Result<T>.Validation(errors, code,
+message)`, added to `Ats.Service.Common.Result`/`Result<T>` (backward compatible — the
+two-argument overload is untouched) — see Deviation Log.
 
 ## 4. API Layer
 
@@ -558,3 +567,5 @@ Appended by `/implement` when reality diverged from this design.
 | Date | Task | Section | Designed | Actual | Reason |
 |---|---|---|---|---|---|
 | 2026-08-05 | CP-1 precondition | `backend/global.json` (not an LLD section — build environment) | SDK pin `10.0.400-preview.0.26322.102` (set at `0001`) | SDK pin changed to `10.0.302` | The pinned preview SDK is no longer resolvable — `dotnet --list-sdks` shows only `10.0.302`/`8.0.129` installed, and Microsoft's `10.0` channel release feed confirms `10.0.302` is now `latest-sdk` (the preview build was superseded by the stable .NET 10 LTS release). `dotnet build` failed with "SDK not found" before any CP-1 code was written — a pre-existing environment blocker, not a CP-1 code defect. Repinning to the installed stable SDK on the same major.minor (.NET 10) unblocked the build; confirmed via a clean `dotnet build`/`dotnet test tests/Ats.UnitTests` baseline run before touching CP-1 files. |
+| 2026-08-05 | T-10 | §3.2 `SearchPublicAsync` step 3 | `.Where(r => r.Title.Contains(keyword) \|\| r.Description.Contains(keyword))`, relying on SQLite's default `LIKE` case-insensitivity | `.Where(r => EF.Functions.Like(r.Title, $"%{keyword}%") \|\| EF.Functions.Like(r.Description, $"%{keyword}%"))` | EF Core's Sqlite provider (10.0.10) translates `string.Contains` to `instr(value, pattern) > 0`, which is a case-sensitive binary comparison in SQLite — not `LIKE`. A unit test searching `"engineer"` against a title `"Senior Engineer"` failed under the LLD's original translation (0 matches instead of 1). `EF.Functions.Like` forces the `LIKE` SQL function, which SQLite evaluates ASCII case-insensitively by default, restoring the intended behaviour (AC-16, AC-20). |
+| 2026-08-05 | T-10 | §3.2 "Returns — outcome→result→HTTP" | `Result<T>.Validation(errors)` (existing two-arg overload, no code) | Added `Result<T>.Validation(errors, code, message)` overload to `Ats.Service.Common.Result`/`Result<T>` | The existing `Result<T>.Validation(errors, message)` overload does not accept an error code, so `AuthEndpoints.ToProblemResult()` (reused unchanged per §4) would fall back to its generic `"auth.error"` code for every 400 — mismatching `api.md`'s documented `requisition.create.validation-failed`/`requisition.update.validation-failed` codes. Added a backward-compatible three-argument overload (`errors, code, message`) to both `Result` and `Result<T>` rather than duplicating validation-to-ProblemDetails mapping at the endpoint layer; the pre-existing two-argument overload and every caller of it (`AuthService`) are unchanged. |

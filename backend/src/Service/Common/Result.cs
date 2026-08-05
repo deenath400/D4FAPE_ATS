@@ -32,6 +32,15 @@ public class Result
             ValidationErrors = errors
         };
 
+    public static Result Validation(IDictionary<string, string[]> errors, string code, string message) =>
+        new()
+        {
+            Status = ResultStatus.Validation,
+            ErrorCode = code,
+            ErrorMessage = message,
+            ValidationErrors = errors
+        };
+
     public static Result Unauthorized(string code, string message) =>
         new()
         {
@@ -83,6 +92,15 @@ public class Result<T> : Result
         new()
         {
             Status = ResultStatus.Validation,
+            ErrorMessage = message,
+            ValidationErrors = errors
+        };
+
+    public static new Result<T> Validation(IDictionary<string, string[]> errors, string code, string message) =>
+        new()
+        {
+            Status = ResultStatus.Validation,
+            ErrorCode = code,
             ErrorMessage = message,
             ValidationErrors = errors
         };

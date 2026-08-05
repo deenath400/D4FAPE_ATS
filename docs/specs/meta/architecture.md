@@ -70,8 +70,10 @@ graph TD
 | `ui/bff` | Frontend BFF layer: proxy route handlers and shared backend invoke function | 0001, 0002 |
 | `ui/staff` | Authenticated recruiter and hiring-manager workspace: requisitions, pipeline, decisions | — |
 | `api/system` | Backend HTTP boundary: system status & auth endpoints, composition root | 0001, 0002 |
+| `api/requisition` | Staff CRUD/lifecycle endpoints (`RecruiterOnly`/`StaffOnly`) plus anonymous public search/detail endpoints under `/api/public/requisitions` | 0003 |
 | `api/<area>` | HTTP boundary — routing, request DTOs, authorization policies | — |
 | `service/system` | Backend system status, auth service, and database health check | 0001, 0002 |
+| `service/requisition` | Requisition lifecycle state machine (draft/published/closed transition guards), content validation, keyword search + pagination | 0003 |
 | `service/<area>` | Business rules and transaction boundaries. The only caller of `db/*` | — |
 | `db/core` | EF Core context, SQLite WAL/busy-timeout interceptor, health check, migrations | 0001, 0002 |
 | `db/requisition` | `Requisition`/`Stage` entities, EF Core configurations, migration — each Requisition owns an independent Stage set (FR-14) | 0003 |
@@ -156,6 +158,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-05 | 0002 | CP-2: Implemented AuthService, JwtTokenGenerator, AuthEndpoints (/register, /login, /refresh, /logout, /me), and JWT Bearer auth policies |
 | 2026-08-05 | 0002 | CP-3: Configured NextAuth v5 session provider, JWT callback refresh flow, and BFF proxy route |
 | 2026-08-05 | 0003 | CP-1: Added `Requisition`/`Stage` entities, EF Core configurations, and `AddRequisitionsAndStages` migration |
+| 2026-08-05 | 0003 | CP-2: Built `RequisitionService`, staff `RequisitionEndpoints` and anonymous `PublicRequisitionEndpoints`, `PagedResult<T>` pagination envelope, and unit/integration test coverage |
 
 ## Related Specs
 

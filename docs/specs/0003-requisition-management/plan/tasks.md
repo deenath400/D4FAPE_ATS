@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 6 / 42 tasks · checkpoint CP-1 of 4 complete, CP-2 next
+**Progress:** 17 / 42 tasks · checkpoint CP-2 of 4 complete, CP-3 next
 
 ---
 
@@ -60,57 +60,57 @@ file, `dotnet test tests/Ats.UnitTests` (Requisition entity tests) passes.*
 `dotnet test tests/Ats.IntegrationTests` both pass; every endpoint in `api.md` returns the
 documented status/body.*
 
-- [ ] **T-07** — `PagedResult<T>` generic type
+- [x] **T-07** — `PagedResult<T>` generic type
   - Files: `backend/src/Service/Common/PagedResult.cs`
   - Covers: —
   - Depends on: —
 
-- [ ] **T-08** — Requisition DTOs (`RequisitionDto`, `PublicRequisitionDto`, `CreateRequisitionRequestDto`, `UpdateRequisitionRequestDto`)
+- [x] **T-08** — Requisition DTOs (`RequisitionDto`, `PublicRequisitionDto`, `CreateRequisitionRequestDto`, `UpdateRequisitionRequestDto`)
   - Files: `backend/src/Service/Requisition/Dtos/RequisitionDto.cs`, `backend/src/Service/Requisition/Dtos/PublicRequisitionDto.cs`, `backend/src/Service/Requisition/Dtos/CreateRequisitionRequestDto.cs`, `backend/src/Service/Requisition/Dtos/UpdateRequisitionRequestDto.cs`
   - Covers: —
   - Depends on: —
 
-- [ ] **T-09** — `IRequisitionService` interface
+- [x] **T-09** — `IRequisitionService` interface
   - Files: `backend/src/Service/Requisition/IRequisitionService.cs`
   - Covers: —
   - Depends on: T-07, T-08
 
-- [ ] **T-10** — `RequisitionService` implementation (create/update/publish/unpublish/close/get/list/public search/public detail)
+- [x] **T-10** — `RequisitionService` implementation (create/update/publish/unpublish/close/get/list/public search/public detail)
   - Files: `backend/src/Service/Requisition/RequisitionService.cs`
   - Covers: AC-1, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-9, AC-10, AC-11, AC-12, AC-16, AC-17, AC-18, AC-19, AC-20, AC-21, AC-22, AC-24, NFR-1, NFR-2
   - Depends on: T-05, T-09
 
-- [ ] **T-11** — Unit tests for `RequisitionService`
+- [x] **T-11** — Unit tests for `RequisitionService`
   - Files: `backend/tests/Ats.UnitTests/Requisition/RequisitionServiceTests.cs`
   - Covers: AC-1, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-9, AC-10, AC-11, AC-16, AC-17, AC-18, AC-19, AC-20, AC-21, AC-22, AC-24, NFR-1
   - Depends on: T-10
 
-- [ ] **T-12** — Register `IRequisitionService` in DI
+- [x] **T-12** — Register `IRequisitionService` in DI
   - Files: `backend/src/Service/ServiceCollectionExtensions.cs`
   - Covers: —
   - Depends on: T-10
 
-- [ ] **T-13** — Staff `RequisitionEndpoints` (create/list/get/update/publish/unpublish/close)
+- [x] **T-13** — Staff `RequisitionEndpoints` (create/list/get/update/publish/unpublish/close)
   - Files: `backend/src/Api/RequisitionEndpoints.cs`
   - Covers: AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-9, AC-10, AC-11, AC-12, AC-13
   - Depends on: T-12
 
-- [ ] **T-14** — Public `PublicRequisitionEndpoints` (list + detail)
+- [x] **T-14** — Public `PublicRequisitionEndpoints` (list + detail)
   - Files: `backend/src/Api/PublicRequisitionEndpoints.cs`
   - Covers: AC-16, AC-17, AC-18, AC-19, AC-20, AC-21, AC-22, AC-24
   - Depends on: T-12
 
-- [ ] **T-15** — Wire both endpoint groups into the host
+- [x] **T-15** — Wire both endpoint groups into the host
   - Files: `backend/src/Api/Program.cs`
   - Covers: —
   - Depends on: T-13, T-14
 
-- [ ] **T-16** — Integration tests: staff endpoints
+- [x] **T-16** — Integration tests: staff endpoints
   - Files: `backend/tests/Ats.IntegrationTests/Requisition/RequisitionEndpointsTests.cs`
   - Covers: AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-9, AC-10, AC-11, AC-12, AC-13
   - Depends on: T-15
 
-- [ ] **T-17** — Integration tests: public endpoints
+- [x] **T-17** — Integration tests: public endpoints
   - Files: `backend/tests/Ats.IntegrationTests/Requisition/PublicRequisitionEndpointsTests.cs`
   - Covers: AC-16, AC-17, AC-18, AC-19, AC-20, AC-21, AC-22, AC-24
   - Depends on: T-15

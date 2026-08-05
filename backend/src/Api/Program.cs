@@ -70,6 +70,8 @@ app.UseAuthorization();
 
 app.MapSystemStatus();
 app.MapAuthEndpoints();
+app.MapRequisitionEndpoints();
+app.MapPublicRequisitionEndpoints();
 
 app.Run();
 

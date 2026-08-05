@@ -2,6 +2,7 @@ namespace Ats.Service;
 
 using Ats.Db;
 using Ats.Service.Auth;
+using Ats.Service.Requisition;
 using Ats.Shared.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -29,6 +30,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ISystemStatusService, SystemStatusService>();
+        services.AddScoped<IRequisitionService, RequisitionService>();
 
         return services;
     }
