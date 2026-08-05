@@ -315,6 +315,11 @@ public class ApplicationServiceTests : IDisposable
     [Fact]
     public async Task SubmitAsync_StorageThrows_ReturnsErrorNoRowWritten()
     {
+        // NFR-1 dedicated verification (T-42): submission is atomic with respect to a valid,
+        // persisted CV — a storage-write failure (E-4) must never leave an orphaned Application
+        // (or CvAttachment) row behind. The write is attempted before either row is added to the
+        // DbContext (ApplicationService.SubmitAsync step 8 precedes step 9), so a failure here
+        // has nothing to roll back — but this test proves that structurally, not by inspection.
         var requisitionId = await CreatePublishedRequisitionAsync();
         var candidateId = await CreateCandidateAsync();
 
@@ -333,6 +338,7 @@ public class ApplicationServiceTests : IDisposable
         Assert.Equal(ResultStatus.Error, result.Status);
         Assert.Equal("application.submit.storage-failed", result.ErrorCode);
         Assert.Empty(_dbContext.Applications);
+        Assert.Empty(_dbContext.CvAttachments);
     }
 
     [Fact]

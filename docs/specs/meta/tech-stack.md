@@ -1,6 +1,6 @@
 # Tech Stack
 
-**Updated:** 2026-08-05 · **Budget:** 80 lines target / 120 hard ceiling
+**Updated:** 2026-08-06 · **Budget:** 80 lines target / 120 hard ceiling
 
 Everything needed to build, run, and test the project. `/validate` reads the Commands
 section literally, so it must stay accurate.
@@ -44,7 +44,7 @@ section literally, so it must stay accurate.
 | Migrations | EF Core migrations | InitialCreate empty migration |
 | Cache | None | — |
 | Queue / background | None | No `worker/*` component |
-| Object storage | TBD | CV/attachment store undecided |
+| Object storage | Local disk, behind `shared/storage`'s `IFileStorage` (`LocalDiskFileStorage`) | CVs only so far; base path via `Storage:CvBasePath` (est. 0004). Swapping to a cloud backend is an implementation change behind the interface, not a contract change |
 | Hosting | TBD | Deployment target deliberately deferred |
 | CI | None | No `.github/workflows/` exists |
 
@@ -71,6 +71,8 @@ section literally, so it must stay accurate.
 | `Jwt:SigningKey` | Secret key for signing JWT access tokens | Yes | `DevelopmentSuperSecretKeyWithAtLeast32BytesLengthForHmacSha256!` |
 | `Jwt:Issuer` | Valid JWT token issuer string | Yes | `D4FAPE-ATS` |
 | `Jwt:Audience` | Valid JWT token audience string | Yes | `D4FAPE-ATS-App` |
+| `Storage:CvBasePath` | Local-disk base path CV attachments are written to/read from | No | `./app-data/cv-attachments` |
+| `Applications:MaxCvSizeBytes` | Maximum accepted CV upload size, in bytes | No | `5242880` (5 MB) |
 
 Secrets are never committed. Record the key name and where the value comes from, not the value.
 

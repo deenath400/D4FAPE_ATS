@@ -1,19 +1,27 @@
 namespace Ats.IntegrationTests.Application;
 
 using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Ats.IntegrationTests;
 using Ats.Service.Application.Dtos;
 using Ats.Service.Auth.Dtos;
 using Ats.Service.Requisition.Dtos;
 using Ats.Shared.Auth;
+using Ats.Shared.Storage;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Xunit;
 
 public class ApplicationEndpointsTests
@@ -520,5 +528,142 @@ public class ApplicationEndpointsTests
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
         Assert.Contains("application.list.requisition-not-found", content);
+    }
+
+    [Fact]
+    public async Task POST_applications_SlowFileWrite_DoesNotExtendSqliteWriteLockDuration()
+    {
+        // NFR-3 dedicated verification (T-43): "the Application submission database transaction
+        // remains open only for the row insert itself — the CV file write does not extend how
+        // long the SQLite write lock is held." Proven structurally, not by code inspection: the
+        // CV write for one submission is made artificially slow, and — while that submission is
+        // still in flight — a second, wholly unrelated database write (a candidate registration,
+        // which never touches IFileStorage) is issued against the same SQLite file. If the write
+        // transaction wrapped the file write, SQLite's single-writer lock would force the
+        // unrelated write to wait behind it for the full artificial delay. It finishing quickly
+        // instead proves the lock was never held during the file write.
+        using var factory = new CustomWebApplicationFactory();
+        factory.InitializeDatabase();
+
+        var fileWriteDelay = TimeSpan.FromMilliseconds(1000);
+        using var slowFactory = factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureServices(services =>
+            {
+                services.RemoveAll<IFileStorage>();
+                services.AddSingleton<IFileStorage>(sp =>
+                    new DelayedFileStorage(new LocalDiskFileStorage(sp.GetRequiredService<IConfiguration>()), fileWriteDelay));
+            });
+        });
+
+        using var setupClient = slowFactory.CreateClient();
+        var recruiterToken = await CreateStaffUserAndLoginAsync(factory, setupClient, "recruiter19@example.com", AuthConstants.Roles.Recruiter);
+        var requisitionId = await CreatePublishedRequisitionAsync(setupClient, recruiterToken);
+        var candidateToken = await CreateCandidateAndLoginAsync(setupClient, "candidate18@example.com");
+
+        using var submitClient = slowFactory.CreateClient();
+        Authorize(submitClient, candidateToken);
+        using var unrelatedClient = slowFactory.CreateClient();
+
+        var submitStopwatch = Stopwatch.StartNew();
+        var submitTask = submitClient.PostAsync(
+            $"/api/requisitions/{requisitionId}/applications", CreatePdfFormContent(ValidPdfBytes()));
+
+        // Give the slow submission a head start into its (artificially delayed) file write
+        // before issuing the unrelated write, so the unrelated write's timing genuinely measures
+        // whether it had to wait behind the submission.
+        await Task.Delay(150);
+
+        var unrelatedStopwatch = Stopwatch.StartNew();
+        var unrelatedResponse = await unrelatedClient.PostAsJsonAsync(
+            "/api/auth/register", new RegisterRequestDto("candidate19@example.com", Password, "Grace", "Hopper"));
+        unrelatedStopwatch.Stop();
+
+        var submitResponse = await submitTask;
+        submitStopwatch.Stop();
+
+        Assert.Equal(HttpStatusCode.Created, submitResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, unrelatedResponse.StatusCode);
+
+        // The unrelated write finished comfortably before the slow submission's file write would
+        // have released a held SQLite write lock — proof the lock was never held across it.
+        Assert.True(
+            unrelatedStopwatch.Elapsed < fileWriteDelay,
+            $"Unrelated registration took {unrelatedStopwatch.ElapsedMilliseconds}ms, not less " +
+            $"than the {fileWriteDelay.TotalMilliseconds}ms artificial file-write delay — " +
+            "suggests the SQLite write lock was held across the CV file write (NFR-3 violation).");
+        Assert.True(
+            submitStopwatch.Elapsed >= fileWriteDelay,
+            "The submission finished faster than the artificial file-write delay — the delayed " +
+            "IFileStorage decorator was not actually exercised by this request.");
+    }
+
+    [Fact]
+    public async Task POST_applications_TwoNearSimultaneousSubmissions_ExactlyOneSurvives()
+    {
+        // E-1 regression test (T-44): "the losing request receives HTTP 409, enforced
+        // structurally (e.g. a uniqueness constraint), not by application-level check timing
+        // alone." Fires two near-simultaneous submissions from the same Candidate against the
+        // same Requisition over two independent HttpClients sharing one TestServer/database, and
+        // asserts exactly one Application row survives regardless of how the two requests
+        // actually interleaved.
+        using var factory = new CustomWebApplicationFactory();
+        factory.InitializeDatabase();
+        using var setupClient = factory.CreateClient();
+        var recruiterToken = await CreateStaffUserAndLoginAsync(factory, setupClient, "recruiter20@example.com", AuthConstants.Roles.Recruiter);
+        var requisitionId = await CreatePublishedRequisitionAsync(setupClient, recruiterToken);
+        var candidateToken = await CreateCandidateAndLoginAsync(setupClient, "candidate20@example.com");
+
+        using var client1 = factory.CreateClient();
+        Authorize(client1, candidateToken);
+        using var client2 = factory.CreateClient();
+        Authorize(client2, candidateToken);
+
+        var task1 = client1.PostAsync($"/api/requisitions/{requisitionId}/applications", CreatePdfFormContent(ValidPdfBytes()));
+        var task2 = client2.PostAsync($"/api/requisitions/{requisitionId}/applications", CreatePdfFormContent(ValidPdfBytes()));
+
+        var responses = await Task.WhenAll(task1, task2);
+
+        var createdCount = responses.Count(r => r.StatusCode == HttpStatusCode.Created);
+        var conflictCount = responses.Count(r => r.StatusCode == HttpStatusCode.Conflict);
+
+        Assert.Equal(1, createdCount);
+        Assert.Equal(1, conflictCount);
+
+        Authorize(setupClient, candidateToken);
+        var mineResponse = await setupClient.GetAsync("/api/applications/mine");
+        var mine = await mineResponse.Content.ReadFromJsonAsync<CandidateApplicationListItemDto[]>();
+        Assert.NotNull(mine);
+        Assert.Single(mine!);
+    }
+
+    /// <summary>
+    /// Wraps a real <see cref="IFileStorage"/> with an artificial delay around the write, used by
+    /// <see cref="POST_applications_SlowFileWrite_DoesNotExtendSqliteWriteLockDuration"/> (NFR-3)
+    /// to widen the CV file-write window so a concurrent, unrelated database write can prove it
+    /// was never blocked behind it.
+    /// </summary>
+    private sealed class DelayedFileStorage : IFileStorage
+    {
+        private readonly IFileStorage _inner;
+        private readonly TimeSpan _delay;
+
+        public DelayedFileStorage(IFileStorage inner, TimeSpan delay)
+        {
+            _inner = inner;
+            _delay = delay;
+        }
+
+        public async Task SaveAsync(string storageKey, Stream content, CancellationToken ct = default)
+        {
+            await Task.Delay(_delay, ct);
+            await _inner.SaveAsync(storageKey, content, ct);
+        }
+
+        public Task<Stream> OpenReadAsync(string storageKey, CancellationToken ct = default) =>
+            _inner.OpenReadAsync(storageKey, ct);
+
+        public Task DeleteAsync(string storageKey, CancellationToken ct = default) =>
+            _inner.DeleteAsync(storageKey, ct);
     }
 }

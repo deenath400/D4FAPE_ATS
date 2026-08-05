@@ -590,6 +590,8 @@ No backfill — both tables start empty. Full detail and rollback plan in `erd.m
 | `GET_applications_id_cv_AsRecruiter_Returns200` | Integration | AC-20 | same |
 | `GET_applications_id_cv_MissingId_Returns404` | Integration | E-6 | same |
 | `GET_requisitions_id_applications_MissingRequisition_Returns404` | Integration | E-5 | same |
+| `POST_applications_SlowFileWrite_DoesNotExtendSqliteWriteLockDuration` | Integration | NFR-3 | `tests/Ats.IntegrationTests/Application/ApplicationEndpointsTests.cs` |
+| `POST_applications_TwoNearSimultaneousSubmissions_ExactlyOneSurvives` | Integration | E-1, AC-8 | same |
 | `ApplicationForm` shows validation error banner for a non-PDF file | Component | AC-3 | `tests/portal/application-form.test.tsx` |
 | `ApplicationForm` shows duplicate-submission error banner on 409 | Component | AC-8 | same |
 | `ApplicationForm` shows success panel after 201 | Component | AC-1 | same |

@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 41 / 46 tasks · checkpoints CP-1, CP-2, CP-3 of 4 done, CP-4 next
+**Progress:** 46 / 46 tasks · all checkpoints (CP-1–CP-4) complete
 
 ---
 
@@ -244,27 +244,27 @@ integration tests pass; `dotnet build` succeeds.*
 *Exit condition: full backend and frontend suites green, NFRs demonstrated by a dedicated test
 each, `meta/architecture.md` and `meta/tech-stack.md` reflect what shipped.*
 
-- [ ] **T-42** — NFR-1 verification test: a storage-write failure leaves no `Application` row
+- [x] **T-42** — NFR-1 verification test: a storage-write failure leaves no `Application` row
   - Files: `backend/tests/Ats.UnitTests/Application/ApplicationServiceTests.cs`
   - Covers: NFR-1
   - Depends on: T-23
 
-- [ ] **T-43** — NFR-3 verification test: the SQLite write transaction spans only the row insert, not the file write
+- [x] **T-43** — NFR-3 verification test: the SQLite write transaction spans only the row insert, not the file write
   - Files: `backend/tests/Ats.IntegrationTests/Application/ApplicationEndpointsTests.cs`
   - Covers: NFR-3
   - Depends on: T-24
 
-- [ ] **T-44** — E-1 regression test: two near-simultaneous submissions by the same Candidate against the same Requisition — exactly one survives
+- [x] **T-44** — E-1 regression test: two near-simultaneous submissions by the same Candidate against the same Requisition — exactly one survives
   - Files: `backend/tests/Ats.IntegrationTests/Application/ApplicationEndpointsTests.cs`
   - Covers: E-1, AC-8
   - Depends on: T-24
 
-- [ ] **T-45** — Update `docs/specs/meta/architecture.md`: Component Map (`api/application`, `service/application`, `db/application`, `shared/storage` — resolve "backing store TBD"), Data Model diagram, Change Log
+- [x] **T-45** — Update `docs/specs/meta/architecture.md`: Component Map (`api/application`, `service/application`, `db/application`, `shared/storage` — resolve "backing store TBD"), Data Model diagram, Change Log
   - Files: `docs/specs/meta/architecture.md`
   - Covers: —
   - Depends on: all
 
-- [ ] **T-46** — Update `docs/specs/meta/tech-stack.md`: resolve "Object storage: TBD" row, add `Storage:CvBasePath`/`Applications:MaxCvSizeBytes` to Required Configuration
+- [x] **T-46** — Update `docs/specs/meta/tech-stack.md`: resolve "Object storage: TBD" row, add `Storage:CvBasePath`/`Applications:MaxCvSizeBytes` to Required Configuration
   - Files: `docs/specs/meta/tech-stack.md`
   - Covers: —
   - Depends on: all

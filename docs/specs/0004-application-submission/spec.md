@@ -2,7 +2,7 @@
 id: 0004
 slug: application-submission
 title: Application Submission and CV Upload
-status: implementing
+status: implemented
 components: [api/application, service/application, db/application, shared/storage, ui/portal, ui/staff, ui/bff]
 entities: [Application, CvAttachment]
 depends_on: [0002, 0003]

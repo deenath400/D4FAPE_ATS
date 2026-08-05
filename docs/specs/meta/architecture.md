@@ -1,15 +1,12 @@
 # Architecture Snapshot
 
-**Updated:** 2026-08-05 · **Budget:** 150 lines target / 200 hard ceiling
+**Updated:** 2026-08-06 · **Budget:** 150 lines target / 200 hard ceiling
 
 > The orientation document. A developer or agent reads this file and nothing else, and knows
 > what exists and how it fits together. Detail belongs in the per-spec artifacts; see
 > `.spec-kit/meta-maintenance.md` for what may and may not live here.
 >
 > Maintained by `/implement` via surgical edits. Never regenerate this file.
-
-**Nothing below is built yet.** This is the *intended* structure agreed at initialisation.
-Component rows carry no owning spec until `/implement` ships them.
 
 ---
 
@@ -170,6 +167,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-06 | 0004 | CP-1: Added `Application`/`CvAttachment` entities, EF Core configurations, `AddApplicationsAndCvAttachments` migration, and `shared/storage`'s first implementation (`IFileStorage`/`LocalDiskFileStorage`), resolving the "backing store TBD" note |
 | 2026-08-06 | 0004 | CP-2: Built `ApplicationService` (submission eligibility, CV validation, duplicate handling) and `ApplicationEndpoints` (Candidate submit/list/CV-download, Staff Requisition-scoped list); unit & integration test coverage |
 | 2026-08-06 | 0004 | CP-3: Generalised `ui/bff`'s proxy route to a binary-safe passthrough; gave `ui/portal` an apply flow and "My Applications" page, and `ui/staff` a per-Requisition Applications list; `middleware.ts` now also gates `/applications/*` for the Candidate role |
+| 2026-08-06 | 0004 | CP-4: Hardening — dedicated NFR-1 (storage-write-failure atomicity) and NFR-3 (SQLite write-lock scope excludes the CV file write) verification tests, plus an E-1 concurrent-duplicate-submission regression test; spec closed out, all 46 tasks complete |
 
 ## Related Specs
 
