@@ -25,12 +25,12 @@ one checkpoint per invocation, then stops for review.
 against `src/Db` succeeds against a fresh path; a fresh `git status` after that run shows no
 tracked/untracked database or build-output file.*
 
-- [ ] **T-01** — Repository-level ignore rules and editor config
+- [x] **T-01** — Repository-level ignore rules and editor config
   - Files: `.gitignore`, `.editorconfig`
   - Covers: AC-1, AC-2
   - Depends on: —
 
-- [ ] **T-02** — Backend solution skeleton with project-topology layering enforcement
+- [x] **T-02** — Backend solution skeleton with project-topology layering enforcement
   - Files: `backend/global.json`, `backend/Ats.sln`, `backend/Directory.Build.props`,
     `backend/.config/dotnet-tools.json`, `backend/src/Db/Ats.Db.csproj`,
     `backend/src/Service/Ats.Service.csproj`, `backend/src/Api/Ats.Api.csproj`,
@@ -38,20 +38,20 @@ tracked/untracked database or build-output file.*
   - Covers: AC-7 (project-reference half), NFR-2
   - Depends on: T-01
 
-- [ ] **T-03** — `db/core` context, WAL/busy-timeout interceptor, health check, DI extension, design-time factory
+- [x] **T-03** — `db/core` context, WAL/busy-timeout interceptor, health check, DI extension, design-time factory
   - Files: `backend/src/Db/AppDbContext.cs`, `backend/src/Db/SqlitePragmaConnectionInterceptor.cs`,
     `backend/src/Db/DatabaseHealth.cs`, `backend/src/Db/EfDatabaseHealthCheck.cs`,
     `backend/src/Db/DbServiceCollectionExtensions.cs`, `backend/src/Db/AppDbContextFactory.cs`
   - Covers: FR-9, NFR-1
   - Depends on: T-02
 
-- [ ] **T-04** — Empty initial migration
+- [x] **T-04** — Empty initial migration
   - Files: `backend/src/Db/Migrations/*_InitialCreate.cs`,
     `backend/src/Db/Migrations/AppDbContextModelSnapshot.cs`
   - Covers: AC-8, AC-9
   - Depends on: T-03
 
-- [ ] **T-05** — Architecture test project: the four AC-7 layering checks
+- [x] **T-05** — Architecture test project: the four AC-7 layering checks
   - Files: `backend/tests/Ats.ArchitectureTests/Ats.ArchitectureTests.csproj`,
     `backend/tests/Ats.ArchitectureTests/LayeringRuleTests.cs`
   - Covers: AC-7

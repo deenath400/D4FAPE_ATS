@@ -142,6 +142,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | Date | Spec | Change |
 |---|---|---|
 | 2026-08-05 | — | Blueprint initialised by /initialize-project |
+| 2026-08-05 | 0001 | CP-1: Scaffolded repository tooling, backend project topology, and db/core layer |
 
 ## Related Specs
 

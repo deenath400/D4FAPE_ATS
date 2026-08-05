@@ -2,7 +2,7 @@
 id: 0001
 slug: project-scaffolding
 title: Project Scaffolding and Walking Skeleton
-status: planned
+status: implementing
 components: [infra/build, api/system, service/system, db/core, ui/bff, ui/portal]
 entities: []
 depends_on: []

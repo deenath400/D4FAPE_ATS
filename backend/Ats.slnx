@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Api/">
+    <Project Path="src/Api/Ats.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Db/">
+    <Project Path="src/Db/Ats.Db.csproj" />
+  </Folder>
+  <Folder Name="/src/Service/">
+    <Project Path="src/Service/Ats.Service.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/Ats.Shared.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Ats.ArchitectureTests/Ats.ArchitectureTests.csproj" />
+  </Folder>
+</Solution>
