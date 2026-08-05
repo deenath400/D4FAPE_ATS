@@ -2,8 +2,8 @@
 id: 0004
 slug: application-submission
 title: Application Submission and CV Upload
-status: specified
-components: [api/application, service/application, db/application, shared/storage, ui/portal, ui/staff]
+status: planned
+components: [api/application, service/application, db/application, shared/storage, ui/portal, ui/staff, ui/bff]
 entities: [Application, CvAttachment]
 depends_on: [0002, 0003]
 created: 2026-08-06
@@ -283,6 +283,7 @@ Each criterion is independently testable and traces to one or more FRs.
 | `shared/storage` | New. CV file persistence interface plus a local-disk-backed implementation under the backend's app-data directory (Clarification C-1) — the first owning spec, resolving `tech-stack.md`'s "Object storage: TBD" line and `architecture.md`'s "backing store TBD" note. |
 | `ui/portal` | Modified. Adds an apply flow (application form with CV file input) reachable from the Requisition detail page, and a "My Applications" list page for the authenticated Candidate. |
 | `ui/staff` | Modified. Adds a per-Requisition Applications list view (Candidate identity, submitted date, CV download link) — no stage grouping or decisioning UI. |
+| `ui/bff` | Modified *(identified at Plan stage)*. The existing catch-all proxy route reads/writes request and response bodies as text, which corrupts binary CV bytes in either direction; generalised to a binary-safe passthrough. See `plan/hld.md` Design Decision D-4. |
 
 ## Out of Scope
 
