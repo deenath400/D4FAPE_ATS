@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 39 / 42 tasks · checkpoint CP-3 of 4 complete, CP-4 next
+**Progress:** 42 / 42 tasks · all checkpoints complete
 
 ---
 
@@ -236,17 +236,17 @@ clean.*
 and `npm run lint`/`format` clean, NFR-1/NFR-2 demonstrated by a passing test,
 `meta/architecture.md` reflects the shipped components.*
 
-- [ ] **T-40** — NFR-1 verification: `pageSize` above 50 is clamped, not rejected
+- [x] **T-40** — NFR-1 verification: `pageSize` above 50 is clamped, not rejected
   - Files: `backend/tests/Ats.IntegrationTests/Requisition/PublicRequisitionEndpointsTests.cs`
   - Covers: NFR-1
   - Depends on: T-17
 
-- [ ] **T-41** — NFR-2 verification: public reads never open a write transaction
+- [x] **T-41** — NFR-2 verification: public reads never open a write transaction
   - Files: `backend/tests/Ats.UnitTests/Requisition/RequisitionServiceTests.cs`
   - Covers: NFR-2
   - Depends on: T-11
 
-- [ ] **T-42** — Update `docs/specs/meta/architecture.md`
+- [x] **T-42** — Update `docs/specs/meta/architecture.md`
   - Files: `docs/specs/meta/architecture.md`
   - Covers: — (Data Model diagram: add `REQUISITION ||--o{ STAGE`; Component Map: owning spec `0003` for `api/requisition`, `service/requisition`, `db/requisition`, `ui/staff`, modified note for `ui/portal`; Change Log entry)
   - Depends on: all

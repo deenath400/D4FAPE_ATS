@@ -9,7 +9,10 @@ export default function Loading() {
       </div>
       <div className="rounded-lg border border-slate-700 overflow-hidden">
         {[0, 1, 2, 3, 4].map((row) => (
-          <div key={row} className="h-12 bg-slate-800/50 border-b border-slate-800 last:border-0"></div>
+          <div
+            key={row}
+            className="h-12 bg-slate-800/50 border-b border-slate-800 last:border-0"
+          ></div>
         ))}
       </div>
     </div>

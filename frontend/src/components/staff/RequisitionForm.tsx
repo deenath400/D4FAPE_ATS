@@ -69,9 +69,7 @@ export function RequisitionForm({
       if (!res.ok) {
         const problem = await res.json().catch(() => null);
         setError(
-          problem?.detail ||
-            problem?.title ||
-            "Unable to save the requisition. Please try again.",
+          problem?.detail || problem?.title || "Unable to save the requisition. Please try again.",
         );
         setLoading(false);
         return;

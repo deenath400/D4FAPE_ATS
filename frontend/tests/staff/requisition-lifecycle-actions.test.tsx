@@ -31,14 +31,18 @@ describe("RequisitionLifecycleActions", () => {
   });
 
   it("renders Unpublish and Close for a published requisition (AC-7, AC-9)", () => {
-    render(<RequisitionLifecycleActions requisitionId="req-1" status="published" canWrite={true} />);
+    render(
+      <RequisitionLifecycleActions requisitionId="req-1" status="published" canWrite={true} />,
+    );
     expect(screen.getByRole("button", { name: /unpublish/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /close/i })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /^publish$/i })).not.toBeInTheDocument();
   });
 
   it("calls the publish proxy endpoint and refreshes on success", async () => {
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({}) } as Response);
+    global.fetch = vi
+      .fn()
+      .mockResolvedValue({ ok: true, status: 200, json: async () => ({}) } as Response);
 
     render(<RequisitionLifecycleActions requisitionId="req-1" status="draft" canWrite={true} />);
     fireEvent.click(screen.getByRole("button", { name: /publish/i }));

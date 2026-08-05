@@ -10,7 +10,10 @@ export default function StaffLayout({ children }: { children: React.ReactNode })
       <header className="flex flex-col md:flex-row items-center justify-between gap-4 px-6 py-4 border-b border-slate-800">
         <div>
           <p className="text-xs uppercase tracking-wider text-slate-500">D4FAPE ATS</p>
-          <Link href="/staff/requisitions" className="text-lg font-semibold text-white hover:text-emerald-400">
+          <Link
+            href="/staff/requisitions"
+            className="text-lg font-semibold text-white hover:text-emerald-400"
+          >
             Staff Workspace
           </Link>
         </div>

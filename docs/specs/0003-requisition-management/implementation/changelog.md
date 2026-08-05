@@ -332,3 +332,112 @@ pre-existing failure to your work" — flagged for CP-4/`/validate` attention.
   and Component Map need no further CP-3-driven changes beyond what was applied here.
 
 ---
+
+## CP-4 — Hardening · 2026-08-05
+
+**Tasks completed:** T-40, T-41, T-42
+
+**Files created:** None — CP-4 added one test method to an existing file and made
+formatting-only edits; no new production or test files were needed.
+
+**Files modified**
+
+| Path | Change |
+|---|---|
+| `backend/tests/Ats.UnitTests/Requisition/RequisitionServiceTests.cs` | Added `PublicReads_GetByIdAndSearch_NeverOpenATransaction` (T-41, NFR-2) and its private `TransactionTrackingInterceptor` helper |
+| `backend/src/Db/Migrations/20260805171525_AddRequisitionsAndStages.cs` | Formatting-only: removed the UTF-8 BOM `dotnet ef migrations add` wrote when this file was generated in CP-1, so it satisfies `.editorconfig`'s `charset = utf-8` and `dotnet format --verify-no-changes`; no code change |
+| `frontend/src/app/(portal)/jobs/[id]/page.tsx`, `frontend/src/app/staff/layout.tsx`, `frontend/src/app/staff/requisitions/[id]/page.tsx`, `frontend/src/app/staff/requisitions/loading.tsx`, `frontend/src/components/staff/RequisitionForm.tsx`, `frontend/src/components/staff/RequisitionLifecycleActions.tsx`, `frontend/src/components/HeaderNav.tsx`, `frontend/tests/staff/requisition-form.test.tsx`, `frontend/tests/staff/requisition-lifecycle-actions.test.tsx` | Formatting-only: `prettier --write` (line-wrap/spacing only, e.g. a long `||`-chained error-message expression); no logic change. These are the only 9 of the 41 `npm run format`-flagged files this spec owns — see Deviations |
+| `docs/specs/0003-requisition-management/plan/tasks.md` | T-40/T-41/T-42 ticked `[x]`; `**Progress:**` line updated to `42 / 42 tasks · all checkpoints complete` |
+| `docs/specs/0003-requisition-management/spec.md` | Frontmatter `status: implementing` → `status: implemented` |
+| `docs/specs/index.md` | `0003` row status `implementing` → `implemented` |
+| `docs/specs/meta/architecture.md` | One Change Log row appended for CP-4 (see Meta Updates — Component Map and ER diagram needed no edits, both were already accurate from CP-1–CP-3) |
+
+**Decisions made during implementation**
+
+| # | Decision | Why |
+|---|---|---|
+| I-10 | T-40 required no new test code | `GET_public_requisitions_PageSize1000_Returns50Items` in `PublicRequisitionEndpointsTests.cs` — requesting `pageSize=1000` and asserting `200 OK` with `pageSize: 50` and 50 items returned — already exists, added ahead of schedule during CP-2's T-17 (the CP-2 changelog explicitly lists "NFR-1 clamp" among that checkpoint's 11 public-endpoint tests). It already demonstrates exactly what T-40 asks: the request is *clamped*, not *rejected* (a `400`/`422` would be the "rejected" alternative this test rules out). Re-ran it as part of this checkpoint's full-suite verification rather than duplicating it. |
+| I-11 | T-41's new test asserts both `dbContext.Database.CurrentTransaction == null` (the LLD's literal suggestion) and that no transaction was ever *opened* during the call, via a `Microsoft.EntityFrameworkCore.Diagnostics.DbTransactionInterceptor` attached to a second, instrumented `AppDbContext` sharing the same in-memory SQLite connection | The bare `CurrentTransaction == null` check only proves no transaction is open *after* the call returns — it would not catch a transaction that was opened and then committed/rolled back and disposed *during* the call. The interceptor records every `TransactionStarted`/`TransactionStartedAsync` callback EF Core fires (whether from an explicit `BeginTransactionAsync()` or the implicit transaction `SaveChangesAsync` wraps writes in), so the assertion actually exercises the mechanism NFR-2 cares about, not just its end state. This is additive to, not a replacement of, the LLD's designed assertion. |
+| I-12 | `dotnet format --verify-no-changes` / `npm run format`: fixed only the files this spec created or modified; left all pre-existing 0001/0002 drift untouched | `dotnet format --verify-no-changes` failed on 41 backend `.cs` files before any CP-4 edit — 40 of them are pre-existing 0001/0002 files (CRLF line endings or a BOM `dotnet ef migrations add` wrote into every migration, including 0001's and 0002's, not just 0003's) that predate this checkpoint and that this checkpoint's tasks never name. The one file among the 41 that CP-1 of *this* spec created (`AddRequisitionsAndStages.cs`) was fixed (BOM removed). Symmetrically, `npm run format` failed on 41 frontend files; 9 of them are files this spec created or modified (a `prettier --write` line-wrap fix, no logic change) and were fixed; the remaining 32 are 0001/0002 files or repo config (`package.json`, `tsconfig.json`, etc.) and were left as-is. Reformatting ~72 files this spec never touched would violate "never rewrite unrelated code" for a purely cosmetic, pre-existing condition (same class as CP-1's SDK-pin fix and CP-3's `npm install` lock-file drift — an environment fact, not a CP-4 code defect). Recorded here per the explicit instruction to be transparent about this call; a future spec or a dedicated formatting-normalization task should decide whether to reformat the remaining 32+32 files repo-wide. |
+
+**Deviations from the LLD:** None. T-41's test is an *addition* to the LLD §11 Test Plan's
+suggested assertion (`GetPublicByIdAsync_NeverOpensTransaction`), not a substitution — the LLD
+itself offered `dbContext.Database.CurrentTransaction == null` as one acceptable shape ("a
+dedicated `RequisitionServiceTests` case asserting..."); the interceptor is a stronger
+implementation of exactly that intent, not a design change. No `plan/lld.md` edit was needed.
+
+**Verification run**
+
+```
+$ cd backend && dotnet build
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+$ dotnet test tests/Ats.UnitTests --no-restore
+Passed!  - Failed:     0, Passed:    51, Skipped:     0, Total:    51, Duration: 3 s - Ats.UnitTests.dll (net10.0)
+
+$ dotnet test tests/Ats.IntegrationTests --no-restore
+Passed!  - Failed:     0, Passed:    38, Skipped:     0, Total:    38, Duration: 8 s - Ats.IntegrationTests.dll (net10.0)
+
+$ dotnet test tests/Ats.ArchitectureTests --no-build
+Passed!  - Failed:     0, Passed:     4, Skipped:     0, Total:     4, Duration: 67 ms - Ats.ArchitectureTests.dll (net10.0)
+
+$ dotnet format --verify-no-changes
+# After removing the BOM from AddRequisitionsAndStages.cs (this spec's own file):
+# 40 remaining ENDOFLINE/CHARSET errors, all in pre-existing 0001/0002 files
+# (e.g. Auth*, RefreshToken*, SystemStatus*, CustomWebApplicationFactory.cs,
+# LayeringRuleTests.cs, the 0001/0002 migrations) — none owned by 0003. See Deviations.
+```
+
+```
+$ cd frontend && npm run build
+✓ Compiled successfully, 9/9 static pages generated (unchanged route table from CP-3)
+
+$ npm test
+ Test Files  8 passed (8)
+      Tests  31 passed (31)
+
+$ npm run lint
+✔ No ESLint warnings or errors
+
+$ npm run format
+# After `prettier --write` on the 9 files this spec owns:
+# 32 remaining files flagged, all pre-existing 0001/0002 files or repo config
+# (package.json, tsconfig.json, RegisterForm.tsx, backend-invoke.ts, etc.) — none
+# owned by 0003. See Deviations.
+```
+
+(51 unit tests = 50 pre-existing + 1 new `PublicReads_GetByIdAndSearch_NeverOpenATransaction`.
+38 integration tests unchanged from CP-2 — `GET_public_requisitions_PageSize1000_Returns50Items`
+was already counted there.)
+
+**NFR demonstration**
+
+- **NFR-1** (`pageSize` above 50 is clamped, not rejected): `GET_public_requisitions_PageSize1000_Returns50Items` in `PublicRequisitionEndpointsTests.cs` requests `?pageSize=1000` and asserts `200 OK` with `pageSize: 50` and exactly 50 items returned (55 published requisitions seeded) — proving the request succeeds and is silently clamped rather than rejected with a `4xx`.
+- **NFR-2** (public reads never open a write transaction): `PublicReads_GetByIdAndSearch_NeverOpenATransaction` in `RequisitionServiceTests.cs` calls `GetPublicByIdAsync` and `SearchPublicAsync` through an instrumented `AppDbContext` carrying a `DbTransactionInterceptor`, then asserts the interceptor never observed a `TransactionStarted`/`TransactionStartedAsync` callback and that `Database.CurrentTransaction` is `null` afterward.
+
+**Meta updates applied**
+
+- `architecture.md`: one Change Log row appended for CP-4. The Component Map (owning spec
+  `0003` for `api/requisition`, `service/requisition`, `db/requisition`, `ui/staff`, and
+  `ui/portal`'s `0001, 0003` note) and the Data Model ER diagram (`Requisition ||--o{ Stage`)
+  were already fully accurate from CP-1–CP-3's incremental edits — verified by re-reading the
+  file in full before editing, per the consistency check (`.spec-kit/meta-maintenance.md` §8).
+  No other line changed. File is 167 lines — within the 200-line hard ceiling (over the
+  150-line target, unchanged from before this checkpoint's one-line addition).
+- `tech-stack.md`: no change — no new dependency, command, or config key.
+- `coding-standards.md`: no change — no new project-wide convention.
+
+**Known gaps**
+
+- Pre-existing `dotnet format`/`npm run format` drift in 40 backend and 32 frontend files from
+  specs 0001/0002 (plus repo config files) remains unresolved — see Deviations. Recommend a
+  dedicated hygiene task/spec if the team wants it normalized repo-wide, since fixing it here
+  would touch far more surface area than this checkpoint's named tasks.
+- The Edge Runtime `CompressionStream`/`DecompressionStream` build warning noted in CP-3
+  remains, for the same reason recorded there.
+
+All 42 tasks across CP-1–CP-4 are now complete. Spec `0003` is `implemented`.
+
+---

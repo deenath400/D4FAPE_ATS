@@ -2,7 +2,9 @@ namespace Ats.UnitTests.Requisition;
 
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Ats.Db;
 using Ats.Service.Common;
@@ -10,6 +12,7 @@ using Ats.Service.Requisition;
 using Ats.Service.Requisition.Dtos;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Xunit;
 
@@ -363,5 +366,64 @@ public class RequisitionServiceTests : IDisposable
         Assert.True(result.IsSuccess);
         Assert.Equal(50, result.Value!.PageSize);
         Assert.Equal(50, result.Value.Items.Count);
+    }
+
+    [Fact]
+    public async Task PublicReads_GetByIdAndSearch_NeverOpenATransaction()
+    {
+        // NFR-2: public GET paths must never open a write transaction, preserving SQLite's
+        // single-writer path for registration/application traffic. A DbTransactionInterceptor
+        // observes every transaction EF Core actually starts (explicit or the implicit one
+        // SaveChangesAsync wraps writes in) on the same underlying connection this test's
+        // setup already used to create and publish a requisition.
+        var published = await CreateAndPublishAsync("Senior Engineer", "We build backend systems.");
+
+        var interceptor = new TransactionTrackingInterceptor();
+        var instrumentedOptions = new DbContextOptionsBuilder<AppDbContext>()
+            .UseSqlite(_connection)
+            .AddInterceptors(interceptor)
+            .Options;
+
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Requisitions:DefaultPageSize"] = "20",
+                ["Requisitions:MaxPageSize"] = "50"
+            })
+            .Build();
+
+        await using var instrumentedContext = new AppDbContext(instrumentedOptions);
+        var instrumentedService = new RequisitionService(instrumentedContext, configuration);
+
+        var detailResult = await instrumentedService.GetPublicByIdAsync(published.Id);
+        var searchResult = await instrumentedService.SearchPublicAsync(null, 1, 20);
+
+        Assert.True(detailResult.IsSuccess);
+        Assert.True(searchResult.IsSuccess);
+        Assert.False(interceptor.TransactionOpened, "GetPublicByIdAsync/SearchPublicAsync must never open a transaction (NFR-2).");
+        Assert.Null(instrumentedContext.Database.CurrentTransaction);
+    }
+
+    /// <summary>
+    /// Records whether EF Core ever started a database transaction (explicit or the implicit
+    /// one it wraps write operations in) on the intercepted context — used by
+    /// <see cref="PublicReads_GetByIdAndSearch_NeverOpenATransaction"/> to assert NFR-2.
+    /// </summary>
+    private sealed class TransactionTrackingInterceptor : DbTransactionInterceptor
+    {
+        public bool TransactionOpened { get; private set; }
+
+        public override DbTransaction TransactionStarted(DbConnection connection, TransactionEndEventData eventData, DbTransaction result)
+        {
+            TransactionOpened = true;
+            return base.TransactionStarted(connection, eventData, result);
+        }
+
+        public override ValueTask<DbTransaction> TransactionStartedAsync(
+            DbConnection connection, TransactionEndEventData eventData, DbTransaction result, CancellationToken cancellationToken = default)
+        {
+            TransactionOpened = true;
+            return base.TransactionStartedAsync(connection, eventData, result, cancellationToken);
+        }
     }
 }

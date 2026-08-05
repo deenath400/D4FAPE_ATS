@@ -37,7 +37,9 @@ export default async function StaffRequisitionDetailPage({
     <div className="space-y-8 max-w-2xl">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-white">{requisition.title}</h2>
-        <span className="text-xs uppercase tracking-wider text-slate-400">{requisition.status}</span>
+        <span className="text-xs uppercase tracking-wider text-slate-400">
+          {requisition.status}
+        </span>
       </div>
 
       <RequisitionLifecycleActions

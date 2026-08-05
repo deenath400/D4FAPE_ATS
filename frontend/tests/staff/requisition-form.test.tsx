@@ -125,9 +125,7 @@ describe("RequisitionForm", () => {
     fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole("alert")).toHaveTextContent(
-        "A closed requisition cannot be edited.",
-      );
+      expect(screen.getByRole("alert")).toHaveTextContent("A closed requisition cannot be edited.");
     });
     expect(mockRefresh).not.toHaveBeenCalled();
   });

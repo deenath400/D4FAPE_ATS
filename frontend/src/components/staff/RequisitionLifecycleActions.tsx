@@ -114,7 +114,9 @@ export function RequisitionLifecycleActions({
           </>
         )}
 
-        {status === "closed" && <p className="text-sm text-slate-400">This requisition is closed.</p>}
+        {status === "closed" && (
+          <p className="text-sm text-slate-400">This requisition is closed.</p>
+        )}
       </div>
     </div>
   );

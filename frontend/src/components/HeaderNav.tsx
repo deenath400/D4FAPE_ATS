@@ -32,7 +32,10 @@ export function HeaderNav() {
             Browse Jobs
           </Link>
           {isStaffRole(roles) && (
-            <Link href="/staff/requisitions" className="text-slate-300 hover:text-white transition-all">
+            <Link
+              href="/staff/requisitions"
+              className="text-slate-300 hover:text-white transition-all"
+            >
               Staff Workspace
             </Link>
           )}
@@ -55,7 +58,10 @@ export function HeaderNav() {
 
   return (
     <div className="flex items-center gap-3 text-sm">
-      <Link href="/jobs" className="px-3 py-1.5 font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-all">
+      <Link
+        href="/jobs"
+        className="px-3 py-1.5 font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-all"
+      >
         Browse Jobs
       </Link>
       <Link

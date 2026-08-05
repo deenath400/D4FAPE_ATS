@@ -160,6 +160,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-05 | 0003 | CP-1: Added `Requisition`/`Stage` entities, EF Core configurations, and `AddRequisitionsAndStages` migration |
 | 2026-08-05 | 0003 | CP-2: Built `RequisitionService`, staff `RequisitionEndpoints` and anonymous `PublicRequisitionEndpoints`, `PagedResult<T>` pagination envelope, and unit/integration test coverage |
 | 2026-08-05 | 0003 | CP-3: Gave `ui/staff` its first real code — `/staff` route segment, `middleware.ts` role gating (closes 0002 E-9), requisition list/create/edit/lifecycle pages; added `ui/portal` `/jobs` search + detail pages |
+| 2026-08-05 | 0003 | CP-4: Hardening — dedicated NFR-1 (pageSize clamp) and NFR-2 (public reads never open a transaction) verification tests; spec closed out, all 42 tasks complete |
 
 ## Related Specs
 

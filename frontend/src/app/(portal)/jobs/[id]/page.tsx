@@ -7,11 +7,7 @@ import type { PublicRequisitionDto } from "@/lib/types/requisition";
 
 // Public job detail (AC-21, AC-22). A draft/closed/missing id 404s identically (E-10) —
 // `notFound()` renders Next.js's default not-found page, no bespoke copy required (LLD §5.3).
-export default async function JobDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   let job: PublicRequisitionDto;
