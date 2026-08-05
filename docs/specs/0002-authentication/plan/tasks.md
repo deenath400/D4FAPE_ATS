@@ -94,22 +94,22 @@ Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/impl
 
 *Exit condition: Full backend & frontend test suites pass green, zero lint/type errors, architecture snapshot updated.*
 
-- [ ] **T-12** — Implement `RegisterForm.tsx` and candidate registration page `/register` with Vitest tests
+- [x] **T-12** — Implement `RegisterForm.tsx` and candidate registration page `/register` with Vitest tests
   - Files: `frontend/src/components/auth/RegisterForm.tsx`, `frontend/src/app/(auth)/register/page.tsx`, `frontend/tests/auth/RegisterForm.test.tsx`
   - Covers: AC-13, AC-19
   - Depends on: T-11
 
-- [ ] **T-13** — Implement `LoginForm.tsx` and portal login page `/login` with Vitest tests
+- [x] **T-13** — Implement `LoginForm.tsx` and portal login page `/login` with Vitest tests
   - Files: `frontend/src/components/auth/LoginForm.tsx`, `frontend/src/app/(auth)/login/page.tsx`, `frontend/tests/auth/LoginForm.test.tsx`
   - Covers: AC-12, AC-19
   - Depends on: T-11
 
-- [ ] **T-14** — Update header navigation to display authenticated user session status and sign-out action
+- [x] **T-14** — Update header navigation to display authenticated user session status and sign-out action
   - Files: `frontend/src/components/HeaderNav.tsx`
   - Covers: AC-8, AC-9, AC-12
   - Depends on: T-13
 
-- [ ] **T-15** — Update `docs/specs/meta/architecture.md` Component Map and ER diagram for Spec 0002
+- [x] **T-15** — Update `docs/specs/meta/architecture.md` Component Map and ER diagram for Spec 0002
   - Files: `docs/specs/meta/architecture.md`
   - Covers: —
   - Depends on: T-01, T-05, T-14

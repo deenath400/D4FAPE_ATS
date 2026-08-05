@@ -201,3 +201,75 @@ Test Files  1 passed (1)
 **Known gaps carried into the next checkpoint**
 
 - None.
+
+---
+
+## CP-4 — Frontend Auth UI Components, Hardening & Architecture Sync · 2026-08-05
+
+**Tasks completed:** T-12, T-13, T-14, T-15
+
+**Files created**
+
+| Path | Purpose |
+|---|---|
+| `frontend/src/components/auth/AuthProvider.tsx` | NextAuth client-side `SessionProvider` wrapper |
+| `frontend/src/components/auth/RegisterForm.tsx` | Candidate registration form component with RFC 7807 error banner and automatic login |
+| `frontend/src/components/auth/LoginForm.tsx` | Candidate/Staff login form component with loading state and RFC 7807 error banner |
+| `frontend/src/components/HeaderNav.tsx` | Header navigation component displaying session status, user full name, role badge, and sign-out button |
+| `frontend/src/app/(portal)/register/page.tsx` | Candidate registration portal page `/register` |
+| `frontend/src/app/(portal)/login/page.tsx` | Candidate/Staff login portal page `/login` |
+| `frontend/tests/auth/RegisterForm.test.tsx` | Vitest unit tests for candidate registration form |
+| `frontend/tests/auth/LoginForm.test.tsx` | Vitest unit tests for login form |
+| `frontend/tests/auth/HeaderNav.test.tsx` | Vitest unit tests for header navigation component |
+
+**Files modified**
+
+| Path | Change |
+|---|---|
+| `frontend/src/app/layout.tsx` | Wrapped root layout body with `<AuthProvider>` |
+| `frontend/src/app/(portal)/page.tsx` | Added `<HeaderNav>` to portal landing page header |
+
+**Decisions made during implementation**
+
+| # | Decision | Why |
+|---|---|---|
+| I-4 | Integrated `HeaderNav` directly in landing page header and root layout `AuthProvider` | Ensures seamless authentication status display and sign-out capabilities across client/server components. |
+
+**Deviations from the LLD**
+
+| LLD section | Designed | Actual | Reason | LLD patched? |
+|---|---|---|---|---|
+| — | — | — | None. | — |
+
+**Verification run**
+
+```
+$ npm run build (frontend)
+✓ Compiled successfully
+  Generating static pages (7/7)
+
+$ npm run test (frontend)
+ Test Files  4 passed (4)
+      Tests  11 passed (11)
+
+$ dotnet build (backend)
+Build succeeded. 0 Warning(s), 0 Error(s).
+
+$ dotnet test tests/Ats.UnitTests (backend)
+Passed! - Passed: 17, Total: 17.
+
+$ dotnet test tests/Ats.IntegrationTests (backend)
+Passed! - Passed: 12, Total: 12.
+```
+
+**Meta updates applied**
+
+- `architecture.md`: Appended CP-4 Change Log row.
+- `tech-stack.md`: no change.
+- `coding-standards.md`: no change.
+- `spec.md`: Status updated to `implemented`.
+- `docs/specs/index.md`: Updated Spec 0002 status to `implemented`.
+
+**Known gaps carried into the next checkpoint**
+
+- None. Implementation of Spec 0002 is fully complete.
