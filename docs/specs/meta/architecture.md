@@ -66,9 +66,9 @@ graph TD
 | Component | Responsibility | Owning specs |
 |---|---|---|
 | `infra/build` | Repository build, version pinning, lockfile and lint/format infrastructure | 0001 |
-| `ui/portal` | Public candidate surface: landing page system status, registration, job search, apply | 0001 |
+| `ui/portal` | Public candidate surface: landing page system status, registration, job search, apply | 0001, 0003 |
 | `ui/bff` | Frontend BFF layer: proxy route handlers and shared backend invoke function | 0001, 0002 |
-| `ui/staff` | Authenticated recruiter and hiring-manager workspace: requisitions, pipeline, decisions | — |
+| `ui/staff` | Authenticated recruiter and hiring-manager workspace: requisitions, pipeline, decisions | 0003 |
 | `api/system` | Backend HTTP boundary: system status & auth endpoints, composition root | 0001, 0002 |
 | `api/requisition` | Staff CRUD/lifecycle endpoints (`RecruiterOnly`/`StaffOnly`) plus anonymous public search/detail endpoints under `/api/public/requisitions` | 0003 |
 | `api/<area>` | HTTP boundary — routing, request DTOs, authorization policies | — |
@@ -159,6 +159,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-05 | 0002 | CP-3: Configured NextAuth v5 session provider, JWT callback refresh flow, and BFF proxy route |
 | 2026-08-05 | 0003 | CP-1: Added `Requisition`/`Stage` entities, EF Core configurations, and `AddRequisitionsAndStages` migration |
 | 2026-08-05 | 0003 | CP-2: Built `RequisitionService`, staff `RequisitionEndpoints` and anonymous `PublicRequisitionEndpoints`, `PagedResult<T>` pagination envelope, and unit/integration test coverage |
+| 2026-08-05 | 0003 | CP-3: Gave `ui/staff` its first real code — `/staff` route segment, `middleware.ts` role gating (closes 0002 E-9), requisition list/create/edit/lifecycle pages; added `ui/portal` `/jobs` search + detail pages |
 
 ## Related Specs
 

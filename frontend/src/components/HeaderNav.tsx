@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
+import { isStaffRole } from "@/lib/auth-guards";
 
 export function HeaderNav() {
   const { data: session, status } = useSession();
@@ -26,6 +27,16 @@ export function HeaderNav() {
 
     return (
       <div className="flex items-center gap-4">
+        <nav className="flex items-center gap-3 text-sm">
+          <Link href="/jobs" className="text-slate-300 hover:text-white transition-all">
+            Browse Jobs
+          </Link>
+          {isStaffRole(roles) && (
+            <Link href="/staff/requisitions" className="text-slate-300 hover:text-white transition-all">
+              Staff Workspace
+            </Link>
+          )}
+        </nav>
         <div className="flex items-center gap-2 text-sm">
           <span className="text-slate-200 font-medium">{displayName}</span>
           <span className="px-2 py-0.5 text-xs font-semibold bg-emerald-950/80 border border-emerald-700/80 text-emerald-300 rounded-full">
@@ -44,6 +55,9 @@ export function HeaderNav() {
 
   return (
     <div className="flex items-center gap-3 text-sm">
+      <Link href="/jobs" className="px-3 py-1.5 font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-all">
+        Browse Jobs
+      </Link>
       <Link
         href="/login"
         className="px-3 py-1.5 font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-all"

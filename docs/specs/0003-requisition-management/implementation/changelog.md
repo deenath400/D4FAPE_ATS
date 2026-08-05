@@ -193,3 +193,142 @@ Also ran `dotnet test tests/Ats.ArchitectureTests --no-build` for extra confiden
 - NFR-2 (public reads never open a write transaction) is structurally true — `GetPublicByIdAsync`/`SearchPublicAsync` never call `SaveChangesAsync` — but the dedicated assertion test is CP-4's T-41, not written here.
 
 ---
+
+## CP-3 — Frontend · 2026-08-05
+
+**Tasks completed:** T-18, T-19, T-20, T-21, T-22, T-23, T-24, T-25, T-26, T-27, T-28, T-29, T-30, T-31, T-32, T-33, T-34, T-35, T-36, T-37, T-38, T-39
+
+**Files created**
+
+| Path | Purpose |
+|---|---|
+| `frontend/src/lib/types/requisition.ts` | Shared TS types mirroring `api.md` §4 (`RequisitionDto`, `PublicRequisitionDto`, `Paged<T>`, request DTOs) |
+| `frontend/src/lib/auth-guards.ts` | Pure role-check helpers (`isStaffRole`, `isRecruiter`), no NextAuth/Next.js imports — usable from Edge middleware and Server Components alike |
+| `frontend/src/middleware.ts` | `/staff/*` route gating (FR-9) — redirects an anonymous session to `/login` and a Candidate session to `/`, closing `0002`'s E-9 |
+| `frontend/src/app/staff/layout.tsx` | Staff workspace shell — reuses `HeaderNav`, replaces the `0001` `(staff)` placeholder route group |
+| `frontend/src/components/staff/RequisitionForm.tsx` | Create/edit client form — client-side validation (title required/≤200 chars, description required), POST/PUT via the `ui/bff` proxy |
+| `frontend/src/components/staff/RequisitionLifecycleActions.tsx` | Publish/unpublish/close buttons; renders nothing when `canWrite=false` (HiringManager) |
+| `frontend/src/app/staff/requisitions/page.tsx` | Staff requisition list (AC-12), status badges, "New Requisition" CTA, empty state |
+| `frontend/src/app/staff/requisitions/loading.tsx` | Skeleton loading state |
+| `frontend/src/app/staff/requisitions/error.tsx` | Error boundary with retry |
+| `frontend/src/app/staff/requisitions/new/page.tsx` | Create page (AC-1) |
+| `frontend/src/app/staff/requisitions/[id]/page.tsx` | Detail/edit/lifecycle page (AC-3–AC-11); resolves `canWrite` from the session server-side |
+| `frontend/src/app/staff/requisitions/[id]/loading.tsx` | Skeleton loading state |
+| `frontend/src/app/staff/requisitions/[id]/error.tsx` | Error boundary with retry |
+| `frontend/src/components/portal/JobSearchForm.tsx` | Progressive-enhancement `<form method="get">` keyword search — no client JS |
+| `frontend/src/components/portal/JobList.tsx` | Presentational card list + Prev/Next pagination, empty state |
+| `frontend/src/app/(portal)/jobs/page.tsx` | Public jobs list (AC-16–AC-20, AC-24); `export const dynamic` not needed — reading `searchParams` already opts the route into per-request rendering |
+| `frontend/src/app/(portal)/jobs/loading.tsx` | Skeleton loading state |
+| `frontend/src/app/(portal)/jobs/[id]/page.tsx` | Public job detail (AC-21, AC-22); `notFound()` on a 404 `BackendInvokeError` |
+| `frontend/src/app/(portal)/jobs/[id]/loading.tsx` | Skeleton loading state |
+| `frontend/tests/lib/auth-guards.test.ts` | `isStaffRole`/`isRecruiter` unit tests (AC-14, AC-15) |
+| `frontend/tests/staff/requisition-form.test.tsx` | Validation, create redirect, edit refresh, 409-on-closed banner (AC-1, AC-3, AC-5) |
+| `frontend/tests/staff/requisition-lifecycle-actions.test.tsx` | `canWrite=false` renders nothing, per-status button sets, 409 banner (AC-6, AC-7, AC-9, AC-10, AC-11) |
+| `frontend/tests/portal/job-search-form.test.tsx` | `JobSearchForm` GET-form shape, `JobList` empty state and pagination (AC-16, AC-17, AC-20) |
+
+**Files modified**
+
+| Path | Change |
+|---|---|
+| `frontend/src/components/HeaderNav.tsx` | Added a "Browse Jobs" link (all sessions) and a "Staff Workspace" link gated by `isStaffRole` (authenticated staff sessions only) |
+| `frontend/package-lock.json` | Synced by `npm install` — the committed lock file predated this checkpoint and was stale relative to `package.json` (see Deviations); no dependency versions changed, `package.json` is untouched |
+
+**Files deleted**
+
+| Path | Reason |
+|---|---|
+| `frontend/src/app/(staff)/.gitkeep` | Replaced by the real `frontend/src/app/staff/` route segment (T-22, LLD D-4) |
+
+**Decisions made during implementation**
+
+| # | Decision | Why |
+|---|---|---|
+| I-6 | `middleware.ts` wraps the same `auth()` export `lib/auth.ts` already provides (`export default auth((req) => {...})`), rather than a hand-rolled JWT decode | This is NextAuth v5's documented middleware pattern and reuses the exact session shape (`session.user.roles`) `auth-guards.ts` and every Server Component already expect — no second source of truth for "what roles does this session have." |
+| I-7 | `(portal)/jobs/page.tsx` and `(portal)/jobs/[id]/page.tsx` carry no explicit `export const dynamic` | Next.js 15 already opts a route into per-request (dynamic) rendering when it reads `searchParams` (`/jobs`) or has an unresolved dynamic segment with no `generateStaticParams` (`/jobs/[id]`, `/staff/requisitions/[id]`). Confirmed by the build's route table (`ƒ` = dynamic) — adding a redundant `dynamic` export would be dead code. |
+| I-8 | `frontend/src/app/staff/requisitions/page.tsx` carries an explicit `export const dynamic = "force-dynamic"` | Unlike the two routes above, this page has no `searchParams` and no dynamic segment, so Next.js's default build-time static-generation pass tried to prerender it and called `invokeBackend` with no backend reachable and no `API_BASE_URL` configured — see Deviations. The explicit dynamic export documents *why* it must never be prerendered (session/role-dependent staff data), not just silences the build failure. |
+| I-9 | `RequisitionForm`/`RequisitionLifecycleActions` read/report backend errors via `problem?.detail \|\| problem?.title`, matching `RegisterForm.tsx`'s existing pattern exactly | LLD §5.1 says "mirrors `RegisterForm.tsx`'s structure" — reusing the same error-extraction shape means both forms behave identically for every `ProblemDetails` code this spec's endpoints (`api.md` §3) can return (`requisition.*.validation-failed`, `requisition.update.closed`, `requisition.*.invalid-transition`). |
+
+**Deviations from the LLD**
+
+| LLD section | Designed | Actual | Reason | LLD patched? |
+|---|---|---|---|---|
+| Build precondition (not an LLD section — build environment) | `npm ci` installs cleanly from the committed lock file | `npm ci` failed ("can only install packages when your package.json and package-lock.json ... are in sync"); `npm install` was run instead, which updated `package-lock.json` (34 insertions/24 deletions, integrity/resolved metadata only) | The committed lock file predated this checkpoint's `npm install` and had drifted out of sync with `package.json` (no dependency version or `package.json` change caused this — confirmed via `git diff frontend/package.json`, empty). This is a pre-existing environment gap, the same class of issue CP-1 hit with the backend SDK pin, not a CP-3 code defect. `npm install` is the documented recovery per npm's own error message; no new dependency was added. | No — build-environment fact, not a design decision |
+| §5.1 File Manifest (implicit — LLD doesn't call out `export const dynamic`) | Not specified | Added `export const dynamic = "force-dynamic"` to `frontend/src/app/staff/requisitions/page.tsx` | `npm run build` failed prerendering `/staff/requisitions`: Next.js's default static-generation pass called `invokeBackend` (no `API_BASE_URL` set at build time, and no backend process running during `next build` regardless). Every other new data-fetching page in this checkpoint already reads `searchParams` or a dynamic route segment, which Next.js 15 auto-detects as request-dependent; the staff list page has neither, so it needed the explicit opt-out. Functionally correct either way — staff data must never be statically cached across sessions — this only makes the existing intent (LLD §5.3: "Normal SSR on navigation") build-time explicit. | Yes — LLD §5.1 file manifest row annotated below |
+
+**Verification run**
+
+```
+$ cd frontend && npm install
+added 504 packages, and audited 505 packages in 3m
+3 vulnerabilities (2 high, 1 critical) — pre-existing in `next@15.1.7` (CVE-2025-66478),
+unrelated to this checkpoint's code; no dependency was upgraded or added by CP-3.
+
+$ npm run build
+   ▲ Next.js 15.1.7
+ ⚠ Compiled with warnings
+   (jose/dist/webapi/lib/deflate.js: CompressionStream/DecompressionStream not supported in the
+   Edge Runtime — transitively pulled in by next-auth's `auth()` wrapper now used in
+   `middleware.ts`; does not fail the build, no JWE encryption is used by this project's tokens)
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+ ✓ Generating static pages (9/9)
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    1.51 kB         114 kB
+├ ○ /_not-found                          979 B           106 kB
+├ ƒ /api/auth/[...nextauth]              152 B           106 kB
+├ ƒ /api/bff/proxy/[...path]             152 B           106 kB
+├ ƒ /api/bff/system-status               152 B           106 kB
+├ ƒ /jobs                                908 B           113 kB
+├ ƒ /jobs/[id]                           908 B           113 kB
+├ ○ /login                               1.47 kB         114 kB
+├ ○ /register                            1.75 kB         114 kB
+├ ƒ /staff/requisitions                  171 B           109 kB
+├ ƒ /staff/requisitions/[id]             1.79 kB         107 kB
+└ ○ /staff/requisitions/new              1.37 kB         107 kB
+ƒ Middleware                             85 kB
+
+$ npm test
+ Test Files  8 passed (8)
+      Tests  31 passed (31)
+
+$ npm run lint
+✔ No ESLint warnings or errors
+```
+
+(31 tests = 3 pre-existing [`client-status-panel`] + 2 [`HeaderNav`] + 3 [`LoginForm`] + 3
+[`RegisterForm`] = 11 pre-existing, + 7 new `auth-guards.test.ts` + 4 new
+`requisition-form.test.tsx` + 5 new `requisition-lifecycle-actions.test.tsx` + 4 new
+`job-search-form.test.tsx` = 20 new.)
+
+`npm run format` was also run for extra confidence (not part of CP-3's stated exit condition):
+it reports pre-existing formatting drift across 41 files, including files this checkpoint never
+touched (`package.json`, `.prettierrc.json`, `tsconfig.json`, `vitest.config.ts`) — a
+pre-existing baseline condition (likely CRLF line endings on this Windows environment vs.
+Prettier's LF expectation), not introduced by CP-3. Left as-is per "do not attribute a
+pre-existing failure to your work" — flagged for CP-4/`/validate` attention.
+
+**Meta updates applied**
+
+- `architecture.md`: `ui/staff` Component Map row now lists owning spec `0003` (was `—`);
+  `ui/portal` row gained `0003` alongside `0001`. One Change Log row appended for CP-3.
+- `tech-stack.md`: no change — no new dependency, command, or config key.
+- `coding-standards.md`: no change — no new project-wide convention; `RequisitionForm`/
+  `RequisitionLifecycleActions` follow the existing `RegisterForm.tsx` error-banner/spinner
+  idiom rather than establishing a new one.
+
+**Known gaps carried into the next checkpoint**
+
+- The pre-existing `npm run format` drift (41 files, see Verification) is unresolved — CP-4 or
+  `/validate` should decide whether to normalize it or record it as an accepted environment
+  fact (Windows line endings).
+- The Edge Runtime `CompressionStream`/`DecompressionStream` build warning from `jose` (via
+  `next-auth`'s `auth()` wrapper now exercised in `middleware.ts`) is a warning, not a build
+  failure, and does not affect JWT signing/verification (only unused JWE compression paths);
+  not addressed here as it would require either an experimental Next.js Node.js-runtime
+  middleware flag (not in `tech-stack.md`) or a `next-auth` upgrade (not authorised for CP-3).
+- CP-4 (Hardening) depends on this checkpoint's `ui/staff`/`ui/portal` pages and `middleware.ts`
+  being in place; `meta/architecture.md`'s final CP-4 pass should confirm the Data Model diagram
+  and Component Map need no further CP-3-driven changes beyond what was applied here.
+
+---

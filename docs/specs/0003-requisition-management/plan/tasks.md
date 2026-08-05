@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 17 / 42 tasks · checkpoint CP-2 of 4 complete, CP-3 next
+**Progress:** 39 / 42 tasks · checkpoint CP-3 of 4 complete, CP-4 next
 
 ---
 
@@ -120,112 +120,112 @@ documented status/body.*
 *Exit condition: `npm run build` succeeds, `npm test` (Vitest) passes, `npm run lint` is
 clean.*
 
-- [ ] **T-18** — Shared TS types for Requisition
+- [x] **T-18** — Shared TS types for Requisition
   - Files: `frontend/src/lib/types/requisition.ts`
   - Covers: —
   - Depends on: T-14
 
-- [ ] **T-19** — Role-check helpers
+- [x] **T-19** — Role-check helpers
   - Files: `frontend/src/lib/auth-guards.ts`
   - Covers: — (foundation for AC-14, AC-15)
   - Depends on: —
 
-- [ ] **T-20** — Unit tests for role-check helpers
+- [x] **T-20** — Unit tests for role-check helpers
   - Files: `frontend/tests/lib/auth-guards.test.ts`
   - Covers: AC-14, AC-15
   - Depends on: T-19
 
-- [ ] **T-21** — `middleware.ts` — `/staff/*` route gating
+- [x] **T-21** — `middleware.ts` — `/staff/*` route gating
   - Files: `frontend/src/middleware.ts`
   - Covers: AC-14, AC-15
   - Depends on: T-19
 
-- [ ] **T-22** — Replace the `(staff)` placeholder with a real `/staff` layout
+- [x] **T-22** — Replace the `(staff)` placeholder with a real `/staff` layout
   - Files: Delete `frontend/src/app/(staff)/.gitkeep`; Create `frontend/src/app/staff/layout.tsx`
   - Covers: — (foundation for G-4)
   - Depends on: T-21
 
-- [ ] **T-23** — `RequisitionForm` client component (create + edit)
+- [x] **T-23** — `RequisitionForm` client component (create + edit)
   - Files: `frontend/src/components/staff/RequisitionForm.tsx`
   - Covers: AC-1, AC-3, AC-4, AC-5
   - Depends on: T-18
 
-- [ ] **T-24** — `RequisitionLifecycleActions` client component
+- [x] **T-24** — `RequisitionLifecycleActions` client component
   - Files: `frontend/src/components/staff/RequisitionLifecycleActions.tsx`
   - Covers: AC-6, AC-7, AC-8, AC-9, AC-10, AC-11
   - Depends on: T-18
 
-- [ ] **T-25** — Staff requisitions list page
+- [x] **T-25** — Staff requisitions list page
   - Files: `frontend/src/app/staff/requisitions/page.tsx`
   - Covers: AC-12
   - Depends on: T-18, T-22
 
-- [ ] **T-26** — Staff list loading/error states
+- [x] **T-26** — Staff list loading/error states
   - Files: `frontend/src/app/staff/requisitions/loading.tsx`, `frontend/src/app/staff/requisitions/error.tsx`
   - Covers: AC-12 (UI states)
   - Depends on: T-25
 
-- [ ] **T-27** — Staff new-requisition page
+- [x] **T-27** — Staff new-requisition page
   - Files: `frontend/src/app/staff/requisitions/new/page.tsx`
   - Covers: AC-1
   - Depends on: T-23
 
-- [ ] **T-28** — Staff requisition detail/edit/lifecycle page
+- [x] **T-28** — Staff requisition detail/edit/lifecycle page
   - Files: `frontend/src/app/staff/requisitions/[id]/page.tsx`
   - Covers: AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-9, AC-10, AC-11
   - Depends on: T-23, T-24
 
-- [ ] **T-29** — Staff detail loading/error states
+- [x] **T-29** — Staff detail loading/error states
   - Files: `frontend/src/app/staff/requisitions/[id]/loading.tsx`, `frontend/src/app/staff/requisitions/[id]/error.tsx`
   - Covers: — (UI states)
   - Depends on: T-28
 
-- [ ] **T-30** — Component tests: `RequisitionForm`
+- [x] **T-30** — Component tests: `RequisitionForm`
   - Files: `frontend/tests/staff/requisition-form.test.tsx`
   - Covers: AC-1, AC-3, AC-5
   - Depends on: T-23
 
-- [ ] **T-31** — Component tests: `RequisitionLifecycleActions`
+- [x] **T-31** — Component tests: `RequisitionLifecycleActions`
   - Files: `frontend/tests/staff/requisition-lifecycle-actions.test.tsx`
   - Covers: AC-6, AC-7, AC-9, AC-10, AC-11
   - Depends on: T-24
 
-- [ ] **T-32** — `JobSearchForm` component (portal keyword search)
+- [x] **T-32** — `JobSearchForm` component (portal keyword search)
   - Files: `frontend/src/components/portal/JobSearchForm.tsx`
   - Covers: AC-16, AC-17
   - Depends on: T-18
 
-- [ ] **T-33** — `JobList` component (list + pagination)
+- [x] **T-33** — `JobList` component (list + pagination)
   - Files: `frontend/src/components/portal/JobList.tsx`
   - Covers: AC-18, AC-19, AC-20
   - Depends on: T-18
 
-- [ ] **T-34** — Portal jobs list page
+- [x] **T-34** — Portal jobs list page
   - Files: `frontend/src/app/(portal)/jobs/page.tsx`
   - Covers: AC-16, AC-17, AC-18, AC-19, AC-20, AC-24
   - Depends on: T-32, T-33
 
-- [ ] **T-35** — Portal jobs list loading state
+- [x] **T-35** — Portal jobs list loading state
   - Files: `frontend/src/app/(portal)/jobs/loading.tsx`
   - Covers: — (UI states)
   - Depends on: T-34
 
-- [ ] **T-36** — Portal job detail page
+- [x] **T-36** — Portal job detail page
   - Files: `frontend/src/app/(portal)/jobs/[id]/page.tsx`
   - Covers: AC-21, AC-22
   - Depends on: T-18
 
-- [ ] **T-37** — Portal job detail loading state
+- [x] **T-37** — Portal job detail loading state
   - Files: `frontend/src/app/(portal)/jobs/[id]/loading.tsx`
   - Covers: — (UI states)
   - Depends on: T-36
 
-- [ ] **T-38** — `HeaderNav` — add Staff Workspace / Browse Jobs links
+- [x] **T-38** — `HeaderNav` — add Staff Workspace / Browse Jobs links
   - Files: `frontend/src/components/HeaderNav.tsx`
   - Covers: — (G-2, G-3 discoverability)
   - Depends on: T-25, T-34
 
-- [ ] **T-39** — Component tests: `JobSearchForm` / `JobList`
+- [x] **T-39** — Component tests: `JobSearchForm` / `JobList`
   - Files: `frontend/tests/portal/job-search-form.test.tsx`
   - Covers: AC-16, AC-17, AC-20
   - Depends on: T-32, T-33
