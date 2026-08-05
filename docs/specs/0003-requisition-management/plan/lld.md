@@ -557,3 +557,4 @@ Appended by `/implement` when reality diverged from this design.
 
 | Date | Task | Section | Designed | Actual | Reason |
 |---|---|---|---|---|---|
+| 2026-08-05 | CP-1 precondition | `backend/global.json` (not an LLD section — build environment) | SDK pin `10.0.400-preview.0.26322.102` (set at `0001`) | SDK pin changed to `10.0.302` | The pinned preview SDK is no longer resolvable — `dotnet --list-sdks` shows only `10.0.302`/`8.0.129` installed, and Microsoft's `10.0` channel release feed confirms `10.0.302` is now `latest-sdk` (the preview build was superseded by the stable .NET 10 LTS release). `dotnet build` failed with "SDK not found" before any CP-1 code was written — a pre-existing environment blocker, not a CP-1 code defect. Repinning to the installed stable SDK on the same major.minor (.NET 10) unblocked the build; confirmed via a clean `dotnet build`/`dotnet test tests/Ats.UnitTests` baseline run before touching CP-1 files. |

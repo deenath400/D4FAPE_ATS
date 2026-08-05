@@ -74,6 +74,7 @@ graph TD
 | `service/system` | Backend system status, auth service, and database health check | 0001, 0002 |
 | `service/<area>` | Business rules and transaction boundaries. The only caller of `db/*` | — |
 | `db/core` | EF Core context, SQLite WAL/busy-timeout interceptor, health check, migrations | 0001, 0002 |
+| `db/requisition` | `Requisition`/`Stage` entities, EF Core configurations, migration — each Requisition owns an independent Stage set (FR-14) | 0003 |
 | `db/<area>` | EF Core entities, configurations, migrations, query implementations | — |
 | `shared/auth` | Identity store, JWT issuance and validation, role and claim policy definitions | 0002 |
 | `shared/storage` | CV and attachment persistence behind an interface; backing store TBD | — |
@@ -92,6 +93,7 @@ Entities and relationships only. Columns live in each spec's `plan/erd.md`.
 erDiagram
   ApplicationUser ||--o{ RefreshToken : owns
   ApplicationUser ||--o{ ApplicationRole : has
+  Requisition ||--o{ Stage : owns
 ```
 
 ## Cross-Cutting Concerns
@@ -153,6 +155,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-05 | 0002 | CP-1: Added ASP.NET Core Identity domain entities, RefreshToken schema, and EF Core migration |
 | 2026-08-05 | 0002 | CP-2: Implemented AuthService, JwtTokenGenerator, AuthEndpoints (/register, /login, /refresh, /logout, /me), and JWT Bearer auth policies |
 | 2026-08-05 | 0002 | CP-3: Configured NextAuth v5 session provider, JWT callback refresh flow, and BFF proxy route |
+| 2026-08-05 | 0003 | CP-1: Added `Requisition`/`Stage` entities, EF Core configurations, and `AddRequisitionsAndStages` migration |
 
 ## Related Specs
 

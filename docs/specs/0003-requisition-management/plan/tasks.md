@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 0 / 42 tasks · checkpoint CP-1 of 4
+**Progress:** 6 / 42 tasks · checkpoint CP-1 of 4 complete, CP-2 next
 
 ---
 
@@ -24,32 +24,32 @@ one checkpoint per invocation, then stops for review.
 *Exit condition: `dotnet build` succeeds, migration applies cleanly against a fresh SQLite
 file, `dotnet test tests/Ats.UnitTests` (Requisition entity tests) passes.*
 
-- [ ] **T-01** — `RequisitionStatus` enum + `Requisition` entity
+- [x] **T-01** — `RequisitionStatus` enum + `Requisition` entity
   - Files: `backend/src/Db/Requisitions/RequisitionStatus.cs`, `backend/src/Db/Requisitions/Requisition.cs`
   - Covers: — (foundation for AC-1, AC-3–AC-11)
   - Depends on: —
 
-- [ ] **T-02** — `Stage` entity
+- [x] **T-02** — `Stage` entity
   - Files: `backend/src/Db/Requisitions/Stage.cs`
   - Covers: — (foundation for AC-23)
   - Depends on: T-01
 
-- [ ] **T-03** — EF Core configurations for `Requisition` and `Stage`
+- [x] **T-03** — EF Core configurations for `Requisition` and `Stage`
   - Files: `backend/src/Db/Configurations/RequisitionConfiguration.cs`, `backend/src/Db/Configurations/StageConfiguration.cs`
   - Covers: —
   - Depends on: T-01, T-02
 
-- [ ] **T-04** — Register `DbSet<Requisition>`/`DbSet<Stage>` and apply configurations
+- [x] **T-04** — Register `DbSet<Requisition>`/`DbSet<Stage>` and apply configurations
   - Files: `backend/src/Db/AppDbContext.cs`
   - Covers: —
   - Depends on: T-03
 
-- [ ] **T-05** — Migration `AddRequisitionsAndStages`
+- [x] **T-05** — Migration `AddRequisitionsAndStages`
   - Files: `backend/src/Db/Migrations/*AddRequisitionsAndStages*.cs`, `backend/src/Db/Migrations/AppDbContextModelSnapshot.cs`
   - Covers: —
   - Depends on: T-04
 
-- [ ] **T-06** — Unit tests: entity invariants + Stage ownership shape
+- [x] **T-06** — Unit tests: entity invariants + Stage ownership shape
   - Files: `backend/tests/Ats.UnitTests/Requisition/RequisitionEntityTests.cs`
   - Covers: AC-23
   - Depends on: T-05

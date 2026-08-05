@@ -11,7 +11,7 @@ section literally, so it must stay accurate.
 
 | Runtime | Version | Notes |
 |---|---|---|
-| .NET | 10.0.400-preview | SDK 10.0.400-preview.0.26322.102 |
+| .NET | 10.0.302 | SDK pin (`backend/global.json`) moved off the preview build to the released .NET 10 LTS SDK — the preview is no longer resolvable (est. 0003) |
 | Node.js | 24.13.0 | npm 11.6.2; runs the Next.js app |
 
 ## Backend

@@ -2,6 +2,7 @@ namespace Ats.Db;
 
 using System;
 using Ats.Db.Configurations;
+using Ats.Db.Requisitions;
 using Ats.Shared.Auth;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +15,15 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
     }
 
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Requisition> Requisitions => Set<Requisition>();
+    public DbSet<Stage> Stages => Set<Stage>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
         builder.ApplyConfiguration(new RefreshTokenConfiguration());
+        builder.ApplyConfiguration(new RequisitionConfiguration());
+        builder.ApplyConfiguration(new StageConfiguration());
 
         SeedRoles(builder);
     }
