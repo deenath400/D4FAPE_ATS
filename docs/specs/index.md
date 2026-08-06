@@ -14,12 +14,13 @@ Status values: `specified` → `planned` → `implementing` → `implemented` �
 | 0002 | User Authentication and Refresh Token Flow | validated | shared/auth, api/system, service/system, db/core, ui/bff, ui/portal | User, Role, RefreshToken | Implements backend ASP.NET Core Identity with JWT & refresh token rotation, and frontend NextAuth v5 session proxying. |
 | 0003 | Requisition Management | validated | api/requisition, service/requisition, db/requisition, ui/staff, ui/portal | Requisition, Stage | Recruiters draft, publish, unpublish, and close requisitions behind role policies; candidates browse published ones anonymously on the portal. |
 | 0004 | Application Submission and CV Upload | validated | api/application, service/application, db/application, shared/storage, ui/portal, ui/staff, ui/bff | Application, CvAttachment | Candidates submit a CV-backed Application to a published Requisition; Staff and the Candidate can each see a minimal list of what was submitted. |
+| 0005 | Pipeline Progression | specified | api/pipeline, service/pipeline, db/pipeline, service/requisition, db/requisition, api/application, service/application, db/application, ui/staff, ui/portal | Stage, Application, StageTransition | Recruiters configure a Requisition's pipeline and advance or reject Applications through it, with an audited history and real candidate-visible status. |
 
 ---
 
 ## Next id
 
-`0005`
+`0006`
 
 Update this after allocating an id, so `/specify` never has to scan the directory twice.
 
