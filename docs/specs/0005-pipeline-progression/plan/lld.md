@@ -825,31 +825,42 @@ limits.
 
 Full ordered detail — including the exact `migrationBuilder` calls and raw SQL — lives in
 `erd.md` §5; this section states only the sequencing `/implement` must follow when hand-adjusting
-the `dotnet ef migrations add`-generated file:
+the `dotnet ef migrations add`-generated file.
+
+> **As shipped (CP-1), diverges from the table originally below — see Deviation Log.** The
+> actual `Up()` order is: (1) `Stages` gains `SortOrder`/`NormalizedName` + its unique index;
+> (2) `CreateTable("StageTransitions")` + its indexes; (3) `Applications` gains `CurrentStageId`
+> **nullable, with no FK yet** + `IsRejected` + the `(RequisitionId, CurrentStageId)` and
+> `CurrentStageId` indexes; (4) raw SQL — seed default Stages, then backfill
+> `Applications.CurrentStageId`/`IsRejected`; (5) `AlterColumn CurrentStageId` to **NOT NULL**,
+> immediately followed by `AddForeignKey` — both SQLite table-rebuild operations, placed
+> back-to-back with nothing else in between or after.
 
 | Step | Change | Reversible |
 |---|---|---|
 | 1 | `Stages`: add `SortOrder` (int, NOT NULL, default 0), `NormalizedName` (text, NOT NULL, default `''`) | Yes |
 | 2 | `Stages`: create unique index `(RequisitionId, NormalizedName)` | Yes |
 | 3 | `CreateTable("StageTransitions")` + its index | Yes |
-| 4 | `Applications`: add `CurrentStageId` (Guid, **nullable**, FK → `Stages.Id` `RESTRICT`) | Yes |
+| 4 | `Applications`: add `CurrentStageId` (Guid, **nullable, no FK yet**) | Yes |
 | 5 | `Applications`: add `IsRejected` (bool, NOT NULL, default `false`) | Yes |
 | 6 | `Applications`: create index `(RequisitionId, CurrentStageId)` | Yes |
 | 7 | Raw SQL: seed default 4 Stages for every Requisition with zero Stages | No (data op) |
 | 8 | Raw SQL: backfill `Applications.CurrentStageId`/`IsRejected` for every row where `CurrentStageId IS NULL` | No (data op) |
-| 9 | `Applications`: `AlterColumn` `CurrentStageId` to **NOT NULL** | Yes (back to nullable) |
+| 9 | `Applications`: `AlterColumn` `CurrentStageId` to **NOT NULL**, then `AddForeignKey` → `Stages.Id` `RESTRICT` (back-to-back, no raw SQL between them) | Yes (back to nullable / drop FK) |
 
 **Ordering is load-bearing**: step 7 must run before step 8 (the backfill's subquery needs Stage
 rows to exist), and step 9 must run after step 8 (tightening to `NOT NULL` before every row has
-a value would fail outright). `dotnet ef migrations add AddPipelineProgression` will not, by
-itself, produce this exact sequence — `/implement` generates the migration once
-`StageConfiguration`/`ApplicationConfiguration`/`StageTransitionConfiguration` are all at their
-**final** shape (i.e. `CurrentStageId` modelled as required in the entity/config), then manually
-splits whatever single `AddColumn(nullable:false)+AddForeignKey` operation EF emits for
-`CurrentStageId` into steps 4 + 7 + 8 + 9 above, inserting the two raw-SQL
-`migrationBuilder.Sql(...)` calls at the right point. `Down()` reverses steps 1–6, 9 in reverse
-order (see erd.md §5 rollback plan); no `Down()` SQL is needed for steps 7/8 since dropping the
-columns/table already discards the seeded data.
+a value would fail outright). It is *also* load-bearing that no `migrationBuilder.Sql(...)` call
+is interleaved between an operation that triggers a SQLite table rebuild (`AddForeignKey`,
+`AlterColumn`) and the point that rebuild is flushed — see Deviation Log. `dotnet ef migrations
+add AddPipelineProgression` will not, by itself, produce this exact sequence — `/implement`
+generates the migration once `StageConfiguration`/`ApplicationConfiguration`/
+`StageTransitionConfiguration` are all at their **final** shape (i.e. `CurrentStageId` modelled
+as required in the entity/config), then manually splits whatever single
+`AddColumn(nullable:false)+AddForeignKey` operation EF emits for `CurrentStageId` into steps
+4 + 7 + 8 + 9 above, inserting the two raw-SQL `migrationBuilder.Sql(...)` calls at the right
+point. `Down()` reverses steps 1–6, 9 in reverse order (see erd.md §5 rollback plan); no `Down()`
+SQL is needed for steps 7/8 since dropping the columns/table already discards the seeded data.
 
 ## 11. Test Plan
 
@@ -964,3 +975,6 @@ Appended by `/implement` when reality diverged from this design.
 
 | Date | Task | Section | Designed | Actual | Reason |
 |---|---|---|---|---|---|
+| 2026-08-06 | T-09 | §10, erd.md §5 step 6 | FK `Applications.CurrentStageId → Stages.Id` declared on the column at the same time it is added (nullable) | FK added via a separate `AddForeignKey` call placed immediately after the `AlterColumn` to `NOT NULL`, at the very end of `Up()`, with no raw SQL between the two | Interleaving a `migrationBuilder.Sql(...)` call between an `AddForeignKey`/`AlterColumn` operation and the point EF's Sqlite generator flushes the table rebuild it requires fails outright — SQLite refuses to toggle `PRAGMA foreign_keys` mid-transaction, and the two raw-SQL backfill steps sit exactly in that window under the original design. Verified empirically against a scratch SQLite file before finalizing (see `implementation/changelog.md` CP-1 Decisions). |
+| 2026-08-06 | T-09 | erd.md §5 step 9 SQL | `CROSS JOIN (VALUES ('Applied', 0), ... ) AS v(Name, SortOrder)` | `CROSS JOIN (SELECT 'Applied' AS Name, 0 AS SortOrder UNION ALL SELECT ...) AS v` | The column-aliased `VALUES` table-value-constructor form (`AS v(col1, col2)`) is not accepted by the SQLite version this project's `Microsoft.Data.Sqlite` package ships (`near "(": syntax error`); the `UNION ALL SELECT` derived-table form is equivalent and portable. |
+| 2026-08-06 | T-24 (CP-2), pulled forward | §3.4 | `ApplicationService.SubmitAsync`'s first-Stage resolution and no-stages-configured guard are CP-2 work | The write-path portion (first-Stage lookup + `application.submit.no-stages-configured` guard, exactly as designed here) was implemented in CP-1, alongside the equivalent minimal slice of T-23 (`RequisitionService.CreateAsync` seeding the default Stage set) | `Application.Create`'s signature change (T-03: `currentStageId` now a required constructor argument) is a compile-time break at this call site — `dotnet build` cannot succeed at the end of CP-1 without it, and leaving `SubmitAsync` able to construct an `Application` against a Requisition with zero Stages would silently violate G-1 for every Requisition created before CP-2 ships. CP-2 still owns T-23/T-24's full scope: `ListMineAsync`'s `currentStageName`/`isRejected` projection (part of T-24), and the dedicated AC-7/AC-8/AC-10/AC-33 test coverage named in T-32/T-33. See `implementation/changelog.md` CP-1 Deviations for the full reasoning. |

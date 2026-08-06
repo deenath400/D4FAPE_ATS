@@ -3,6 +3,7 @@ namespace Ats.Db;
 using System;
 using Ats.Db.Applications;
 using Ats.Db.Configurations;
+using Ats.Db.Pipeline;
 using Ats.Db.Requisitions;
 using Ats.Shared.Auth;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -20,6 +21,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
     public DbSet<Stage> Stages => Set<Stage>();
     public DbSet<Application> Applications => Set<Application>();
     public DbSet<CvAttachment> CvAttachments => Set<CvAttachment>();
+    public DbSet<StageTransition> StageTransitions => Set<StageTransition>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -29,6 +31,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
         builder.ApplyConfiguration(new StageConfiguration());
         builder.ApplyConfiguration(new ApplicationConfiguration());
         builder.ApplyConfiguration(new CvAttachmentConfiguration());
+        builder.ApplyConfiguration(new StageTransitionConfiguration());
 
         SeedRoles(builder);
     }

@@ -40,6 +40,17 @@ public class RequisitionService : IRequisitionService
 
         var requisition = RequisitionEntity.Create(dto.Title, dto.Description);
         _dbContext.Requisitions.Add(requisition);
+
+        // FR-5 (0005): every Requisition is created with the default 4-Stage set. Pulled forward
+        // from CP-2's T-23 — see implementation/changelog.md CP-1 Deviations — because T-03's
+        // change to Application.Create (currentStageId now required) makes ApplicationService.
+        // SubmitAsync depend on at least one Stage existing for any Requisition it submits
+        // against; CP-2 completes the rest of T-23 (dedicated AC-7/AC-8/AC-33 test coverage).
+        for (var i = 0; i < Ats.Db.Requisitions.Stage.DefaultStageNames.Length; i++)
+        {
+            _dbContext.Stages.Add(Ats.Db.Requisitions.Stage.Create(requisition.Id, Ats.Db.Requisitions.Stage.DefaultStageNames[i], i));
+        }
+
         await _dbContext.SaveChangesAsync(ct);
 
         return Result<RequisitionDto>.Ok(ToDto(requisition));

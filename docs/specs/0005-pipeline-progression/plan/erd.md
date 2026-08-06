@@ -161,6 +161,15 @@ pure `CreateTable` migrations, this one alters populated tables and therefore ne
 `Up()`/`Down()` bodies beyond what `dotnet ef migrations add` emits automatically; see LLD §10 and
 §12 for the exact sequence `/implement` must produce.
 
+> **As shipped (CP-1) — see LLD §10 and its Deviation Log.** Two changes from the table below:
+> (1) the FK on `CurrentStageId` is added via a separate `AddForeignKey` call placed immediately
+> after step 11's `AlterColumn`, not declared alongside the nullable `AddColumn` at step 6 —
+> interleaving the raw-SQL backfill (steps 9-10) between an `AddForeignKey`/`AlterColumn`
+> operation and the point EF's Sqlite generator flushes the table rebuild it requires fails
+> outright; (2) step 9's SQL uses a `UNION ALL SELECT` derived table instead of a
+> column-aliased `VALUES (...) AS v(Name, SortOrder)` constructor, which this project's SQLite
+> version rejects with a syntax error. Both are reflected in the SQL below.
+
 | # | Operation | Reversible | Backfill | Downtime |
 |---|---|---|---|---|
 | 1 | `AddColumn<int>("SortOrder", "Stages", nullable: false, defaultValue: 0)` | Yes — `DropColumn` | — | None (`Stages` is empty in every real deployment; even if not, a constant-default `NOT NULL` add is a plain `ALTER TABLE ADD COLUMN`, not a rebuild) |
@@ -168,12 +177,12 @@ pure `CreateTable` migrations, this one alters populated tables and therefore ne
 | 3 | `CreateIndex("IX_Stages_RequisitionId_NormalizedName", "Stages", ["RequisitionId","NormalizedName"], unique: true)` | Yes — `DropIndex` | — | None — `Stages` is empty, no duplicate-violation risk |
 | 4 | `CreateTable("StageTransitions")` with all columns/FKs/`Kind`/`ActorKind` conversions from §3.3 | Yes — `DropTable` | — | None — new, empty table |
 | 5 | `CreateIndex("IX_StageTransitions_ApplicationId_OccurredAtUtc", ...)` | Yes — `DropIndex` | — | None |
-| 6 | `AddColumn<Guid>("CurrentStageId", "Applications", nullable: true)` **with** the FK to `Stages.Id` declared on the column (`ON DELETE RESTRICT`) | Yes — `DropColumn` (SQLite natively supports `DROP COLUMN`; EF Core Sqlite provider ≥8 emits it directly, no rebuild) | — | Brief — SQLite cannot add an FK-bearing column via plain `ALTER TABLE`; EF Core's Sqlite generator performs its standard rebuild (create-copy-drop-rename) for this one operation. `Applications` is low-hundreds-to-thousands of rows (`0004` erd.md §6) — sub-second |
-| 7 | `AddColumn<bool>("IsRejected", "Applications", nullable: false, defaultValue: false)` | Yes — `DropColumn` | — | Folded into the same rebuild pass as #6 (both are `Applications`-table alterations in the same migration) |
-| 8 | `CreateIndex("IX_Applications_RequisitionId_CurrentStageId", "Applications", ["RequisitionId","CurrentStageId"])` | Yes — `DropIndex` | — | None (recreated as part of the #6/#7 rebuild, or added after — either is correct) |
+| 6 | `AddColumn<Guid>("CurrentStageId", "Applications", nullable: true)` — **no FK yet** (added at step 11a, below) | Yes — `DropColumn` | — | None — a plain `ALTER TABLE ADD COLUMN`, no rebuild, since no FK/rebuild-triggering constraint is attached at this point |
+| 7 | `AddColumn<bool>("IsRejected", "Applications", nullable: false, defaultValue: false)` | Yes — `DropColumn` | — | None, same reasoning as #6 |
+| 8 | `CreateIndex("IX_Applications_RequisitionId_CurrentStageId", "Applications", ["RequisitionId","CurrentStageId"])`, `CreateIndex("IX_Applications_CurrentStageId", ...)` | Yes — `DropIndex` | — | None — plain `CREATE INDEX`, no rebuild |
 | 9 | **Data backfill — raw SQL**, run after #1–#8: seed the default 4-Stage set for every Requisition that currently has zero Stages (see exact SQL below) | No (data operation) | Yes — see below | None — single-pass `INSERT ... SELECT`, ≤ hundreds of rows |
 | 10 | **Data backfill — raw SQL**: set `Applications.CurrentStageId` to each Application's Requisition's lowest-`SortOrder` Stage, and `IsRejected = 0`, for every row where `CurrentStageId IS NULL` (see exact SQL below) | No (data operation) | Yes | None — single-pass `UPDATE`, low-hundreds-to-thousands of rows |
-| 11 | `AlterColumn<Guid>("CurrentStageId", "Applications", nullable: false)` | Yes — `AlterColumn` back to nullable | — | Brief — a second `Applications` rebuild, safe by construction since step 10 already gave every row a real value |
+| 11 | `AlterColumn<Guid>("CurrentStageId", "Applications", nullable: false)`, immediately followed by `AddForeignKey("CurrentStageId" → "Stages"."Id", RESTRICT)` — back-to-back, nothing else in `Up()` after them | Yes — `AlterColumn` back to nullable / `DropForeignKey` | — | Brief — SQLite cannot add an FK constraint or tighten nullability via plain `ALTER TABLE`; EF Core's Sqlite generator performs its standard rebuild (create-copy-drop-rename) for these two operations. `Applications` is low-hundreds-to-thousands of rows (`0004` erd.md §6) — sub-second. Both operations land in the same rebuild window since nothing separates them |
 
 **Step 9 SQL** (GUIDs generated in SQLite via `randomblob`/`hex`, producing a valid
 `8-4-4-4-12` hex string `Guid.Parse` accepts):
@@ -189,8 +198,11 @@ SELECT
   v.SortOrder
 FROM Requisitions r
 CROSS JOIN (
-  VALUES ('Applied', 0), ('Screening', 1), ('Interview', 2), ('Offer', 3)
-) AS v(Name, SortOrder)
+  SELECT 'Applied' AS Name, 0 AS SortOrder
+  UNION ALL SELECT 'Screening', 1
+  UNION ALL SELECT 'Interview', 2
+  UNION ALL SELECT 'Offer', 3
+) AS v
 WHERE NOT EXISTS (SELECT 1 FROM Stages s WHERE s.RequisitionId = r.Id);
 ```
 

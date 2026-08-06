@@ -96,6 +96,29 @@ public class ApplicationService : IApplicationService
                 "application.submit.duplicate", "You have already applied to this requisition.");
         }
 
+        // FR-7 (0005): every Application is assigned its Requisition's first Stage (in current
+        // pipeline order) at submission time. Pulled forward from CP-2's T-24 — see
+        // implementation/changelog.md CP-1 Deviations — because T-03's change to
+        // Application.Create (currentStageId now required) makes this resolution a compile-time
+        // necessity, not a later enhancement; CP-2 completes the rest of T-24 (ListMineAsync's
+        // currentStageName/isRejected projection) and its dedicated AC-10 test coverage.
+        var firstStageId = await _dbContext.Stages
+            .AsNoTracking()
+            .Where(s => s.RequisitionId == requisitionId)
+            .OrderBy(s => s.SortOrder)
+            .Select(s => s.Id)
+            .FirstOrDefaultAsync(ct);
+
+        if (firstStageId == Guid.Empty)
+        {
+            // R-1 (HLD §9): defensive guard for a Requisition a Recruiter has edited down to zero
+            // Stages before any Application arrived. FR-5 guarantees every Requisition starts with
+            // 4 Stages; FR-4 does not itself forbid removing all of them while unoccupied.
+            return Result<ApplicationDto>.Conflict(
+                "application.submit.no-stages-configured",
+                "This job posting's pipeline has not been configured yet.");
+        }
+
         // Server-generated — never derived from the client-supplied filename (NFR-2).
         var storageKey = $"{Guid.NewGuid():N}.pdf";
 
@@ -110,7 +133,7 @@ public class ApplicationService : IApplicationService
                 "application.submit.storage-failed", "Could not save the uploaded file. Please try again.");
         }
 
-        var application = ApplicationEntity.Create(requisitionId, candidateId);
+        var application = ApplicationEntity.Create(requisitionId, candidateId, firstStageId);
         var cv = CvAttachment.Create(application.Id, storageKey, cvFileName, cvContentType, cvSizeBytes);
         application.AttachCv(cv);
         _dbContext.Applications.Add(application);

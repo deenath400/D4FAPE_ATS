@@ -90,8 +90,8 @@ public class RequisitionEntityTests
         var requisitionB = Ats.Db.Requisitions.Requisition.Create("Requisition B", "Description B");
 
         // Act
-        var stageA = Stage.Create(requisitionA.Id, "Applied");
-        var stageB = Stage.Create(requisitionB.Id, "Applied");
+        var stageA = Stage.Create(requisitionA.Id, "Applied", 0);
+        var stageB = Stage.Create(requisitionB.Id, "Applied", 0);
 
         // Assert
         Assert.Equal(requisitionA.Id, stageA.RequisitionId);
@@ -104,7 +104,7 @@ public class RequisitionEntityTests
     public void Stage_Create_WithEmptyRequisitionId_ThrowsArgumentException()
     {
         // Arrange & Act & Assert
-        Assert.Throws<ArgumentException>(() => Stage.Create(Guid.Empty, "Applied"));
+        Assert.Throws<ArgumentException>(() => Stage.Create(Guid.Empty, "Applied", 0));
     }
 
     [Theory]
@@ -114,6 +114,6 @@ public class RequisitionEntityTests
     public void Stage_Create_WithInvalidName_ThrowsArgumentException(string? invalidName)
     {
         // Arrange & Act & Assert
-        Assert.Throws<ArgumentException>(() => Stage.Create(Guid.NewGuid(), invalidName!));
+        Assert.Throws<ArgumentException>(() => Stage.Create(Guid.NewGuid(), invalidName!, 0));
     }
 }

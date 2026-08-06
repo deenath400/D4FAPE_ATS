@@ -71,6 +71,12 @@ public class ApplicationServiceTests : IDisposable
         var requisition = RequisitionEntity.Create(title, "Description");
         requisition.Publish();
         _dbContext.Requisitions.Add(requisition);
+
+        // This helper builds the Requisition entity directly rather than going through
+        // RequisitionService.CreateAsync, so it must seed a Stage itself (0005 FR-7: SubmitAsync
+        // now requires at least one Stage to assign as the Application's current Stage).
+        _dbContext.Stages.Add(Ats.Db.Requisitions.Stage.Create(requisition.Id, "Applied", 0));
+
         await _dbContext.SaveChangesAsync();
         return requisition.Id;
     }

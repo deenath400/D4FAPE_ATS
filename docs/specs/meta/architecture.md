@@ -71,12 +71,13 @@ graph TD
 | `api/application` | Candidate submission (`CandidateOnly`, multipart), Candidate own-list/CV-download, Staff Requisition-scoped list (`StaffOnly`) | 0004 |
 | `api/<area>` | HTTP boundary — routing, request DTOs, authorization policies | — |
 | `service/system` | Backend system status, auth service, and database health check | 0001, 0002 |
-| `service/requisition` | Requisition lifecycle state machine (draft/published/closed transition guards), content validation, keyword search + pagination | 0003 |
-| `service/application` | Submission eligibility (Requisition must be `published`), one-Application-per-Candidate-per-Requisition rule, CV type/size/magic-byte validation, CV-access authorization | 0004 |
+| `service/requisition` | Requisition lifecycle state machine (draft/published/closed transition guards), content validation, keyword search + pagination; creation also seeds the Requisition's default 4-Stage set (0005) | 0003, 0005 |
+| `service/application` | Submission eligibility (Requisition must be `published`), one-Application-per-Candidate-per-Requisition rule, CV type/size/magic-byte validation, CV-access authorization; submission also assigns the Requisition's first Stage (0005) | 0004, 0005 |
 | `service/<area>` | Business rules and transaction boundaries. The only caller of `db/*` | — |
 | `db/core` | EF Core context, SQLite WAL/busy-timeout interceptor, health check, migrations | 0001, 0002 |
-| `db/requisition` | `Requisition`/`Stage` entities, EF Core configurations, migration — each Requisition owns an independent Stage set (FR-14) | 0003 |
-| `db/application` | `Application`/`CvAttachment` entities, EF Core configurations, migration — unique `(CandidateId, RequisitionId)` index enforces one Application per pair | 0004 |
+| `db/requisition` | `Requisition`/`Stage` entities, EF Core configurations, migration — each Requisition owns an independent, ordered Stage set (FR-14; `SortOrder`/`NormalizedName` and per-Requisition name uniqueness added 0005) | 0003, 0005 |
+| `db/application` | `Application`/`CvAttachment` entities, EF Core configurations, migration — unique `(CandidateId, RequisitionId)` index enforces one Application per pair; `Application` now carries a required current Stage and a rejected-outcome flag (0005) | 0004, 0005 |
+| `db/pipeline` | `StageTransition` entity (append-only move/reject audit record) and its EF Core configuration; schema-only so far, no service/API surface yet | 0005 |
 | `db/<area>` | EF Core entities, configurations, migrations, query implementations | — |
 | `shared/auth` | Identity store, JWT issuance and validation, role and claim policy definitions | 0002 |
 | `shared/storage` | CV and attachment persistence behind `IFileStorage`; local-disk-backed (`LocalDiskFileStorage`), base path configurable | 0004 |
@@ -99,6 +100,10 @@ erDiagram
   Requisition ||--o{ Application : receives
   ApplicationUser ||--o{ Application : submits
   Application ||--|| CvAttachment : has
+  Stage ||--o{ Application : "is current stage of"
+  Application ||--o{ StageTransition : records
+  Stage ||--o{ StageTransition : "referenced by"
+  ApplicationUser ||--o{ StageTransition : "acts as"
 ```
 
 ## Cross-Cutting Concerns
@@ -168,6 +173,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-06 | 0004 | CP-2: Built `ApplicationService` (submission eligibility, CV validation, duplicate handling) and `ApplicationEndpoints` (Candidate submit/list/CV-download, Staff Requisition-scoped list); unit & integration test coverage |
 | 2026-08-06 | 0004 | CP-3: Generalised `ui/bff`'s proxy route to a binary-safe passthrough; gave `ui/portal` an apply flow and "My Applications" page, and `ui/staff` a per-Requisition Applications list; `middleware.ts` now also gates `/applications/*` for the Candidate role |
 | 2026-08-06 | 0004 | CP-4: Hardening — dedicated NFR-1 (storage-write-failure atomicity) and NFR-3 (SQLite write-lock scope excludes the CV file write) verification tests, plus an E-1 concurrent-duplicate-submission regression test; spec closed out, all 46 tasks complete |
+| 2026-08-06 | 0005 | CP-1: `Stage` gained ordering/uniqueness (`SortOrder`, `NormalizedName`), `Application` gained a required current-Stage reference and rejected flag, new `db/pipeline` (`StageTransition`, schema-only), `AddPipelineProgression` migration with raw-SQL backfill for pre-existing Requisitions/Applications |
 
 ## Related Specs
 

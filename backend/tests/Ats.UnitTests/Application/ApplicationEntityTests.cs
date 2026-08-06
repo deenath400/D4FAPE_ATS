@@ -12,14 +12,17 @@ public class ApplicationEntityTests
         // Arrange
         var requisitionId = Guid.NewGuid();
         var candidateId = Guid.NewGuid();
+        var currentStageId = Guid.NewGuid();
 
         // Act
-        var application = Ats.Db.Applications.Application.Create(requisitionId, candidateId);
+        var application = Ats.Db.Applications.Application.Create(requisitionId, candidateId, currentStageId);
 
         // Assert
         Assert.NotEqual(Guid.Empty, application.Id);
         Assert.Equal(requisitionId, application.RequisitionId);
         Assert.Equal(candidateId, application.CandidateId);
+        Assert.Equal(currentStageId, application.CurrentStageId);
+        Assert.False(application.IsRejected);
         Assert.True(application.SubmittedAtUtc <= DateTime.UtcNow);
         Assert.Null(application.CvAttachment);
     }
@@ -28,21 +31,60 @@ public class ApplicationEntityTests
     public void Application_Create_WithEmptyRequisitionId_ThrowsArgumentException()
     {
         // Arrange & Act & Assert
-        Assert.Throws<ArgumentException>(() => Ats.Db.Applications.Application.Create(Guid.Empty, Guid.NewGuid()));
+        Assert.Throws<ArgumentException>(
+            () => Ats.Db.Applications.Application.Create(Guid.Empty, Guid.NewGuid(), Guid.NewGuid()));
     }
 
     [Fact]
     public void Application_Create_WithEmptyCandidateId_ThrowsArgumentException()
     {
         // Arrange & Act & Assert
-        Assert.Throws<ArgumentException>(() => Ats.Db.Applications.Application.Create(Guid.NewGuid(), Guid.Empty));
+        Assert.Throws<ArgumentException>(
+            () => Ats.Db.Applications.Application.Create(Guid.NewGuid(), Guid.Empty, Guid.NewGuid()));
+    }
+
+    [Fact]
+    public void Application_Create_WithEmptyCurrentStageId_ThrowsArgumentException()
+    {
+        // Arrange & Act & Assert
+        Assert.Throws<ArgumentException>(
+            () => Ats.Db.Applications.Application.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.Empty));
+    }
+
+    [Fact]
+    public void Application_MoveToStage_UpdatesCurrentStageId()
+    {
+        // Arrange
+        var application = Ats.Db.Applications.Application.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        var newStageId = Guid.NewGuid();
+
+        // Act
+        application.MoveToStage(newStageId);
+
+        // Assert
+        Assert.Equal(newStageId, application.CurrentStageId);
+    }
+
+    [Fact]
+    public void Application_Reject_SetsIsRejectedKeepsCurrentStageId()
+    {
+        // Arrange
+        var currentStageId = Guid.NewGuid();
+        var application = Ats.Db.Applications.Application.Create(Guid.NewGuid(), Guid.NewGuid(), currentStageId);
+
+        // Act
+        application.Reject();
+
+        // Assert
+        Assert.True(application.IsRejected);
+        Assert.Equal(currentStageId, application.CurrentStageId);
     }
 
     [Fact]
     public void Application_AttachCv_SetsCvAttachment()
     {
         // Arrange
-        var application = Ats.Db.Applications.Application.Create(Guid.NewGuid(), Guid.NewGuid());
+        var application = Ats.Db.Applications.Application.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         var cv = CvAttachment.Create(application.Id, "abc123.pdf", "resume.pdf", "application/pdf", 1024);
 
         // Act
@@ -56,7 +98,7 @@ public class ApplicationEntityTests
     public void Application_AttachCv_CalledTwice_Throws()
     {
         // Arrange
-        var application = Ats.Db.Applications.Application.Create(Guid.NewGuid(), Guid.NewGuid());
+        var application = Ats.Db.Applications.Application.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         var firstCv = CvAttachment.Create(application.Id, "abc123.pdf", "resume.pdf", "application/pdf", 1024);
         var secondCv = CvAttachment.Create(application.Id, "def456.pdf", "resume2.pdf", "application/pdf", 2048);
         application.AttachCv(firstCv);
@@ -69,7 +111,7 @@ public class ApplicationEntityTests
     public void Application_AttachCv_WithNull_ThrowsArgumentNullException()
     {
         // Arrange
-        var application = Ats.Db.Applications.Application.Create(Guid.NewGuid(), Guid.NewGuid());
+        var application = Ats.Db.Applications.Application.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => application.AttachCv(null!));

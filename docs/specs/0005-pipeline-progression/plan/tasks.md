@@ -2,7 +2,7 @@
 
 **Spec:** `../spec.md` · **LLD:** `lld.md` · **Updated:** 2026-08-06
 
-**Progress:** 0 / 58 tasks · checkpoint CP-1 of 4
+**Progress:** 12 / 58 tasks · checkpoint CP-1 of 4 complete
 
 ---
 
@@ -20,62 +20,62 @@
 *Exit condition: `AddPipelineProgression` migration applies cleanly (including backfill),
 entity/migration unit and integration tests pass, `dotnet build` succeeds.*
 
-- [ ] **T-01** — Modify `Stage` entity: `SortOrder`, `NormalizedName`, `DefaultStageNames`, `Rename`, `ChangeSortOrder`, `Create` gains `sortOrder`
+- [x] **T-01** — Modify `Stage` entity: `SortOrder`, `NormalizedName`, `DefaultStageNames`, `Rename`, `ChangeSortOrder`, `Create` gains `sortOrder`
   - Files: `src/Db/Requisitions/Stage.cs`
   - Covers: AC-1, AC-3, AC-4, AC-5, AC-6, AC-31
   - Depends on: —
 
-- [ ] **T-02** — Modify `StageConfiguration`: map `SortOrder`/`NormalizedName`, add unique `(RequisitionId, NormalizedName)` index
+- [x] **T-02** — Modify `StageConfiguration`: map `SortOrder`/`NormalizedName`, add unique `(RequisitionId, NormalizedName)` index
   - Files: `src/Db/Configurations/StageConfiguration.cs`
   - Covers: AC-31
   - Depends on: T-01
 
-- [ ] **T-03** — Modify `Application` entity: `CurrentStageId`, `IsRejected`, `Create` requires `currentStageId`, `MoveToStage`, `Reject`
+- [x] **T-03** — Modify `Application` entity: `CurrentStageId`, `IsRejected`, `Create` requires `currentStageId`, `MoveToStage`, `Reject`
   - Files: `src/Db/Applications/Application.cs`
   - Covers: AC-10, AC-11, AC-14, AC-15
   - Depends on: —
 
-- [ ] **T-04** — Modify `ApplicationConfiguration`: `CurrentStageId`/`IsRejected` as concurrency tokens, FK `RESTRICT`, `(RequisitionId, CurrentStageId)` index
+- [x] **T-04** — Modify `ApplicationConfiguration`: `CurrentStageId`/`IsRejected` as concurrency tokens, FK `RESTRICT`, `(RequisitionId, CurrentStageId)` index
   - Files: `src/Db/Configurations/ApplicationConfiguration.cs`
   - Covers: AC-29
   - Depends on: T-03, T-01
 
-- [ ] **T-05** — Create `StageTransitionKind`, `StageTransitionActorKind` enums
+- [x] **T-05** — Create `StageTransitionKind`, `StageTransitionActorKind` enums
   - Files: `src/Db/Pipeline/StageTransitionKind.cs`, `src/Db/Pipeline/StageTransitionActorKind.cs`
   - Covers: AC-16 (FR-13)
   - Depends on: —
 
-- [ ] **T-06** — Create `StageTransition` entity (`CreateMove`/`CreateRejection` factories)
+- [x] **T-06** — Create `StageTransition` entity (`CreateMove`/`CreateRejection` factories)
   - Files: `src/Db/Pipeline/StageTransition.cs`
   - Covers: AC-11, AC-14, AC-16, AC-17, AC-30
   - Depends on: T-05
 
-- [ ] **T-07** — Create `StageTransitionConfiguration`
+- [x] **T-07** — Create `StageTransitionConfiguration`
   - Files: `src/Db/Configurations/StageTransitionConfiguration.cs`
   - Covers: AC-17
   - Depends on: T-06
 
-- [ ] **T-08** — Modify `AppDbContext`: `DbSet<StageTransition>`, apply configuration
+- [x] **T-08** — Modify `AppDbContext`: `DbSet<StageTransition>`, apply configuration
   - Files: `src/Db/AppDbContext.cs`
   - Covers: —
   - Depends on: T-07
 
-- [ ] **T-09** — Generate and hand-adjust `AddPipelineProgression` migration (schema ops + raw-SQL backfill, per `erd.md` §5 / `lld.md` §10)
+- [x] **T-09** — Generate and hand-adjust `AddPipelineProgression` migration (schema ops + raw-SQL backfill, per `erd.md` §5 / `lld.md` §10)
   - Files: `src/Db/Migrations/<timestamp>_AddPipelineProgression.cs`, `.Designer.cs`, `AppDbContextModelSnapshot.cs`
   - Covers: AC-32
   - Depends on: T-01, T-02, T-03, T-04, T-08
 
-- [ ] **T-10** — Unit tests: `Stage` entity invariants
+- [x] **T-10** — Unit tests: `Stage` entity invariants
   - Files: `tests/Ats.UnitTests/Pipeline/StageEntityTests.cs`
   - Covers: AC-1, AC-3
   - Depends on: T-01
 
-- [ ] **T-11** — Unit tests: `StageTransition` factory invariants
+- [x] **T-11** — Unit tests: `StageTransition` factory invariants
   - Files: `tests/Ats.UnitTests/Pipeline/ApplicationTransitionEntityTests.cs`
   - Covers: AC-11, AC-14, AC-16
   - Depends on: T-06
 
-- [ ] **T-12** — Integration tests: migration backfill correctness and default-name consistency
+- [x] **T-12** — Integration tests: migration backfill correctness and default-name consistency
   - Files: `tests/Ats.IntegrationTests/Pipeline/PipelineMigrationBackfillTests.cs`
   - Covers: AC-32
   - Depends on: T-09
