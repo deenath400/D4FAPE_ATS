@@ -22,6 +22,11 @@ public class Result
     public string? ErrorMessage { get; protected set; }
     public IDictionary<string, string[]>? ValidationErrors { get; protected set; }
 
+    // Extra machine-readable ProblemDetails fields beyond code/errors (0005 HLD D-7) — e.g. the
+    // move-conflict response's actualCurrentStageId/actualCurrentStageName. Merged into
+    // ProblemDetails.Extensions by AuthEndpoints.ToProblemResult().
+    public IDictionary<string, object>? Extensions { get; protected set; }
+
     public static Result Ok() => new() { Status = ResultStatus.Success };
 
     public static Result Validation(IDictionary<string, string[]> errors, string message = "Validation failed.") =>
@@ -71,6 +76,15 @@ public class Result
             Status = ResultStatus.Conflict,
             ErrorCode = code,
             ErrorMessage = message
+        };
+
+    public static Result Conflict(string code, string message, IDictionary<string, object>? extensions) =>
+        new()
+        {
+            Status = ResultStatus.Conflict,
+            ErrorCode = code,
+            ErrorMessage = message,
+            Extensions = extensions
         };
 
     public static Result Error(string code, string message) =>
@@ -135,6 +149,15 @@ public class Result<T> : Result
             Status = ResultStatus.Conflict,
             ErrorCode = code,
             ErrorMessage = message
+        };
+
+    public static new Result<T> Conflict(string code, string message, IDictionary<string, object>? extensions) =>
+        new()
+        {
+            Status = ResultStatus.Conflict,
+            ErrorCode = code,
+            ErrorMessage = message,
+            Extensions = extensions
         };
 
     public static new Result<T> Error(string code, string message) =>

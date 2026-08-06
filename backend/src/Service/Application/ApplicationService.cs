@@ -160,6 +160,9 @@ public class ApplicationService : IApplicationService
         // Join to a plain anonymous projection first, then order and construct the DTO in a
         // final Select — ordering by a property read off a constructed record does not
         // translate to SQL (EF Core), so the ORDER BY must apply to scalar columns.
+        // Second join to Stages (0005 FR-17) projects the Application's current Stage name
+        // alongside its rejected outcome; the note stays out of this projection entirely
+        // (FR-23, AC-30 — CandidateApplicationListItemDto has no field capable of carrying it).
         var items = await _dbContext.Applications
             .AsNoTracking()
             .Where(a => a.CandidateId == candidateId)
@@ -167,10 +170,16 @@ public class ApplicationService : IApplicationService
                 _dbContext.Requisitions.AsNoTracking(),
                 a => a.RequisitionId,
                 r => r.Id,
-                (a, r) => new { a.Id, a.RequisitionId, r.Title, a.SubmittedAtUtc })
+                (a, r) => new { a.Id, a.RequisitionId, r.Title, a.SubmittedAtUtc, a.CurrentStageId, a.IsRejected })
+            .Join(
+                _dbContext.Stages.AsNoTracking(),
+                a => a.CurrentStageId,
+                s => s.Id,
+                (a, s) => new { a.Id, a.RequisitionId, a.Title, a.SubmittedAtUtc, StageName = s.Name, a.IsRejected })
             .OrderByDescending(x => x.SubmittedAtUtc)
             .Select(x => new CandidateApplicationListItemDto(
-                x.Id, x.RequisitionId, x.Title, x.SubmittedAtUtc, $"/api/applications/{x.Id}/cv"))
+                x.Id, x.RequisitionId, x.Title, x.SubmittedAtUtc, $"/api/applications/{x.Id}/cv",
+                x.StageName, x.IsRejected))
             .ToListAsync(ct);
 
         return Result<IReadOnlyList<CandidateApplicationListItemDto>>.Ok(items);

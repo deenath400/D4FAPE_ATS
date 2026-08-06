@@ -88,6 +88,57 @@ public class RequisitionServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task CreateAsync_SeedsFourDefaultStagesInOrder()
+    {
+        // AC-7 (FR-5): every newly created Requisition has the default 4-Stage set — Applied,
+        // Screening, Interview, Offer — in that pipeline order.
+        var result = await _service.CreateAsync(new CreateRequisitionRequestDto("Senior Backend Engineer", "Description"));
+        Assert.True(result.IsSuccess);
+
+        var stages = await _dbContext.Stages
+            .AsNoTracking()
+            .Where(s => s.RequisitionId == result.Value!.Id)
+            .OrderBy(s => s.SortOrder)
+            .ToListAsync();
+
+        Assert.Equal(4, stages.Count);
+        Assert.Equal(new[] { "Applied", "Screening", "Interview", "Offer" }, stages.Select(s => s.Name));
+        Assert.Equal(new[] { 0, 1, 2, 3 }, stages.Select(s => s.SortOrder));
+    }
+
+    [Fact]
+    public async Task CreateAsync_StatusStillDraft()
+    {
+        // AC-33 (FR-5): the default Stage set is additive to, not a replacement of, 0003's
+        // creation behaviour — the Requisition still starts life as draft.
+        var result = await _service.CreateAsync(new CreateRequisitionRequestDto("Senior Backend Engineer", "Description"));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("draft", result.Value!.Status);
+    }
+
+    [Fact]
+    public async Task CreateAsync_DefaultStageSet_CanBeEditedLikeAnyOtherStage()
+    {
+        // AC-8 (FR-5): the default set carries no special protection — a Recruiter can rename,
+        // add, reorder, or remove any of the seeded Stages exactly as they would any other.
+        var created = await CreateAsync();
+        var stages = await _dbContext.Stages
+            .AsNoTracking()
+            .Where(s => s.RequisitionId == created.Id)
+            .OrderBy(s => s.SortOrder)
+            .ToListAsync();
+        var appliedStage = stages.Single(s => s.Name == "Applied");
+
+        var trackedAppliedStage = await _dbContext.Stages.SingleAsync(s => s.Id == appliedStage.Id);
+        trackedAppliedStage.Rename("Application Received");
+        await _dbContext.SaveChangesAsync();
+
+        var renamed = await _dbContext.Stages.AsNoTracking().SingleAsync(s => s.Id == appliedStage.Id);
+        Assert.Equal("Application Received", renamed.Name);
+    }
+
+    [Fact]
     public async Task UpdateContentAsync_WhileDraft_UpdatesFields()
     {
         var created = await CreateAsync();

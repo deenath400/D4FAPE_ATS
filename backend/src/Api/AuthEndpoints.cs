@@ -112,7 +112,8 @@ public static class AuthEndpoints
             result.ErrorCode ?? "auth.error",
             result.Status.ToString(),
             result.ErrorMessage ?? "An authentication error occurred.",
-            result.ValidationErrors);
+            result.ValidationErrors,
+            result.Extensions);
     }
 
     private static IResult CreateProblemDetails(
@@ -120,7 +121,8 @@ public static class AuthEndpoints
         string code,
         string title,
         string detail,
-        System.Collections.Generic.IDictionary<string, string[]>? errors = null)
+        System.Collections.Generic.IDictionary<string, string[]>? errors = null,
+        System.Collections.Generic.IDictionary<string, object>? extensions = null)
     {
         var problem = new ProblemDetails
         {
@@ -135,6 +137,17 @@ public static class AuthEndpoints
         if (errors != null)
         {
             problem.Extensions["errors"] = errors;
+        }
+
+        // 0005 HLD D-7: extra machine-readable context beyond code/errors (e.g. the move-conflict
+        // response's actualCurrentStageId/actualCurrentStageName) is merged in here rather than
+        // duplicating ProblemDetails-mapping logic at the endpoint layer.
+        if (extensions != null)
+        {
+            foreach (var (key, value) in extensions)
+            {
+                problem.Extensions[key] = value;
+            }
         }
 
         return Results.Json(problem, statusCode: statusCode, contentType: "application/problem+json");

@@ -2,7 +2,7 @@
 
 **Spec:** `../spec.md` · **LLD:** `lld.md` · **Updated:** 2026-08-06
 
-**Progress:** 12 / 58 tasks · checkpoint CP-1 of 4 complete
+**Progress:** 36 / 58 tasks · checkpoint CP-2 of 4 complete
 
 ---
 
@@ -85,122 +85,122 @@ entity/migration unit and integration tests pass, `dotnet build` succeeds.*
 *Exit condition: all `api.md` endpoints return their documented status codes and bodies;
 `RequisitionService`/`ApplicationService` modifications are covered; integration tests pass.*
 
-- [ ] **T-13** — Modify `Result`/`Result<T>`: add `Extensions` dictionary and `Conflict(code, message, extensions)` overloads
+- [x] **T-13** — Modify `Result`/`Result<T>`: add `Extensions` dictionary and `Conflict(code, message, extensions)` overloads
   - Files: `src/Service/Common/Result.cs`
   - Covers: AC-29
   - Depends on: T-01..T-09 (CP-1 exit)
 
-- [ ] **T-14** — Modify `ToProblemResult()`: merge `Result.Extensions` into `ProblemDetails.Extensions`
+- [x] **T-14** — Modify `ToProblemResult()`: merge `Result.Extensions` into `ProblemDetails.Extensions`
   - Files: `src/Api/AuthEndpoints.cs`
   - Covers: AC-29
   - Depends on: T-13
 
-- [ ] **T-15** — Create Stage-config DTOs
+- [x] **T-15** — Create Stage-config DTOs
   - Files: `src/Service/Pipeline/Dtos/StageDto.cs`, `AddStageRequestDto.cs`, `RenameStageRequestDto.cs`, `ReorderStagesRequestDto.cs`
   - Covers: AC-1, AC-3, AC-4, AC-9
   - Depends on: —
 
-- [ ] **T-16** — Create transition DTOs
+- [x] **T-16** — Create transition DTOs
   - Files: `src/Service/Pipeline/Dtos/MoveApplicationRequestDto.cs`, `RejectApplicationRequestDto.cs`, `ApplicationTransitionDto.cs`, `StageTransitionDto.cs`
   - Covers: AC-11, AC-14, AC-16, AC-20, AC-29, AC-30
   - Depends on: —
 
-- [ ] **T-17** — Create pipeline-board DTOs
+- [x] **T-17** — Create pipeline-board DTOs
   - Files: `src/Service/Pipeline/Dtos/PipelineBoardDto.cs`, `PipelineStageGroupDto.cs`, `PipelineRejectedGroupDto.cs`, `PipelineBoardApplicationDto.cs`
   - Covers: AC-18, AC-19
   - Depends on: —
 
-- [ ] **T-18** — Create `IPipelineService`
+- [x] **T-18** — Create `IPipelineService`
   - Files: `src/Service/Pipeline/IPipelineService.cs`
   - Covers: —
   - Depends on: T-15, T-16, T-17
 
-- [ ] **T-19** — Implement `PipelineService` — Stage configuration methods (`AddStageAsync`, `GetStagesAsync`, `RenameStageAsync`, `ReorderStagesAsync`, `RemoveStageAsync`)
+- [x] **T-19** — Implement `PipelineService` — Stage configuration methods (`AddStageAsync`, `GetStagesAsync`, `RenameStageAsync`, `ReorderStagesAsync`, `RemoveStageAsync`)
   - Files: `src/Service/Pipeline/PipelineService.cs`
   - Covers: AC-1, AC-3, AC-4, AC-5, AC-6, AC-9, AC-28, AC-31
   - Depends on: T-18
 
-- [ ] **T-20** — Implement `PipelineService` — transition methods (`MoveApplicationAsync`, `RejectApplicationAsync`)
+- [x] **T-20** — Implement `PipelineService` — transition methods (`MoveApplicationAsync`, `RejectApplicationAsync`)
   - Files: `src/Service/Pipeline/PipelineService.cs`
   - Covers: AC-11, AC-12, AC-13, AC-14, AC-15, AC-16, AC-28, AC-29, AC-30, NFR-2
   - Depends on: T-19, T-14
 
-- [ ] **T-21** — Implement `PipelineService` — board and history methods (`GetPipelineBoardAsync`, `GetTransitionHistoryAsync`)
+- [x] **T-21** — Implement `PipelineService` — board and history methods (`GetPipelineBoardAsync`, `GetTransitionHistoryAsync`)
   - Files: `src/Service/Pipeline/PipelineService.cs`
   - Covers: AC-17, AC-18, AC-19, AC-20, AC-21, AC-27, NFR-1
   - Depends on: T-20
 
-- [ ] **T-22** — Modify `ServiceCollectionExtensions`: register `IPipelineService`
+- [x] **T-22** — Modify `ServiceCollectionExtensions`: register `IPipelineService`
   - Files: `src/Service/ServiceCollectionExtensions.cs`
   - Covers: —
   - Depends on: T-21
 
-- [ ] **T-23** — Modify `RequisitionService.CreateAsync`: seed default 4-Stage set
+- [x] **T-23** — Modify `RequisitionService.CreateAsync`: seed default 4-Stage set
   - Files: `src/Service/Requisition/RequisitionService.cs`
   - Covers: AC-7, AC-8, AC-33
   - Depends on: T-01
 
-- [ ] **T-24** — Modify `ApplicationService.SubmitAsync`: resolve and assign first Stage; no-stages-configured guard
+- [x] **T-24** — Modify `ApplicationService.SubmitAsync`: resolve and assign first Stage; no-stages-configured guard
   - Files: `src/Service/Application/ApplicationService.cs`
   - Covers: AC-10
   - Depends on: T-03, T-23
 
-- [ ] **T-25** — Modify `ApplicationService.ListMineAsync` and `CandidateApplicationListItemDto`: add `currentStageName`/`isRejected`
+- [x] **T-25** — Modify `ApplicationService.ListMineAsync` and `CandidateApplicationListItemDto`: add `currentStageName`/`isRejected`
   - Files: `src/Service/Application/ApplicationService.cs`, `src/Service/Application/Dtos/CandidateApplicationListItemDto.cs`
   - Covers: AC-22, AC-23
   - Depends on: T-24
 
-- [ ] **T-26** — Create `PipelineEndpoints` — Stage-config routes (add, list, rename, reorder, remove)
+- [x] **T-26** — Create `PipelineEndpoints` — Stage-config routes (add, list, rename, reorder, remove)
   - Files: `src/Api/PipelineEndpoints.cs`
   - Covers: AC-1, AC-2, AC-5, AC-6, AC-9, AC-26, AC-28, AC-31
   - Depends on: T-19
 
-- [ ] **T-27** — Extend `PipelineEndpoints` — move, reject, board, history routes
+- [x] **T-27** — Extend `PipelineEndpoints` — move, reject, board, history routes
   - Files: `src/Api/PipelineEndpoints.cs`
   - Covers: AC-11, AC-14, AC-24, AC-25, AC-26, AC-27, AC-29, AC-30
   - Depends on: T-26, T-20, T-21
 
-- [ ] **T-28** — Modify `Program.cs`: `app.MapPipelineEndpoints();`
+- [x] **T-28** — Modify `Program.cs`: `app.MapPipelineEndpoints();`
   - Files: `src/Api/Program.cs`
   - Covers: —
   - Depends on: T-27
 
-- [ ] **T-29** — Unit tests: `PipelineService` Stage-configuration logic
+- [x] **T-29** — Unit tests: `PipelineService` Stage-configuration logic
   - Files: `tests/Ats.UnitTests/Pipeline/PipelineServiceTests.cs`
   - Covers: AC-1, AC-3, AC-4, AC-5, AC-6, AC-28, AC-31
   - Depends on: T-19
 
-- [ ] **T-30** — Unit tests: `PipelineService` move/reject logic
+- [x] **T-30** — Unit tests: `PipelineService` move/reject logic
   - Files: `tests/Ats.UnitTests/Pipeline/PipelineServiceTests.cs`
   - Covers: AC-11, AC-12, AC-13, AC-14, AC-15, AC-16, AC-28, AC-29, AC-30
   - Depends on: T-20
 
-- [ ] **T-31** — Unit tests: `PipelineService` board/history logic
+- [x] **T-31** — Unit tests: `PipelineService` board/history logic
   - Files: `tests/Ats.UnitTests/Pipeline/PipelineServiceTests.cs`
   - Covers: AC-17, AC-18, AC-19, AC-20, AC-21, AC-30
   - Depends on: T-21
 
-- [ ] **T-32** — Unit tests: `RequisitionService.CreateAsync` default-Stage seeding
+- [x] **T-32** — Unit tests: `RequisitionService.CreateAsync` default-Stage seeding
   - Files: `tests/Ats.UnitTests/Requisition/RequisitionServiceTests.cs`
   - Covers: AC-7, AC-8, AC-33
   - Depends on: T-23
 
-- [ ] **T-33** — Unit tests: `ApplicationService.SubmitAsync`/`ListMineAsync` modifications
+- [x] **T-33** — Unit tests: `ApplicationService.SubmitAsync`/`ListMineAsync` modifications
   - Files: `tests/Ats.UnitTests/Application/ApplicationServiceTests.cs`
   - Covers: AC-10, AC-22, AC-23
   - Depends on: T-24, T-25
 
-- [ ] **T-34** — Integration tests: Stage-config endpoints, all documented status codes
+- [x] **T-34** — Integration tests: Stage-config endpoints, all documented status codes
   - Files: `tests/Ats.IntegrationTests/Pipeline/StageEndpointsTests.cs`
   - Covers: AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-9, AC-26, AC-28, AC-31
   - Depends on: T-28
 
-- [ ] **T-35** — Integration tests: move/reject/board/history endpoints, all documented status codes
+- [x] **T-35** — Integration tests: move/reject/board/history endpoints, all documented status codes
   - Files: `tests/Ats.IntegrationTests/Pipeline/TransitionEndpointsTests.cs`
   - Covers: AC-11, AC-12, AC-13, AC-14, AC-15, AC-16, AC-17, AC-18, AC-19, AC-20, AC-21, AC-24, AC-25, AC-26, AC-27, AC-28, AC-29, AC-30
   - Depends on: T-28
 
-- [ ] **T-36** — Integration tests: `GET /api/applications/mine` status fields, note exclusion
+- [x] **T-36** — Integration tests: `GET /api/applications/mine` status fields, note exclusion
   - Files: `tests/Ats.IntegrationTests/Application/ApplicationEndpointsTests.cs`
   - Covers: AC-22, AC-23, AC-30
   - Depends on: T-25

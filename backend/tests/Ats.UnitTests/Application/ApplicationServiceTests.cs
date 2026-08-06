@@ -81,6 +81,18 @@ public class ApplicationServiceTests : IDisposable
         return requisition.Id;
     }
 
+    private async Task<Guid> CreatePublishedRequisitionWithNoStagesAsync(string title = "Stageless Role")
+    {
+        // R-1 (HLD §9) test fixture: a published Requisition a Recruiter has edited down to
+        // zero Stages before any Application arrived — deliberately skips the Stage seeding
+        // CreatePublishedRequisitionAsync performs.
+        var requisition = RequisitionEntity.Create(title, "Description");
+        requisition.Publish();
+        _dbContext.Requisitions.Add(requisition);
+        await _dbContext.SaveChangesAsync();
+        return requisition.Id;
+    }
+
     private async Task<Guid> CreateDraftRequisitionAsync(string title = "Draft Role")
     {
         var requisition = RequisitionEntity.Create(title, "Description");
@@ -281,6 +293,50 @@ public class ApplicationServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task SubmitAsync_AssignsRequisitionsFirstStage()
+    {
+        // AC-10 (FR-7): the new Application's current Stage is the Requisition's first Stage in
+        // current pipeline order — proven against a Requisition with more than one Stage so a
+        // wrong (e.g. last-Stage) assignment would be caught.
+        var requisition = RequisitionEntity.Create("Senior Engineer", "Description");
+        requisition.Publish();
+        _dbContext.Requisitions.Add(requisition);
+        var screeningStage = Ats.Db.Requisitions.Stage.Create(requisition.Id, "Screening", 1);
+        var appliedStage = Ats.Db.Requisitions.Stage.Create(requisition.Id, "Applied", 0);
+        _dbContext.Stages.AddRange(screeningStage, appliedStage);
+        await _dbContext.SaveChangesAsync();
+
+        var candidateId = await CreateCandidateAsync();
+        using var cvContent = ValidPdfStream();
+
+        var result = await _service.SubmitAsync(
+            requisition.Id, candidateId, cvContent, "resume.pdf", "application/pdf", cvContent.Length);
+
+        Assert.True(result.IsSuccess);
+        var application = await _dbContext.Applications.AsNoTracking().SingleAsync(a => a.Id == result.Value!.Id);
+        Assert.Equal(appliedStage.Id, application.CurrentStageId);
+        Assert.False(application.IsRejected);
+    }
+
+    [Fact]
+    public async Task SubmitAsync_NoStagesConfigured_ReturnsConflict()
+    {
+        // R-1 (HLD §9): a Requisition edited down to zero Stages before any Application arrived
+        // must not silently create a stage-less Application (G-1).
+        var requisitionId = await CreatePublishedRequisitionWithNoStagesAsync();
+        var candidateId = await CreateCandidateAsync();
+        using var cvContent = ValidPdfStream();
+
+        var result = await _service.SubmitAsync(
+            requisitionId, candidateId, cvContent, "resume.pdf", "application/pdf", cvContent.Length);
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal(ResultStatus.Conflict, result.Status);
+        Assert.Equal("application.submit.no-stages-configured", result.ErrorCode);
+        Assert.Empty(_dbContext.Applications);
+    }
+
+    [Fact]
     public async Task SubmitAsync_TwoDistinctCandidatesSameRequisition_BothSucceed()
     {
         var requisitionId = await CreatePublishedRequisitionAsync();
@@ -397,6 +453,48 @@ public class ApplicationServiceTests : IDisposable
         Assert.Equal(2, result.Value!.Count);
         Assert.Contains(result.Value, i => i.RequisitionTitle == "Backend Engineer");
         Assert.Contains(result.Value, i => i.RequisitionTitle == "Frontend Engineer");
+    }
+
+    [Fact]
+    public async Task ListMineAsync_IncludesCurrentStageNameAndIsRejected()
+    {
+        // AC-22/AC-23 (FR-17): the Candidate's own-list rows carry the real current status —
+        // a Stage name for an active Application, and isRejected=true (with its retained Stage
+        // name still present, FR-10) for a rejected one.
+        var candidateId = await CreateCandidateAsync();
+        var activeRequisitionId = await CreatePublishedRequisitionAsync("Backend Engineer");
+        var rejectedRequisitionId = await CreatePublishedRequisitionAsync("Frontend Engineer");
+
+        using (var cv1 = ValidPdfStream())
+        {
+            var submitted = await _service.SubmitAsync(
+                activeRequisitionId, candidateId, cv1, "resume.pdf", "application/pdf", cv1.Length);
+            Assert.True(submitted.IsSuccess);
+        }
+
+        Guid rejectedApplicationId;
+        using (var cv2 = ValidPdfStream())
+        {
+            var submitted = await _service.SubmitAsync(
+                rejectedRequisitionId, candidateId, cv2, "resume.pdf", "application/pdf", cv2.Length);
+            Assert.True(submitted.IsSuccess);
+            rejectedApplicationId = submitted.Value!.Id;
+        }
+
+        var rejectedApplication = await _dbContext.Applications.SingleAsync(a => a.Id == rejectedApplicationId);
+        rejectedApplication.Reject();
+        await _dbContext.SaveChangesAsync();
+
+        var result = await _service.ListMineAsync(candidateId);
+
+        Assert.True(result.IsSuccess);
+        var active = result.Value!.Single(i => i.RequisitionId == activeRequisitionId);
+        Assert.Equal("Applied", active.CurrentStageName);
+        Assert.False(active.IsRejected);
+
+        var rejected = result.Value!.Single(i => i.RequisitionId == rejectedRequisitionId);
+        Assert.Equal("Applied", rejected.CurrentStageName);
+        Assert.True(rejected.IsRejected);
     }
 
     [Fact]

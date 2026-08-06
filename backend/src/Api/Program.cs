@@ -73,6 +73,7 @@ app.MapAuthEndpoints();
 app.MapRequisitionEndpoints();
 app.MapPublicRequisitionEndpoints();
 app.MapApplicationEndpoints();
+app.MapPipelineEndpoints();
 
 app.Run();
 

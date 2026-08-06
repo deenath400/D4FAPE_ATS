@@ -3,6 +3,7 @@ namespace Ats.Service;
 using Ats.Db;
 using Ats.Service.Application;
 using Ats.Service.Auth;
+using Ats.Service.Pipeline;
 using Ats.Service.Requisition;
 using Ats.Shared.Auth;
 using Ats.Shared.Storage;
@@ -35,6 +36,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRequisitionService, RequisitionService>();
         services.AddSingleton<IFileStorage, LocalDiskFileStorage>();
         services.AddScoped<IApplicationService, ApplicationService>();
+        services.AddScoped<IPipelineService, PipelineService>();
 
         return services;
     }

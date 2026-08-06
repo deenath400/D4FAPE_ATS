@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Ats.IntegrationTests;
 using Ats.Service.Application.Dtos;
 using Ats.Service.Auth.Dtos;
+using Ats.Service.Pipeline.Dtos;
 using Ats.Service.Requisition.Dtos;
 using Ats.Shared.Auth;
 using Ats.Shared.Storage;
@@ -349,6 +350,55 @@ public class ApplicationEndpointsTests
         Assert.Equal(HttpStatusCode.OK, candidate2MineBeforeSubmit.StatusCode);
         var candidate2Mine = await candidate2MineBeforeSubmit.Content.ReadFromJsonAsync<CandidateApplicationListItemDto[]>();
         Assert.Empty(candidate2Mine!);
+    }
+
+    [Fact]
+    public async Task GET_applications_mine_IncludesStatus_ExcludesNote()
+    {
+        // AC-22/AC-23/AC-30 (0005 FR-17, FR-23): the Candidate's own-list rows carry the real
+        // current status (a Stage name for an active Application, isRejected + retained Stage
+        // name for a rejected one), and the staff-only transition note never appears anywhere
+        // in this response.
+        using var factory = new CustomWebApplicationFactory();
+        factory.InitializeDatabase();
+        using var client = factory.CreateClient();
+        var recruiterToken = await CreateStaffUserAndLoginAsync(factory, client, "recruiter22@example.com", AuthConstants.Roles.Recruiter);
+        var activeRequisitionId = await CreatePublishedRequisitionAsync(client, recruiterToken, "Backend Engineer");
+        var rejectedRequisitionId = await CreatePublishedRequisitionAsync(client, recruiterToken, "Frontend Engineer");
+
+        var candidateToken = await CreateCandidateAndLoginAsync(client, "candidate22@example.com");
+        Authorize(client, candidateToken);
+        var activeSubmit = await client.PostAsync(
+            $"/api/requisitions/{activeRequisitionId}/applications", CreatePdfFormContent(ValidPdfBytes()));
+        var activeApplication = await activeSubmit.Content.ReadFromJsonAsync<ApplicationDto>();
+        var rejectedSubmit = await client.PostAsync(
+            $"/api/requisitions/{rejectedRequisitionId}/applications", CreatePdfFormContent(ValidPdfBytes()));
+        var rejectedApplication = await rejectedSubmit.Content.ReadFromJsonAsync<ApplicationDto>();
+
+        Authorize(client, recruiterToken);
+        var rejectResponse = await client.PostAsJsonAsync(
+            $"/api/applications/{rejectedApplication!.Id}/reject",
+            new RejectApplicationRequestDto("Not enough backend depth."));
+        Assert.Equal(HttpStatusCode.OK, rejectResponse.StatusCode);
+
+        Authorize(client, candidateToken);
+        var mineResponse = await client.GetAsync("/api/applications/mine");
+
+        Assert.Equal(HttpStatusCode.OK, mineResponse.StatusCode);
+        var body = await mineResponse.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("Not enough backend depth.", body);
+
+        var mine = await mineResponse.Content.ReadFromJsonAsync<CandidateApplicationListItemDto[]>();
+        Assert.NotNull(mine);
+        Assert.Equal(2, mine!.Length);
+
+        var active = mine.Single(i => i.Id == activeApplication!.Id);
+        Assert.Equal("Applied", active.CurrentStageName);
+        Assert.False(active.IsRejected);
+
+        var rejected = mine.Single(i => i.Id == rejectedApplication.Id);
+        Assert.Equal("Applied", rejected.CurrentStageName);
+        Assert.True(rejected.IsRejected);
     }
 
     [Fact]

@@ -109,3 +109,108 @@ spans specs 0001-0004.
   process until CP-2.
 
 ---
+
+## CP-2 — Service & API · 2026-08-06
+
+**Tasks completed:** T-13, T-14, T-15, T-16, T-17, T-18, T-19, T-20, T-21, T-22, T-23, T-24,
+T-25, T-26, T-27, T-28, T-29, T-30, T-31, T-32, T-33, T-34, T-35, T-36
+
+**Starting-state note.** This checkpoint's working tree already contained substantial
+uncommitted CP-2 work — `Result`/`Result<T>` `Extensions` + the three-arg `Conflict` overload
+(T-13), `AuthEndpoints.ToProblemResult()`'s extension-merge (T-14), all twelve
+`src/Service/Pipeline/Dtos/*.cs` files (T-15/T-16/T-17), `IPipelineService` (T-18), and a
+complete `PipelineService` implementation covering every method in `api.md`/`lld.md` §3.2
+(T-19/T-20/T-21). Every file was read in full and checked line-by-line against `lld.md` §2–§3
+and `api.md` §3 before being trusted — all of it matched the design exactly, so none of it was
+rewritten. What remained genuinely undone: `IPipelineService` registration (T-22), the
+`ListMineAsync`/`CandidateApplicationListItemDto` projection (T-25), the entire API layer
+(T-26–T-28), and all dedicated test coverage (T-29–T-36) — none of which had a test file or a
+`PipelineEndpoints.cs`/`Program.cs` change on disk. This is recorded here per the Implement
+stage's honesty requirement, not silently absorbed into "files modified" below.
+
+**Files created**
+
+| Path | Purpose |
+|---|---|
+| `backend/src/Service/Pipeline/Dtos/StageDto.cs`, `AddStageRequestDto.cs`, `RenameStageRequestDto.cs`, `ReorderStagesRequestDto.cs` | Stage-config DTOs (T-15) — found already present, verified against `api.md` §3.1–§3.5/§4 |
+| `backend/src/Service/Pipeline/Dtos/MoveApplicationRequestDto.cs`, `RejectApplicationRequestDto.cs`, `ApplicationTransitionDto.cs`, `StageTransitionDto.cs` | Transition DTOs (T-16) — found already present, verified against `api.md` §3.6/§3.7/§4 |
+| `backend/src/Service/Pipeline/Dtos/PipelineBoardDto.cs`, `PipelineStageGroupDto.cs`, `PipelineRejectedGroupDto.cs`, `PipelineBoardApplicationDto.cs` | Board DTOs (T-17) — found already present, verified against `api.md` §3.8/§4 |
+| `backend/src/Service/Pipeline/IPipelineService.cs` | Service contract (T-18) — found already present, verified against `lld.md` §3.1 |
+| `backend/src/Service/Pipeline/PipelineService.cs` | Full implementation (T-19/T-20/T-21) — found already present, verified method-by-method against `lld.md` §3.2's behaviour spec |
+| `backend/src/Api/PipelineEndpoints.cs` | Endpoints 1–9 of `api.md` §2 (T-26/T-27) — new this session |
+| `backend/tests/Ats.UnitTests/Pipeline/PipelineServiceTests.cs` | Stage-config, move/reject, board/history unit coverage (T-29/T-30/T-31) |
+| `backend/tests/Ats.IntegrationTests/Pipeline/StageEndpointsTests.cs` | Stage-config HTTP coverage, all documented status codes (T-34) |
+| `backend/tests/Ats.IntegrationTests/Pipeline/TransitionEndpointsTests.cs` | Move/reject/board/history HTTP coverage, all documented status codes (T-35) |
+
+**Files modified**
+
+| Path | Change |
+|---|---|
+| `backend/src/Service/Common/Result.cs` | `Extensions` dictionary + 3-arg `Conflict` overloads on `Result`/`Result<T>` (T-13) — found already present, verified against `lld.md` §3.5 |
+| `backend/src/Api/AuthEndpoints.cs` | `ToProblemResult()` merges `Result.Extensions` into `ProblemDetails.Extensions` (T-14) — found already present, verified against `lld.md` §3.5 |
+| `backend/src/Service/ServiceCollectionExtensions.cs` | Registered `IPipelineService → PipelineService` (T-22) |
+| `backend/src/Service/Requisition/RequisitionService.cs` | No code change this checkpoint — `CreateAsync`'s default-Stage seeding (T-23) was already fully correct as shipped by CP-1; this checkpoint only added its dedicated AC-7/AC-8/AC-33 test coverage (T-32) |
+| `backend/src/Service/Application/ApplicationService.cs` | `SubmitAsync`'s first-Stage resolution and no-stages-configured guard (T-24's write-path half) were already correct from CP-1; this checkpoint completed T-24/T-25 by adding `ListMineAsync`'s second `Join` to `Stages`, projecting `CurrentStageName`/`IsRejected` |
+| `backend/src/Service/Application/Dtos/CandidateApplicationListItemDto.cs` | Added `CurrentStageName`, `IsRejected` (T-25) |
+| `backend/src/Api/Program.cs` | `app.MapPipelineEndpoints();` (T-28) |
+| `backend/tests/Ats.UnitTests/Requisition/RequisitionServiceTests.cs` | Added `CreateAsync_SeedsFourDefaultStagesInOrder` (AC-7), `CreateAsync_StatusStillDraft` (AC-33), `CreateAsync_DefaultStageSet_CanBeEditedLikeAnyOtherStage` (AC-8) (T-32) |
+| `backend/tests/Ats.UnitTests/Application/ApplicationServiceTests.cs` | Added `SubmitAsync_AssignsRequisitionsFirstStage` (AC-10), `SubmitAsync_NoStagesConfigured_ReturnsConflict` (R-1), `ListMineAsync_IncludesCurrentStageNameAndIsRejected` (AC-22, AC-23), plus the `CreatePublishedRequisitionWithNoStagesAsync` fixture helper (T-33) |
+| `backend/tests/Ats.IntegrationTests/Application/ApplicationEndpointsTests.cs` | Added `GET_applications_mine_IncludesStatus_ExcludesNote` (AC-22, AC-23, AC-30) (T-36) |
+
+**Decisions made during implementation**
+
+| # | Decision | Why |
+|---|---|---|
+| I-2 | `MoveApplicationAsync_ConcurrentSaveChanges_ThrowsConcurrencyMappedToConflict` (T-30) pre-loads the Application into the test's own tracked `DbContext`, then moves it via a second, independent `DbContext` on the same connection before calling the service again on the first — rather than two real concurrent threads | EF Core does not silently overwrite an already-tracked entity's current/original values from a later query result (identity resolution), so this deterministically reproduces the "stale in-memory snapshot passes the pre-check, `SaveChangesAsync` throws `DbUpdateConcurrencyException`" path (HLD §4.2) without any timing-dependent thread race — matches the project's existing precedent (`ApplicationServiceTests.ThrowingSaveChangesDbContext`) of isolating a specific failure branch deterministically rather than racing real threads for a unit test, while `POST_applications_TwoNearSimultaneousSubmissions_ExactlyOneSurvives` (0004, reused pattern) remains the genuine concurrent-thread regression test at the integration level |
+
+**Deviations from the LLD**
+
+None new this checkpoint. All three CP-1 deviations remain in force (see CP-1 section above and
+`plan/lld.md` §Deviation Log); CP-2's `PipelineService`, `PipelineEndpoints`, and `Result`
+changes were implemented exactly as `lld.md` §3–§4 specified, with no divergence found during
+verification.
+
+**Verification run**
+
+```
+$ dotnet build
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+$ dotnet test tests/Ats.ArchitectureTests --no-build
+Passed!  - Failed: 0, Passed: 4, Skipped: 0, Total: 4, Duration: 169 ms
+
+$ dotnet test tests/Ats.UnitTests --no-build
+Passed!  - Failed: 0, Passed: 161, Skipped: 0, Total: 161, Duration: 9 s
+
+$ dotnet test tests/Ats.IntegrationTests --no-build
+Passed!  - Failed: 0, Passed: 95, Skipped: 0, Total: 95, Duration: 35 s
+```
+
+161 unit tests = 118 pre-existing (CP-1 and earlier) + 43 new (T-29/T-30/T-31: 37 in the new
+`PipelineServiceTests.cs`; T-32: 3 new `RequisitionServiceTests.cs` cases; T-33: 3 new
+`ApplicationServiceTests.cs` cases). 95 integration tests = 66 pre-existing + 29 new (T-34: 12 in
+`StageEndpointsTests.cs`; T-35: 16 in `TransitionEndpointsTests.cs`; T-36: 1 new
+`ApplicationEndpointsTests.cs` case). No pre-existing test was weakened, skipped, or disabled.
+
+**Meta updates applied**
+
+- `architecture.md`: `db/pipeline` row text amended — `StageTransition` now has a real
+  service/API surface (it was schema-only as of CP-1); `service/pipeline`/`api/pipeline` rows
+  added to the Component Map (both were named in the spec's frontmatter and HLD §3 but did not
+  yet exist as table rows); `Cross-Cutting Concerns` unchanged. Change Log row appended.
+- `tech-stack.md`: no change.
+- `coding-standards.md`: no change (the `Result.Extensions` convention note is T-58, CP-4).
+
+**Known gaps carried into the next checkpoint**
+
+- No frontend surface exists yet for any pipeline behavior — Stage configuration, pipeline
+  board, move/reject controls, transition history, and the candidate status upgrade are all
+  CP-3 (T-37 through T-53).
+- NFR-1/NFR-2 dedicated verification tests (exact query count at 500 Applications; transaction
+  scope) and the E-2 concurrent-move regression test are CP-4 (T-54/T-55/T-56), not this
+  checkpoint — CP-2's own tests exercise the board/move/reject code paths functionally but do
+  not yet assert query counts or transaction boundaries directly.
+
+---
