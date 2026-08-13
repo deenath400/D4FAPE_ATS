@@ -1,6 +1,6 @@
 # Tech Stack
 
-**Updated:** 2026-08-06 · **Budget:** 80 lines target / 120 hard ceiling
+**Updated:** 2026-08-14 · **Budget:** 80 lines target / 120 hard ceiling
 
 Everything needed to build, run, and test the project. `/validate` reads the Commands
 section literally, so it must stay accurate.
@@ -46,6 +46,7 @@ section literally, so it must stay accurate.
 | Queue / background | None | No `worker/*` component |
 | Object storage | Local disk, behind `shared/storage`'s `IFileStorage` (`LocalDiskFileStorage`) | CVs only so far; base path via `Storage:CvBasePath` (est. 0004). Swapping to a cloud backend is an implementation change behind the interface, not a contract change |
 | Hosting | TBD | Deployment target deliberately deferred |
+| Orchestration | .NET Aspire (`src/AppHost`) | Development-only local process orchestration for both deployables (est. 0006); does not pre-empt Hosting, which remains TBD |
 | CI | None | No `.github/workflows/` exists |
 
 ## Commands
@@ -54,7 +55,8 @@ section literally, so it must stay accurate.
 |---|---|---|
 | Install | `dotnet restore --use-lock-file` / `npm ci` | `backend` / `frontend` |
 | Build | `dotnet build && dotnet test tests/Ats.ArchitectureTests --no-build` / `npm run build` | `backend` / `frontend` |
-| Run (dev) | `dotnet run --project src/Api` / `npm run dev` | `backend` / `frontend` |
+| Run (dev) | `dotnet run --project src/Api` / `npm run dev` | `backend` / `frontend` (independent, primary; remain fully supported alongside Aspire — est. 0006) |
+| Run (orchestrated dev) | `dotnet run --project src/AppHost` | `backend` (starts both services + dashboard; development-only — est. 0006) |
 | Test (unit) | `dotnet test tests/Ats.UnitTests` / `npm test` | `backend` / `frontend` |
 | Test (integration) | `dotnet test tests/Ats.IntegrationTests` | `backend` |
 | Lint | `dotnet build` / `npm run lint` | `backend` / `frontend` |
@@ -88,3 +90,4 @@ frontend/         Next.js candidate portal application
 ## Related Specs
 
 - `0001` (Project Scaffolding and Walking Skeleton)
+- `0006` (Local Service Orchestration with Aspire)

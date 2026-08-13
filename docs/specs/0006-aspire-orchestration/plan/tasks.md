@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 4 / 10 tasks · checkpoint CP-1 of 2 complete
+**Progress:** 10 / 10 tasks · checkpoint CP-2 of 2 complete — all tasks done
 
 ---
 
@@ -77,7 +77,7 @@ work on their documented ports; database migrations succeed under Aspire; port c
 handled cleanly; `tech-stack.md` is updated with the Aspire command; no production
 configuration or multi-environment setup is present in the AppHost.*
 
-- [ ] **T-5** — Test database operations under Aspire orchestration
+- [x] **T-5** — Test database operations under Aspire orchestration
   - Files: — (manual validation)
   - Covers: AC-8, AC-9
   - Depends on: T-3
@@ -90,7 +90,7 @@ configuration or multi-environment setup is present in the AppHost.*
     - Verify the migration history in `__EFMigrationsHistory` table is retained
     - Run the migration again; verify it is a no-op (no new migrations applied)
 
-- [ ] **T-6** — Verify independent backend command continues to work
+- [x] **T-6** — Verify independent backend command continues to work
   - Files: — (manual validation)
   - Covers: AC-11
   - Depends on: —
@@ -102,7 +102,7 @@ configuration or multi-environment setup is present in the AppHost.*
     - Verify the behavior is identical to running the backend independently before this spec
     - Stop the backend with Ctrl+C
 
-- [ ] **T-7** — Verify independent frontend command continues to work
+- [x] **T-7** — Verify independent frontend command continues to work
   - Files: — (manual validation)
   - Covers: AC-12
   - Depends on: —
@@ -114,7 +114,7 @@ configuration or multi-environment setup is present in the AppHost.*
     - Verify the behavior is identical to running the frontend independently before this spec
     - Stop the frontend with Ctrl+C
 
-- [ ] **T-8** — Test port conflict detection (AC-13)
+- [x] **T-8** — Test port conflict detection (AC-13)
   - Files: — (manual validation)
   - Covers: AC-13
   - Depends on: T-6, T-7 (or T-3)
@@ -127,7 +127,7 @@ configuration or multi-environment setup is present in the AppHost.*
     - Verify Aspire is still running with both services healthy
     - Alternative test: start the independent backend first, then Aspire; verify Aspire fails fast with a clear port-conflict error
 
-- [ ] **T-9** — Verify development-only scope (AC-14)
+- [x] **T-9** — Verify development-only scope (AC-14)
   - Files: `src/AppHost/Program.cs`, `src/AppHost/Ats.AppHost.csproj`
   - Covers: AC-14
   - Depends on: T-1
@@ -138,7 +138,7 @@ configuration or multi-environment setup is present in the AppHost.*
     - Confirm the AppHost is purely a local orchestration tool with no production artifact
     - Verify tech-stack.md does not list Aspire as a production infrastructure component (Infrastructure row remains "TBD")
 
-- [ ] **T-10** — Update tech-stack.md with Aspire command
+- [x] **T-10** — Update tech-stack.md with Aspire command
   - Files: `docs/specs/meta/tech-stack.md`
   - Covers: AC-10
   - Depends on: T-3 (command must exist and work first)
