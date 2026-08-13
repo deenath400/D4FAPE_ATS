@@ -214,3 +214,105 @@ Passed!  - Failed: 0, Passed: 95, Skipped: 0, Total: 95, Duration: 35 s
   not yet assert query counts or transaction boundaries directly.
 
 ---
+
+## CP-3 — Frontend · 2026-08-13
+
+**Tasks completed:** T-37, T-38, T-39, T-40, T-41, T-42, T-43, T-44, T-45, T-46, T-47, T-48,
+T-49, T-50, T-51, T-52, T-53
+
+**Files created**
+
+| Path | Purpose |
+|---|---|
+| `frontend/src/lib/types/pipeline.ts` | Shared TS types mirroring `api.md` §4 (T-37) |
+| `frontend/src/components/staff/StageConfigPanel.tsx` | Add/rename/reorder/remove Stages, `canWrite`-gated (T-39) |
+| `frontend/src/app/staff/requisitions/[id]/stages/page.tsx`, `loading.tsx`, `error.tsx` | Stage-configuration screen (T-40) |
+| `frontend/src/components/staff/PipelineBoard.tsx` | Grouped-by-Stage board + separate Rejected column (T-42) |
+| `frontend/src/components/staff/MoveApplicationControl.tsx` | Target-Stage select + note + submit, per Application card (T-43) |
+| `frontend/src/components/staff/RejectApplicationControl.tsx` | Confirm-then-note-then-submit, terminal action (T-44) |
+| `frontend/src/app/staff/requisitions/[id]/pipeline/page.tsx`, `loading.tsx`, `error.tsx` | Pipeline board screen (T-45) |
+| `frontend/src/components/staff/TransitionHistoryList.tsx` | Chronological transition list for one Application (T-46) |
+| `frontend/src/app/staff/applications/[id]/page.tsx`, `loading.tsx`, `error.tsx` | Application detail / transition-history screen (T-47) |
+| `frontend/tests/staff/stage-config-panel.test.tsx` | `StageConfigPanel` coverage (T-49) |
+| `frontend/tests/staff/pipeline-board.test.tsx` | `PipelineBoard` coverage (T-50) |
+| `frontend/tests/staff/move-application-control.test.tsx` | `MoveApplicationControl` coverage (T-51) |
+| `frontend/tests/staff/transition-history-list.test.tsx` | `TransitionHistoryList` coverage (T-52) |
+
+**Files modified**
+
+| Path | Change |
+|---|---|
+| `frontend/src/lib/types/application.ts` | Added `currentStageName`, `isRejected` to `CandidateApplicationListItemDto` (T-38) |
+| `frontend/src/app/staff/requisitions/[id]/page.tsx` | Added "Configure Stages"/"View Pipeline" links alongside "View Applications" (T-41) |
+| `frontend/src/components/portal/ApplicationList.tsx` | Renders the current Stage name, or a "Rejected" badge instead when `isRejected` (T-48) |
+| `frontend/tests/portal/application-list.test.tsx` | Added `currentStageName`/`isRejected` to existing fixtures; added stage-name and Rejected-badge cases (AC-22, AC-23) (T-53) |
+
+**Decisions made during implementation**
+
+| # | Decision | Why |
+|---|---|---|
+| I-3 | `StageConfigPanel` keeps a local `stages` `useState` seeded from the `stages` prop, resynced via `useEffect` on prop change, rather than deriving purely from props on every render | Matches `lld.md` §5.1's "`stages` (local, optimistic reorder)" state note — an up/down reorder click needs to show its result immediately, before the `PUT .../reorder` response returns; a pure-prop derivation would either not move until the round trip completes or require prop-drilling an optimistic override up into the Server Component. The `useEffect` resync keeps it consistent with the server's canonical order after every `router.refresh()`. |
+| I-4 | `PipelineBoard` and `TransitionHistoryList` are plain (non-`"use client"`) components, even though they compose client components (`MoveApplicationControl`/`RejectApplicationControl`) | Coding standards: "Server Components by default; `use client` only where interactivity requires it." Neither component holds its own state or event handlers — they only map over server-fetched data and render child client components, which React supports natively inside a Server Component tree. |
+| I-5 | `MoveApplicationControl`'s target-Stage `<select>` defaults to the first Stage in pipeline order that is not the Application's current Stage, rather than defaulting to the current Stage itself | A default that pre-selects the Application's own current Stage would make the common case (advance to the next Stage) require an extra click to change the selection; api.md does not forbid moving to the same Stage, but it is a pointless request the UI has no reason to default to. |
+
+**Deviations from the LLD**
+
+None. `pipeline.ts`, `application.ts`, every component's props/state shape, the page/loading/error
+triad per route, and the data-access table (LLD §5.2) were all implemented exactly as designed.
+The backend DTOs actually shipped by CP-2 (`backend/src/Service/Pipeline/Dtos/*.cs`,
+`PipelineEndpoints.cs`) were read directly and confirmed to match `api.md` §4 and this LLD's §6
+field-for-field before writing the frontend types — no contract mismatch found.
+
+**Verification run**
+
+```
+$ npm test
+
+ Test Files  15 passed (15)
+      Tests  59 passed (59)
+
+$ npm run build
+
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+ ✓ Generating static pages (9/9)
+
+Route (app)                                Size     First Load JS
+├ ƒ /staff/applications/[id]               178 B           109 kB
+├ ƒ /staff/requisitions/[id]/pipeline      1.64 kB         111 kB
+├ ƒ /staff/requisitions/[id]/stages        1.98 kB         111 kB
+  (full table in build output; all pre-existing routes unchanged)
+
+$ npm run lint
+✔ No ESLint warnings or errors
+```
+
+59 component/unit tests = 45 pre-existing + 14 new (T-49: 5, T-50: 3, T-51: 2, T-52: 3, T-53: 2
+new cases added to the modified `application-list.test.tsx`, on top of its 2 pre-existing
+cases). No pre-existing test was weakened, skipped, or disabled.
+
+`npm run format` (prettier `--check`) was also run as a courtesy check. It reports pre-existing
+formatting issues across roughly two dozen files this checkpoint never touched (`next.config.ts`,
+`package.json`, `layout.tsx`, `LoginForm.tsx`, etc. — confirmed via `git status`, none of them
+appear in this checkpoint's diff), consistent with a pre-existing condition predating this spec.
+Every file this checkpoint created or modified was run through `prettier --write` and re-verified
+against `npm test`/`npm run build`/`npm run lint` afterward — all still green.
+
+**Meta updates applied**
+
+- `architecture.md`: no change this checkpoint — CP-4's T-57 owns the Component Map/Data Model
+  update for this spec, per `tasks.md`. The frontend surface added here (`ui/staff`/`ui/portal`
+  pages and components) does not introduce a new top-level component beyond what `architecture.md`
+  already lists (`ui/staff`, `ui/portal`), so no interim row change was needed either.
+- `tech-stack.md`: no change.
+- `coding-standards.md`: no change (the `Result.Extensions` convention note remains T-58, CP-4).
+
+**Known gaps carried into the next checkpoint**
+
+- NFR-1/NFR-2 dedicated verification tests, the E-2 concurrent-move regression test, and the
+  `architecture.md`/`coding-standards.md` updates are CP-4 (T-54 through T-58).
+- No end-to-end/browser test exercises the new pages against a running backend — coverage here is
+  component-level (Vitest + Testing Library) and the existing backend integration-test suite;
+  full-stack verification is out of this checkpoint's and this spec's stated test plan.
+
+---

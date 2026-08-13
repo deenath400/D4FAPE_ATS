@@ -45,6 +45,18 @@ export default async function StaffRequisitionDetailPage({
           >
             View Applications
           </Link>
+          <Link
+            href={`/staff/requisitions/${requisition.id}/stages`}
+            className="text-sm font-medium text-emerald-400 hover:text-emerald-300"
+          >
+            Configure Stages
+          </Link>
+          <Link
+            href={`/staff/requisitions/${requisition.id}/pipeline`}
+            className="text-sm font-medium text-emerald-400 hover:text-emerald-300"
+          >
+            View Pipeline
+          </Link>
           <span className="text-xs uppercase tracking-wider text-slate-400">
             {requisition.status}
           </span>

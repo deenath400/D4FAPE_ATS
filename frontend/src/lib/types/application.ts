@@ -15,6 +15,8 @@ export type CandidateApplicationListItemDto = {
   requisitionTitle: string;
   submittedAtUtc: string;
   cvDownloadUrl: string; // backend-relative path; frontend prefixes /api/bff/proxy
+  currentStageName: string; // 0005 FR-17 — retained even when isRejected is true
+  isRejected: boolean; // 0005 FR-17 — the frontend shows a rejected indicator instead (AC-23)
 };
 
 export type StaffApplicationListItemDto = {

@@ -23,6 +23,8 @@ describe("ApplicationList", () => {
         requisitionTitle: "Senior Backend Engineer",
         submittedAtUtc: "2026-08-06T10:15:00Z",
         cvDownloadUrl: "/api/applications/app-1/cv",
+        currentStageName: "Interview",
+        isRejected: false,
       },
       {
         id: "app-2",
@@ -30,6 +32,8 @@ describe("ApplicationList", () => {
         requisitionTitle: "Product Designer",
         submittedAtUtc: "2026-08-05T09:00:00Z",
         cvDownloadUrl: "/api/applications/app-2/cv",
+        currentStageName: "Applied",
+        isRejected: false,
       },
     ];
 
@@ -41,5 +45,43 @@ describe("ApplicationList", () => {
     const downloadLinks = screen.getAllByRole("link", { name: /download cv/i });
     expect(downloadLinks).toHaveLength(2);
     expect(downloadLinks[0]).toHaveAttribute("href", "/api/bff/proxy/api/applications/app-1/cv");
+  });
+
+  it("shows the current stage name for an active application (AC-22)", () => {
+    const items: CandidateApplicationListItemDto[] = [
+      {
+        id: "app-1",
+        requisitionId: "req-1",
+        requisitionTitle: "Senior Backend Engineer",
+        submittedAtUtc: "2026-08-06T10:15:00Z",
+        cvDownloadUrl: "/api/applications/app-1/cv",
+        currentStageName: "Interview",
+        isRejected: false,
+      },
+    ];
+
+    render(<ApplicationList items={items} />);
+
+    expect(screen.getByText("Interview")).toBeInTheDocument();
+    expect(screen.queryByText(/rejected/i)).not.toBeInTheDocument();
+  });
+
+  it("shows a Rejected badge instead of a stage name for a rejected application (AC-23)", () => {
+    const items: CandidateApplicationListItemDto[] = [
+      {
+        id: "app-1",
+        requisitionId: "req-1",
+        requisitionTitle: "Senior Backend Engineer",
+        submittedAtUtc: "2026-08-06T10:15:00Z",
+        cvDownloadUrl: "/api/applications/app-1/cv",
+        currentStageName: "Screening",
+        isRejected: true,
+      },
+    ];
+
+    render(<ApplicationList items={items} />);
+
+    expect(screen.getByText("Rejected")).toBeInTheDocument();
+    expect(screen.queryByText("Screening")).not.toBeInTheDocument();
   });
 });

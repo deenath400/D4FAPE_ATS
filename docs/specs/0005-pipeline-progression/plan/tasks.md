@@ -2,7 +2,7 @@
 
 **Spec:** `../spec.md` · **LLD:** `lld.md` · **Updated:** 2026-08-06
 
-**Progress:** 36 / 58 tasks · checkpoint CP-2 of 4 complete
+**Progress:** 53 / 58 tasks · checkpoint CP-3 of 4 complete
 
 ---
 
@@ -210,87 +210,87 @@ entity/migration unit and integration tests pass, `dotnet build` succeeds.*
 *Exit condition: Stage configuration, pipeline board, move/reject, transition history, and the
 updated Candidate status view all render; component tests pass.*
 
-- [ ] **T-37** — Create shared pipeline TS types
+- [x] **T-37** — Create shared pipeline TS types
   - Files: `src/lib/types/pipeline.ts`
   - Covers: —
   - Depends on: CP-2 exit
 
-- [ ] **T-38** — Modify `application.ts` types: `currentStageName`, `isRejected`
+- [x] **T-38** — Modify `application.ts` types: `currentStageName`, `isRejected`
   - Files: `src/lib/types/application.ts`
   - Covers: AC-22, AC-23
   - Depends on: —
 
-- [ ] **T-39** — Create `StageConfigPanel`
+- [x] **T-39** — Create `StageConfigPanel`
   - Files: `src/components/staff/StageConfigPanel.tsx`
   - Covers: AC-1, AC-3, AC-4, AC-5, AC-6, AC-31
   - Depends on: T-37
 
-- [ ] **T-40** — Create Stage-configuration page
+- [x] **T-40** — Create Stage-configuration page
   - Files: `src/app/staff/requisitions/[id]/stages/page.tsx`, `loading.tsx`, `error.tsx`
   - Covers: AC-9
   - Depends on: T-39
 
-- [ ] **T-41** — Modify Requisition detail page: add "Configure Stages"/"View Pipeline" links
+- [x] **T-41** — Modify Requisition detail page: add "Configure Stages"/"View Pipeline" links
   - Files: `src/app/staff/requisitions/[id]/page.tsx`
   - Covers: —
   - Depends on: T-40
 
-- [ ] **T-42** — Create `PipelineBoard`
+- [x] **T-42** — Create `PipelineBoard`
   - Files: `src/components/staff/PipelineBoard.tsx`
   - Covers: AC-11, AC-18, AC-19
   - Depends on: T-37
 
-- [ ] **T-43** — Create `MoveApplicationControl`
+- [x] **T-43** — Create `MoveApplicationControl`
   - Files: `src/components/staff/MoveApplicationControl.tsx`
   - Covers: AC-11, AC-29
   - Depends on: T-37
 
-- [ ] **T-44** — Create `RejectApplicationControl`
+- [x] **T-44** — Create `RejectApplicationControl`
   - Files: `src/components/staff/RejectApplicationControl.tsx`
   - Covers: AC-14
   - Depends on: T-37
 
-- [ ] **T-45** — Create pipeline-board page
+- [x] **T-45** — Create pipeline-board page
   - Files: `src/app/staff/requisitions/[id]/pipeline/page.tsx`, `loading.tsx`, `error.tsx`
   - Covers: AC-18, AC-19
   - Depends on: T-42, T-43, T-44
 
-- [ ] **T-46** — Create `TransitionHistoryList`
+- [x] **T-46** — Create `TransitionHistoryList`
   - Files: `src/components/staff/TransitionHistoryList.tsx`
   - Covers: AC-20, AC-21, AC-30
   - Depends on: T-37
 
-- [ ] **T-47** — Create Application detail (transition history) page
+- [x] **T-47** — Create Application detail (transition history) page
   - Files: `src/app/staff/applications/[id]/page.tsx`, `loading.tsx`, `error.tsx`
   - Covers: AC-20, AC-21
   - Depends on: T-46
 
-- [ ] **T-48** — Modify `ApplicationList`: render Stage name or Rejected badge
+- [x] **T-48** — Modify `ApplicationList`: render Stage name or Rejected badge
   - Files: `src/components/portal/ApplicationList.tsx`
   - Covers: AC-22, AC-23
   - Depends on: T-38
 
-- [ ] **T-49** — Component tests: `StageConfigPanel`
+- [x] **T-49** — Component tests: `StageConfigPanel`
   - Files: `tests/staff/stage-config-panel.test.tsx`
   - Covers: AC-1, AC-6, AC-31
   - Depends on: T-39
 
-- [ ] **T-50** — Component tests: `PipelineBoard`
+- [x] **T-50** — Component tests: `PipelineBoard`
   - Files: `tests/staff/pipeline-board.test.tsx`
   - Covers: AC-18, AC-19
   - Depends on: T-42
 
-- [ ] **T-51** — Component tests: `MoveApplicationControl`
+- [x] **T-51** — Component tests: `MoveApplicationControl`
   - Files: `tests/staff/move-application-control.test.tsx`
   - Covers: AC-29
   - Depends on: T-43
 
-- [ ] **T-52** — Component tests: `TransitionHistoryList`
+- [x] **T-52** — Component tests: `TransitionHistoryList`
   - Files: `tests/staff/transition-history-list.test.tsx`
   - Covers: AC-21, AC-30
   - Depends on: T-46
 
-- [ ] **T-53** — Modify component tests: `ApplicationList`
+- [x] **T-53** — Modify component tests: `ApplicationList`
   - Files: `tests/portal/application-list.test.tsx`
   - Covers: AC-22, AC-23
   - Depends on: T-48
