@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 0 / 10 tasks · checkpoint CP-1 of 2
+**Progress:** 4 / 10 tasks · checkpoint CP-1 of 2 complete
 
 ---
 
@@ -26,7 +26,7 @@ directory, both backend and frontend services report running in the Aspire dashb
 dashboard is accessible and interactive, pressing Ctrl+C terminates both services cleanly
 with no orphaned processes.*
 
-- [ ] **T-1** — Create AppHost project and declare services
+- [x] **T-1** — Create AppHost project and declare services
   - Files: `src/AppHost/Ats.AppHost.csproj`, `src/AppHost/Program.cs` (part 1: service declarations and port bindings)
   - Covers: AC-1, AC-2, AC-5
   - Depends on: —
@@ -37,7 +37,7 @@ with no orphaned processes.*
     - Declare backend service via `AddProject<Projects.Ats_Api>("api")` with `.WithHttpEndpoint(port: 5000, targetPort: 5000)`
     - Declare frontend service via `AddExecutable()` for `npm run dev` with `.WithHttpEndpoint(port: 3000, targetPort: 3000)`
 
-- [ ] **T-2** — Wire environment variables (API_BASE_URL) for service discovery
+- [x] **T-2** — Wire environment variables (API_BASE_URL) for service discovery
   - Files: `src/AppHost/Program.cs` (part 2: environment binding)
   - Covers: AC-2, AC-5 (service discovery binding)
   - Depends on: T-1
@@ -46,7 +46,7 @@ with no orphaned processes.*
     - Verify Aspire's resource-reference model resolves the endpoint correctly (http://localhost:5000)
     - No new config files; binding is declarative in Program.cs only
 
-- [ ] **T-3** — Test orchestration startup and shutdown
+- [x] **T-3** — Test orchestration startup and shutdown
   - Files: — (manual validation)
   - Covers: AC-3, AC-4
   - Depends on: T-2
@@ -59,7 +59,7 @@ with no orphaned processes.*
     - Press Ctrl+C and verify both services shut down gracefully
     - Verify `ps` / `Get-Process` shows no orphaned processes (e.g., stray `npm` or `dotnet` processes)
 
-- [ ] **T-4** — Test backend-frontend connectivity through proxy (AC-6, AC-7)
+- [x] **T-4** — Test backend-frontend connectivity through proxy (AC-6, AC-7)
   - Files: — (manual validation)
   - Covers: AC-6, AC-7
   - Depends on: T-3

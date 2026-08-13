@@ -62,7 +62,7 @@ graph TD
 
 | Component | Responsibility | Owning specs |
 |---|---|---|
-| `infra/build` | Repository build, version pinning, lockfile and lint/format infrastructure | 0001 |
+| `infra/build` | Repository build, version pinning, lockfile and lint/format infrastructure; `src/AppHost` (.NET Aspire) orchestrates both deployables for local development only | 0001, 0006 |
 | `ui/portal` | Public candidate surface: landing page system status, registration, job search, apply, own Applications list (now with current Stage name / Rejected badge, 0005) | 0001, 0003, 0004, 0005 |
 | `ui/bff` | Frontend BFF layer: proxy route handlers (binary-safe passthrough) and shared backend invoke function | 0001, 0002, 0004 |
 | `ui/staff` | Authenticated recruiter and hiring-manager workspace: requisitions, per-Requisition Applications list, Stage configuration, pipeline board, move/reject controls, transition history | 0003, 0004, 0005 |
@@ -179,6 +179,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-06 | 0005 | CP-2: New `service/pipeline`/`api/pipeline` (Stage CRUD/reorder/remove, Application move/reject with optimistic concurrency, staff pipeline board, transition history); `Result`/`ToProblemResult()` gained an `Extensions` mechanism for conflict-response context; `GET /api/applications/mine` now reports current Stage name / rejected outcome |
 | 2026-08-13 | 0005 | CP-3: Gave `ui/staff` a Stage-configuration screen, pipeline board, move/reject controls, and transition-history view; `ui/portal`'s "My Applications" list now shows a Stage name or Rejected badge |
 | 2026-08-13 | 0005 | CP-4: Hardening — dedicated NFR-1 (pipeline board issues exactly two queries, verified with a query-counting interceptor) and NFR-2 (move/reject's transaction spans only the Application/StageTransition writes) verification tests, plus an E-2 concurrent-move regression test; `GetPipelineBoardAsync` fixed to collapse its existence check and Stage fetch into one query, matching NFR-1's designed two-query budget; spec closed out, all 58 tasks complete |
+| 2026-08-13 | 0006 | CP-1: Added `backend/src/AppHost` (.NET Aspire, `Microsoft.NET.Sdk`) declaring the `api` and `frontend` resources with port bindings and `API_BASE_URL` service-discovery wiring; development-only, launched via `dotnet run --project src/AppHost` |
 
 ## Related Specs
 

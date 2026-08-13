@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting" Version="13.0.0" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.0.0" />
+    <!-- Plain Microsoft.NET.Sdk (per this project's design) does not pull in the DCP
+         orchestrator and dashboard binaries the way the Aspire.AppHost.Sdk normally would;
+         they are referenced explicitly here as RID-specific runtime packages instead. -->
+    <PackageReference Include="Aspire.Hosting.Orchestration.win-x64" Version="13.0.0" />
+    <PackageReference Include="Aspire.Dashboard.Sdk.win-x64" Version="13.0.0" />
+  </ItemGroup>
+</Project>

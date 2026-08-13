@@ -2,12 +2,12 @@
 id: 0006
 slug: aspire-orchestration
 title: Local Service Orchestration with Aspire
-status: specified
+status: implementing
 components: [infra/build, ui/bff, api/system, ui/portal]
 entities: []
 depends_on: [0001]
 created: 2026-08-13
-updated: 2026-08-13
+updated: 2026-08-14
 ---
 
 # Local Service Orchestration with Aspire
