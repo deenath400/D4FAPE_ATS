@@ -435,3 +435,28 @@ tests against the actual commands SQLite receives, and `meta/architecture.md`/
 in `spec.md`'s frontmatter and `docs/specs/index.md`.
 
 ---
+
+## Post-validation follow-up · 2026-08-13
+
+`/validate` (see `../validation/report.md`) returned PASS-WITH-FINDINGS with two Medium
+findings, both test-coverage gaps rather than product defects. Fixed directly rather than
+reopening the spec, since both were small and unambiguous:
+
+- **F-1** — `POST /api/applications/{id}/reject` had no HTTP-level test for 403
+  (HiringManager/Candidate) or 409 (closed Requisition), unlike its sibling `move` endpoint.
+  Added `POST_applications_id_reject_AsHiringManagerOrCandidate_Returns403` (theory, both roles)
+  and `POST_applications_id_reject_OnClosedRequisition_Returns409` to
+  `backend/tests/Ats.IntegrationTests/Pipeline/TransitionEndpointsTests.cs`.
+- **F-2** — `StageEndpointsTests.cs`'s `ANY_stagesEndpoint_OnClosedRequisition_Returns409` only
+  exercised the Add-Stage route despite its name implying broader coverage; Rename/Reorder/Remove
+  were closed-guard-tested only at the unit level. Renamed it to
+  `POST_stages_OnClosedRequisition_Returns409` and added
+  `PUT_stages_id_OnClosedRequisition_Returns409`, `PUT_stages_reorder_OnClosedRequisition_Returns409`,
+  and `DELETE_stages_id_OnClosedRequisition_Returns409` in
+  `backend/tests/Ats.IntegrationTests/Pipeline/StageEndpointsTests.cs`.
+
+Full backend suite re-run after the fix: `dotnet test tests/Ats.ArchitectureTests` 4/4,
+`tests/Ats.UnitTests` 161/161, `tests/Ats.IntegrationTests` 105/105 (99 + 6 new), all passing.
+No product code changed — test coverage only.
+
+---

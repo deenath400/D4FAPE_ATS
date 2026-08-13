@@ -332,6 +332,50 @@ public class TransitionEndpointsTests
         Assert.Contains("application.reject.already-rejected", content);
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task POST_applications_id_reject_AsHiringManagerOrCandidate_Returns403(bool asHiringManager)
+    {
+        using var factory = new CustomWebApplicationFactory();
+        factory.InitializeDatabase();
+        using var client = factory.CreateClient();
+        var recruiterToken = await CreateStaffUserAndLoginAsync(factory, client, "recruiter20@example.com", AuthConstants.Roles.Recruiter);
+        var requisitionId = await CreatePublishedRequisitionAsync(client, recruiterToken);
+        var applicationId = await SubmitApplicationAsync(client, requisitionId, "candidate19@example.com");
+
+        var token = asHiringManager
+            ? await CreateStaffUserAndLoginAsync(factory, client, "hm3@example.com", AuthConstants.Roles.HiringManager)
+            : await CreateCandidateAndLoginAsync(client, "candidate20@example.com");
+        Authorize(client, token);
+
+        var response = await client.PostAsJsonAsync(
+            $"/api/applications/{applicationId}/reject", new RejectApplicationRequestDto(null));
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task POST_applications_id_reject_OnClosedRequisition_Returns409()
+    {
+        using var factory = new CustomWebApplicationFactory();
+        factory.InitializeDatabase();
+        using var client = factory.CreateClient();
+        var recruiterToken = await CreateStaffUserAndLoginAsync(factory, client, "recruiter21@example.com", AuthConstants.Roles.Recruiter);
+        var requisitionId = await CreatePublishedRequisitionAsync(client, recruiterToken);
+        var applicationId = await SubmitApplicationAsync(client, requisitionId, "candidate21@example.com");
+
+        Authorize(client, recruiterToken);
+        await client.PostAsync($"/api/requisitions/{requisitionId}/close", null);
+
+        var response = await client.PostAsJsonAsync(
+            $"/api/applications/{applicationId}/reject", new RejectApplicationRequestDto(null));
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        var content = await response.Content.ReadAsStringAsync();
+        Assert.Contains("application.reject.requisition-closed", content);
+    }
+
     [Fact]
     public async Task GET_requisitions_id_pipeline_GroupsAndCounts()
     {

@@ -271,7 +271,7 @@ public class StageEndpointsTests
     }
 
     [Fact]
-    public async Task ANY_stagesEndpoint_OnClosedRequisition_Returns409()
+    public async Task POST_stages_OnClosedRequisition_Returns409()
     {
         using var factory = new CustomWebApplicationFactory();
         factory.InitializeDatabase();
@@ -288,6 +288,74 @@ public class StageEndpointsTests
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
         Assert.Contains("stage.add.requisition-closed", content);
+    }
+
+    [Fact]
+    public async Task PUT_stages_id_OnClosedRequisition_Returns409()
+    {
+        using var factory = new CustomWebApplicationFactory();
+        factory.InitializeDatabase();
+        using var client = factory.CreateClient();
+        var recruiterToken = await CreateStaffUserAndLoginAsync(factory, client, "recruiter15@example.com", AuthConstants.Roles.Recruiter);
+        var requisitionId = await CreateDraftRequisitionAsync(client, recruiterToken);
+        Authorize(client, recruiterToken);
+        var stages = await (await client.GetAsync($"/api/requisitions/{requisitionId}/stages"))
+            .Content.ReadFromJsonAsync<StageDto[]>();
+        var screening = stages!.Single(s => s.Name == "Screening");
+        await client.PostAsync($"/api/requisitions/{requisitionId}/publish", null);
+        await client.PostAsync($"/api/requisitions/{requisitionId}/close", null);
+
+        var response = await client.PutAsJsonAsync(
+            $"/api/requisitions/{requisitionId}/stages/{screening.Id}", new RenameStageRequestDto("Renamed"));
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        var content = await response.Content.ReadAsStringAsync();
+        Assert.Contains("stage.rename.requisition-closed", content);
+    }
+
+    [Fact]
+    public async Task PUT_stages_reorder_OnClosedRequisition_Returns409()
+    {
+        using var factory = new CustomWebApplicationFactory();
+        factory.InitializeDatabase();
+        using var client = factory.CreateClient();
+        var recruiterToken = await CreateStaffUserAndLoginAsync(factory, client, "recruiter16@example.com", AuthConstants.Roles.Recruiter);
+        var requisitionId = await CreateDraftRequisitionAsync(client, recruiterToken);
+        Authorize(client, recruiterToken);
+        var stages = await (await client.GetAsync($"/api/requisitions/{requisitionId}/stages"))
+            .Content.ReadFromJsonAsync<StageDto[]>();
+        var newOrder = stages!.OrderByDescending(s => s.SortOrder).Select(s => s.Id).ToArray();
+        await client.PostAsync($"/api/requisitions/{requisitionId}/publish", null);
+        await client.PostAsync($"/api/requisitions/{requisitionId}/close", null);
+
+        var response = await client.PutAsJsonAsync(
+            $"/api/requisitions/{requisitionId}/stages/reorder", new ReorderStagesRequestDto(newOrder));
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        var content = await response.Content.ReadAsStringAsync();
+        Assert.Contains("stage.reorder.requisition-closed", content);
+    }
+
+    [Fact]
+    public async Task DELETE_stages_id_OnClosedRequisition_Returns409()
+    {
+        using var factory = new CustomWebApplicationFactory();
+        factory.InitializeDatabase();
+        using var client = factory.CreateClient();
+        var recruiterToken = await CreateStaffUserAndLoginAsync(factory, client, "recruiter17@example.com", AuthConstants.Roles.Recruiter);
+        var requisitionId = await CreateDraftRequisitionAsync(client, recruiterToken);
+        Authorize(client, recruiterToken);
+        var stages = await (await client.GetAsync($"/api/requisitions/{requisitionId}/stages"))
+            .Content.ReadFromJsonAsync<StageDto[]>();
+        var offer = stages!.Single(s => s.Name == "Offer");
+        await client.PostAsync($"/api/requisitions/{requisitionId}/publish", null);
+        await client.PostAsync($"/api/requisitions/{requisitionId}/close", null);
+
+        var response = await client.DeleteAsync($"/api/requisitions/{requisitionId}/stages/{offer.Id}");
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        var content = await response.Content.ReadAsStringAsync();
+        Assert.Contains("stage.remove.requisition-closed", content);
     }
 
     [Fact]
