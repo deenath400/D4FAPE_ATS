@@ -3,6 +3,9 @@
   <Folder Name="/src/Api/">
     <Project Path="src/Api/Ats.Api.csproj" />
   </Folder>
+  <Folder Name="/src/AppHost/">
+    <Project Path="src/AppHost/Ats.AppHost.csproj" />
+  </Folder>
   <Folder Name="/src/Db/">
     <Project Path="src/Db/Ats.Db.csproj" />
   </Folder>

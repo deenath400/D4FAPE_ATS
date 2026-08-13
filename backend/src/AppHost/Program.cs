@@ -12,18 +12,14 @@ var apiProjectPath = Path.Combine(builder.AppHostDirectory, "..", "Api", "Ats.Ap
 //    - Resource name: "api"
 //    - Port: 5000 (matches API_BASE_URL default in tech-stack.md)
 //    - No code changes to Api.csproj; Aspire runs it via `dotnet run` internally.
-//    - isProxied: false — for a non-container (project/executable) resource, DCP rejects
-//      a proxied endpoint whose port and targetPort are equal; the process binds the port
-//      directly, so Aspire routes to it without an intermediary proxy.
-//    - ASPNETCORE_ENVIRONMENT: Api has no Properties/launchSettings.json of its own, so
-//      without an explicit environment Aspire (like a bare `dotnet run`) launches it as
-//      Production, which never loads appsettings.Development.json and leaves
-//      ConnectionStrings:Default empty. Setting Development here reproduces the same
-//      environment an independent `dotnet run --project src/Api` is expected to use.
-var backend = builder
-    .AddProject("api", apiProjectPath)
-    .WithHttpEndpoint(port: 5000, targetPort: 5000, isProxied: false)
-    .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development");
+//    - Api now has its own Properties/launchSettings.json (added to fix independent
+//      `dotnet run --project src/Api` — see AC-11), whose "http" profile already declares
+//      applicationUrl http://localhost:5000 and ASPNETCORE_ENVIRONMENT=Development.
+//      AddProject uses that launch profile by default and auto-derives an "http" endpoint
+//      from it, so an explicit .WithHttpEndpoint(...) call here is not just redundant but
+//      a naming collision (DistributedApplicationException: "Endpoint with name 'http'
+//      already exists") — Aspire never reaches a running state if both are present.
+var backend = builder.AddProject("api", apiProjectPath);
 
 // 2. Declare the frontend service.
 //    - Working directory: repo-root/frontend (Node.js project). AppHost sits three levels
