@@ -1,6 +1,6 @@
 # Architecture Snapshot
 
-**Updated:** 2026-08-13 · **Budget:** 150 lines target / 200 hard ceiling
+**Updated:** 2026-08-14 · **Budget:** 150 lines target / 200 hard ceiling
 
 > The orientation document. A developer or agent reads this file and nothing else, and knows
 > what exists and how it fits together. Detail belongs in the per-spec artifacts; see
@@ -182,6 +182,8 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-13 | 0006 | CP-1: Added `backend/src/AppHost` (.NET Aspire, `Microsoft.NET.Sdk`) declaring the `api` and `frontend` resources with port bindings and `API_BASE_URL` service-discovery wiring; development-only, launched via `dotnet run --project src/AppHost` |
 | 2026-08-14 | 0006 | CP-2: Verified DB migrations, restart persistence, and OS-level port-conflict errors under Aspire; confirmed independent `dotnet run --project src/Api`/`npm run dev` remain unchanged; documented the Aspire command in `tech-stack.md`; spec closed out, all 10 tasks complete |
 | 2026-08-14 | 0007 | CP-1: Added `AuthConstants.SeedAccounts` and `AppDbContext.SeedUsers`, seeding one fixed `ApplicationUser` + role assignment per existing role (Candidate, Recruiter, HiringManager, shared password `Temp@123`) via the `AddSeedSampleAccounts` migration — no new component or entity, `db/core`/`shared/auth` and `User`/`Role` already covered these |
+| 2026-08-14 | 0007 | CP-2: Built login integration tests for all three seeded accounts, password hash verification unit test, and duplicate candidate registration conflict test |
+| 2026-08-14 | 0007 | CP-3: Hardening — full-suite regression pass verifying no existing migration or auth test broke; spec closed out, all 9 tasks complete |
 
 ## Related Specs
 

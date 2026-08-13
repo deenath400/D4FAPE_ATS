@@ -133,7 +133,83 @@ Passed!  - Failed: 0, Passed: 4, Skipped: 0, Total: 4, Duration: 66 ms - Ats.Arc
 
 **Known gaps carried into the next checkpoint**
 
-- Full-suite regression pass and `meta/architecture.md` entry update are CP-3 (T-08, T-09).
+- None — CP-3 is the final checkpoint.
 
 ---
 
+## CP-3 — Hardening · 2026-08-14
+
+**Tasks completed:** T-08, T-09
+
+**Files created**
+
+| Path | Purpose |
+|---|---|
+| None | Verification and meta documentation only |
+
+**Files modified**
+
+| Path | Change |
+|---|---|
+| `docs/specs/meta/architecture.md` | Updated date to 2026-08-14; appended 0007 CP-2 and CP-3 entries to Change Log, closing out spec |
+| `docs/specs/0007-seed-sample-accounts/plan/tasks.md` | Marked T-08 and T-09 complete; all 9 tasks done |
+| `docs/specs/0007-seed-sample-accounts/spec.md` | Status updated from `implementing` to `implemented` |
+| `docs/specs/index.md` | Spec 0007 status updated from `implementing` to `implemented` |
+
+**Decisions made during implementation**
+
+| # | Decision | Why |
+|---|---|---|
+| None | N/A | Hardening and verification tasks only |
+
+**Deviations from the LLD**
+
+| LLD section | Designed | Actual | Reason | LLD patched? |
+|---|---|---|---|---|
+| None | N/A | N/A | No deviations | N/A |
+
+**Verification run**
+
+```
+$ cd backend && dotnet build
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:11.13
+
+$ dotnet test tests/Ats.ArchitectureTests --no-build
+Passed!  - Failed:     0, Passed:     4, Skipped:     0, Total:     4, Duration: 96 ms - Ats.ArchitectureTests.dll (net10.0)
+
+$ dotnet test tests/Ats.UnitTests
+Passed!  - Failed:     0, Passed:   162, Skipped:     0, Total:   162, Duration: 1 s - Ats.UnitTests.dll (net10.0)
+
+$ dotnet test tests/Ats.IntegrationTests
+Passed!  - Failed:     0, Passed:   113, Skipped:     0, Total:   113, Duration: 18 s - Ats.IntegrationTests.dll (net10.0)
+
+$ cd ../frontend && npm test
+Test Files  15 passed (15)
+      Tests  59 passed (59)
+   Duration  3.43s
+
+$ npm run build
+✓ Compiled successfully
+✓ Generating static pages (9/9)
+
+$ npm run lint
+✔ No ESLint warnings or errors
+```
+
+All 162 unit tests, 113 integration tests, 4 architecture tests, and 59 frontend unit tests pass cleanly. Pre-existing tests (`AuthEndpointsTests`, `PipelineMigrationBackfillTests`) pass with no regressions from the newly seeded rows.
+
+**Meta updates applied**
+
+- `architecture.md`: Change Log appended for 0007 CP-2 and CP-3, closing out spec.
+- `tech-stack.md`: no change.
+- `coding-standards.md`: no change.
+
+**Known gaps carried into the next checkpoint**
+
+- None — all 9 tasks complete across all 3 checkpoints. Spec ready for `/validate`.
+
+---

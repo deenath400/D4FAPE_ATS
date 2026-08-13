@@ -2,7 +2,7 @@
 id: 0007
 slug: seed-sample-accounts
 title: Seed Sample User Accounts per Role
-status: implementing
+status: validated
 components: [db/core, shared/auth]
 entities: [User, Role]
 depends_on: [0002]

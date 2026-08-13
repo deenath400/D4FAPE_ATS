@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 7 / 9 tasks · checkpoint CP-2 of 3 complete, CP-3 next
+**Progress:** 9 / 9 tasks · all 3 checkpoints complete (all tasks done)
 
 ---
 
@@ -88,7 +88,7 @@ duplicate-email edge case.*
 `dotnet test tests/Ats.IntegrationTests`, `dotnet test tests/Ats.ArchitectureTests --no-build`);
 `meta/architecture.md` reflects the shipped change.*
 
-- [ ] **T-08** — Full-suite regression pass: confirm no existing test (in particular
+- [x] **T-08** — Full-suite regression pass: confirm no existing test (in particular
   `Ats.IntegrationTests/Auth/AuthEndpointsTests.cs` and
   `Ats.IntegrationTests/Pipeline/PipelineMigrationBackfillTests.cs`, which also migrate a fresh
   SQLite file from scratch) broke as a result of the new seeded rows.
@@ -96,7 +96,7 @@ duplicate-email edge case.*
   - Covers: NFR-1
   - Depends on: T-04, T-05, T-06, T-07
 
-- [ ] **T-09** — Update `docs/specs/meta/architecture.md` Change Log with the 0007 entry.
+- [x] **T-09** — Update `docs/specs/meta/architecture.md` Change Log with the 0007 entry.
   - Files: `docs/specs/meta/architecture.md`
   - Covers: —
   - Depends on: T-08
