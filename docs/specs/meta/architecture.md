@@ -181,6 +181,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-13 | 0005 | CP-4: Hardening — dedicated NFR-1 (pipeline board issues exactly two queries, verified with a query-counting interceptor) and NFR-2 (move/reject's transaction spans only the Application/StageTransition writes) verification tests, plus an E-2 concurrent-move regression test; `GetPipelineBoardAsync` fixed to collapse its existence check and Stage fetch into one query, matching NFR-1's designed two-query budget; spec closed out, all 58 tasks complete |
 | 2026-08-13 | 0006 | CP-1: Added `backend/src/AppHost` (.NET Aspire, `Microsoft.NET.Sdk`) declaring the `api` and `frontend` resources with port bindings and `API_BASE_URL` service-discovery wiring; development-only, launched via `dotnet run --project src/AppHost` |
 | 2026-08-14 | 0006 | CP-2: Verified DB migrations, restart persistence, and OS-level port-conflict errors under Aspire; confirmed independent `dotnet run --project src/Api`/`npm run dev` remain unchanged; documented the Aspire command in `tech-stack.md`; spec closed out, all 10 tasks complete |
+| 2026-08-14 | 0007 | CP-1: Added `AuthConstants.SeedAccounts` and `AppDbContext.SeedUsers`, seeding one fixed `ApplicationUser` + role assignment per existing role (Candidate, Recruiter, HiringManager, shared password `Temp@123`) via the `AddSeedSampleAccounts` migration — no new component or entity, `db/core`/`shared/auth` and `User`/`Role` already covered these |
 
 ## Related Specs
 

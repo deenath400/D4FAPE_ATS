@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 0 / 9 tasks · checkpoint CP-1 of 3
+**Progress:** 7 / 9 tasks · checkpoint CP-2 of 3 complete, CP-3 next
 
 ---
 
@@ -25,7 +25,7 @@ one checkpoint per invocation, then stops for review.
 `SeedAccountsMigrationTests` (row-count/uniqueness/environment-independence/no-duplicate tests)
 pass.*
 
-- [ ] **T-01** — Add `AuthConstants.SeedAccounts` (fixed user GUIDs, seeded emails, shared
+- [x] **T-01** — Add `AuthConstants.SeedAccounts` (fixed user GUIDs, seeded emails, shared
   password, pinned `PasswordHasher` output). Includes the one-time hash-generation step
   (LLD §10 step 0): run a throwaway snippet calling
   `new PasswordHasher<ApplicationUser>().HashPassword(new ApplicationUser(), "Temp@123")`,
@@ -34,14 +34,14 @@ pass.*
   - Covers: FR-3, FR-4, AC-2, AC-9
   - Depends on: —
 
-- [ ] **T-02** — Add `AppDbContext.SeedUsers(ModelBuilder)` (3 `ApplicationUser` `HasData` rows
+- [x] **T-02** — Add `AppDbContext.SeedUsers(ModelBuilder)` (3 `ApplicationUser` `HasData` rows
   + 3 `IdentityUserRole<Guid>` `HasData` rows), call it from `OnModelCreating` after
   `SeedRoles(builder)`. Include the doc-pointer comment referencing `plan/erd.md` §7.
   - Files: `backend/src/Db/AppDbContext.cs`
   - Covers: FR-1, FR-2, FR-3, FR-6, AC-1, AC-6, AC-7, AC-9
   - Depends on: T-01
 
-- [ ] **T-03** — Generate the EF Core migration: `dotnet ef migrations add AddSeedSampleAccounts
+- [x] **T-03** — Generate the EF Core migration: `dotnet ef migrations add AddSeedSampleAccounts
   --project src/Db` from `backend/`, then verify `dotnet ef database update --project src/Db`
   applies cleanly against a throwaway local SQLite file.
   - Files: `backend/src/Db/Migrations/{timestamp}_AddSeedSampleAccounts.cs`,
@@ -50,7 +50,7 @@ pass.*
   - Covers: FR-1, FR-7, AC-1, AC-8, NFR-1
   - Depends on: T-02
 
-- [ ] **T-04** — Integration tests: fresh-database row counts (exactly 3 users + 3 role rows),
+- [x] **T-04** — Integration tests: fresh-database row counts (exactly 3 users + 3 role rows),
   Recruiter has exactly one role assignment, re-migrating twice does not duplicate rows, and
   seeded accounts still exist when the host environment is overridden to `Production`.
   - Files: `backend/tests/Ats.IntegrationTests/Auth/SeedAccountsMigrationTests.cs`
@@ -63,20 +63,20 @@ pass.*
 both green, covering every seeded-credential login, the password hash format check, and the
 duplicate-email edge case.*
 
-- [ ] **T-05** — Integration tests: `POST /api/auth/login` succeeds (200, correct `role` claim,
+- [x] **T-05** — Integration tests: `POST /api/auth/login` succeeds (200, correct `role` claim,
   valid refresh token) for each of the three seeded credentials.
   - Files: `backend/tests/Ats.IntegrationTests/Auth/SeedAccountsLoginTests.cs`
   - Covers: AC-3, AC-4, AC-5
   - Depends on: T-03
 
-- [ ] **T-06** — Unit test: seeded `PasswordHash` is not the literal string `Temp@123` and
+- [x] **T-06** — Unit test: seeded `PasswordHash` is not the literal string `Temp@123` and
   successfully verifies via `PasswordHasher<ApplicationUser>.VerifyHashedPassword` against
   `Temp@123`.
   - Files: `backend/tests/Ats.UnitTests/Auth/SeedAccountsPasswordHashTests.cs`
   - Covers: AC-2
   - Depends on: T-01
 
-- [ ] **T-07** — Integration test: `POST /api/auth/register` with `sample.candidate@d4fape-ats.local`
+- [x] **T-07** — Integration test: `POST /api/auth/register` with `sample.candidate@d4fape-ats.local`
   returns 409 `auth.register.duplicate-email`.
   - Files: `backend/tests/Ats.IntegrationTests/Auth/SeedAccountsLoginTests.cs`
   - Covers: E-1
