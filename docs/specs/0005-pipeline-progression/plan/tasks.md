@@ -1,8 +1,8 @@
 # Tasks — 0005 Pipeline Progression
 
-**Spec:** `../spec.md` · **LLD:** `lld.md` · **Updated:** 2026-08-06
+**Spec:** `../spec.md` · **LLD:** `lld.md` · **Updated:** 2026-08-13
 
-**Progress:** 53 / 58 tasks · checkpoint CP-3 of 4 complete
+**Progress:** 58 / 58 tasks · all 4 checkpoints complete
 
 ---
 
@@ -300,27 +300,27 @@ updated Candidate status view all render; component tests pass.*
 *Exit condition: full backend + frontend suites green, lint clean, NFRs demonstrated,
 `meta/architecture.md` and `meta/coding-standards.md` reflect this spec's shipped shape.*
 
-- [ ] **T-54** — NFR-1 verification: pipeline board issues exactly two queries and groups in memory (no per-stage round trip) at up to 500 Applications
+- [x] **T-54** — NFR-1 verification: pipeline board issues exactly two queries and groups in memory (no per-stage round trip) at up to 500 Applications
   - Files: `tests/Ats.IntegrationTests/Pipeline/TransitionEndpointsTests.cs`
   - Covers: NFR-1
   - Depends on: T-35
 
-- [ ] **T-55** — NFR-2 verification: move/reject's open transaction spans only the Application/StageTransition writes
+- [x] **T-55** — NFR-2 verification: move/reject's open transaction spans only the Application/StageTransition writes
   - Files: `tests/Ats.IntegrationTests/Pipeline/TransitionEndpointsTests.cs`
   - Covers: NFR-2
   - Depends on: T-35
 
-- [ ] **T-56** — E-2 regression: two concurrent moves against the same Application, exactly one succeeds
+- [x] **T-56** — E-2 regression: two concurrent moves against the same Application, exactly one succeeds
   - Files: `tests/Ats.IntegrationTests/Pipeline/TransitionEndpointsTests.cs`
   - Covers: AC-29, E-2
   - Depends on: T-35
 
-- [ ] **T-57** — Update `docs/specs/meta/architecture.md`: Component Map (`api/pipeline`, `service/pipeline`, `db/pipeline`, modified rows), Data Model erDiagram (`Stage`/`Application`/`StageTransition` deltas), Change Log entries
+- [x] **T-57** — Update `docs/specs/meta/architecture.md`: Component Map (`api/pipeline`, `service/pipeline`, `db/pipeline`, modified rows), Data Model erDiagram (`Stage`/`Application`/`StageTransition` deltas), Change Log entries
   - Files: `docs/specs/meta/architecture.md`
   - Covers: —
   - Depends on: T-54, T-55, T-56
 
-- [ ] **T-58** — Update `docs/specs/meta/coding-standards.md`: note the `Result.Extensions` convention (est. 0005) under Project-Specific Rules
+- [x] **T-58** — Update `docs/specs/meta/coding-standards.md`: note the `Result.Extensions` convention (est. 0005) under Project-Specific Rules
   - Files: `docs/specs/meta/coding-standards.md`
   - Covers: —
   - Depends on: T-13

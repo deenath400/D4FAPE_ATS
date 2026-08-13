@@ -2,12 +2,12 @@
 id: 0005
 slug: pipeline-progression
 title: Pipeline Progression
-status: implementing
+status: implemented
 components: [api/pipeline, service/pipeline, db/pipeline, service/requisition, db/requisition, api/application, service/application, db/application, ui/staff, ui/portal]
 entities: [Stage, Application, StageTransition]
 depends_on: [0003, 0004]
 created: 2026-08-06
-updated: 2026-08-06
+updated: 2026-08-13
 ---
 
 # Pipeline Progression

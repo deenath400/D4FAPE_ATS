@@ -1,6 +1,6 @@
 # Coding Standards
 
-**Updated:** 2026-08-05 · **Budget:** 120 lines target / 180 hard ceiling
+**Updated:** 2026-08-13 · **Budget:** 120 lines target / 180 hard ceiling
 
 The rules `/implement` follows and `/validate` checks against. Only include rules that are
 **decidable by reading code**.
@@ -128,6 +128,11 @@ citing the originating spec.
 - `process.env.API_BASE_URL` may only be accessed inside `src/lib/server/backend-invoke.ts` (est. 0001).
 - All browser-originated calls to backend endpoints pass through `ui/bff` proxy route handlers (est. 0001).
 - Indentation, style, and code formatting enforced by `.editorconfig` / Roslyn code style (backend) and ESLint / Prettier (frontend) (est. 0001).
+- A `Result`/`Result<T>` conflict that needs to carry machine-readable context beyond its error
+  code/message (e.g. the actual current state a client should reconcile against) uses the
+  `Conflict(code, message, extensions)` overload to populate `Result.Extensions`, which
+  `ToProblemResult()` merges into the HTTP response's `ProblemDetails.Extensions`. Do not smuggle
+  such context inside `ErrorMessage` string interpolation (est. 0005).
 
 ## Related Specs
 

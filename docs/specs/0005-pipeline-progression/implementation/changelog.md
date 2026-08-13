@@ -316,3 +316,122 @@ against `npm test`/`npm run build`/`npm run lint` afterward — all still green.
   full-stack verification is out of this checkpoint's and this spec's stated test plan.
 
 ---
+
+## CP-4 — Hardening · 2026-08-13
+
+**Tasks completed:** T-54, T-55, T-56, T-57, T-58
+
+**Files created**
+
+None — every CP-4 task modified an existing test file or meta document; no new source or test
+file was warranted.
+
+**Files modified**
+
+| Path | Change |
+|---|---|
+| `backend/src/Service/Pipeline/PipelineService.cs` | `GetPipelineBoardAsync` reworked to collapse its Requisition-existence check and Stage fetch into a single `Requisitions.AsNoTracking().Include(r => r.Stages.OrderBy(...)).FirstOrDefaultAsync(...)` call — fixing a real NFR-1 violation T-54 uncovered (see Deviations) |
+| `backend/tests/Ats.IntegrationTests/Pipeline/TransitionEndpointsTests.cs` | Added `GetPipelineBoardAsync_At500Applications_IssuesExactlyTwoQueriesAndGroupsInMemory` (T-54, NFR-1); `MoveApplicationAsync_TransactionSpansOnlyApplicationAndStageTransitionWrites` and `RejectApplicationAsync_TransactionSpansOnlyApplicationAndStageTransitionWrites` (T-55, NFR-2); `POST_applications_id_move_TwoConcurrentMoves_ExactlyOneSucceeds` (T-56, AC-29/E-2); plus the `GetUserIdByEmailAsync`/`SeedManyApplicationsDirectAsync` test helpers and three private interceptor classes (`SelectCountingInterceptor`, `TransactionWindowState`/`TransactionWindowTrackingInterceptor`/`TransactionWindowCommandInterceptor`) the new tests depend on |
+| `docs/specs/0005-pipeline-progression/plan/lld.md` | §3.2 `GetPipelineBoardAsync` steps renumbered to describe the two-query implementation; Deviation Log gained the T-54 row |
+| `docs/specs/meta/architecture.md` | `ui/portal`/`ui/staff` Component Map rows gained `0005` in Owning specs (both were Modified by this spec per its Impacted Components table but the column was never updated in CP-1–CP-3) and a short responsibility-text amendment; two Change Log rows appended — a backfilled CP-3 row (never added when that checkpoint closed) and this CP-4 row; `Updated` date bumped |
+| `docs/specs/meta/coding-standards.md` | Project-Specific Rules gained the `Result.Extensions`/`Conflict(code, message, extensions)` convention note `(est. 0005)`; `Updated` date bumped |
+| `docs/specs/0005-pipeline-progression/plan/tasks.md` | T-54 through T-58 ticked; progress line updated to 58/58, all checkpoints complete |
+| `docs/specs/0005-pipeline-progression/spec.md` | Frontmatter `status: implementing` → `implemented`, `updated` bumped |
+| `docs/specs/index.md` | 0005's row status `implementing` → `implemented` |
+
+**Decisions made during implementation**
+
+| # | Decision | Why |
+|---|---|---|
+| I-6 | T-54's 500-Application fixture is seeded directly against the SQLite file via a scoped `AppDbContext` (bypassing HTTP registration/CV submission), rather than issuing 500 real HTTP submissions | 500 real Candidate registrations would pay for ASP.NET Core Identity's password hashing 500 times purely to build test fixture volume — orders of magnitude slower than the behaviour under test and unrelated to what NFR-1 verifies (query count/shape, not the submission path, which already has its own dedicated coverage from 0004/T-24). The seeded rows are otherwise indistinguishable from real submissions. |
+| I-7 | NFR-1 (T-54) and NFR-2 (T-55) are verified by constructing a second, `PipelineService` bound to a fresh, instrumented `AppDbContext` pointed at the same on-disk SQLite file the `CustomWebApplicationFactory`-driven HTTP calls already wrote to, rather than instrumenting the DI-registered context the running host uses | Matches the established 0004 precedent (`RequisitionServiceTests.PublicReads_GetByIdAndSearch_NeverOpenATransaction`) of pointing a second, interceptor-equipped `DbContextOptions` at the same underlying storage rather than reaching into `WebApplicationFactory`'s DI container to inject interceptors into the live host — simpler, and proven not to disturb the commands being counted. |
+| I-8 | T-56's concurrent-move test fires two real overlapping HTTP `POST .../move` requests via `Task.WhenAll` over two independent `HttpClient`s sharing one `TestServer`/database file, rather than deterministically simulating the race the way `PipelineServiceTests.MoveApplicationAsync_ConcurrentSaveChanges_ThrowsConcurrencyMappedToConflict` (CP-2, T-30) does | The task instructions for T-56 specifically call for "a real concurrency test ... that proves the optimistic-concurrency/locking behavior ... actually rejects one of the two," and 0004 already established this exact pattern (`POST_applications_TwoNearSimultaneousSubmissions_ExactlyOneSurvives`) for its own E-1 concurrency regression — reused verbatim for E-2. The CP-2 unit test remains valuable as a fast, deterministic exercise of the specific `DbUpdateConcurrencyException` catch branch; this one is the genuine end-to-end proof. |
+
+**Deviations from the LLD**
+
+| LLD section | Designed | Actual | Reason | LLD patched? |
+|---|---|---|---|---|
+| §3.2 `GetPipelineBoardAsync` | "exactly two `AsNoTracking()` queries" (HLD §7 NFR-1 row; lld.md §3.2 step 2 comment) | CP-2 shipped three: a separate `Requisitions.AnyAsync(...)` existence check, then the Stages query, then the Applications query | T-54's query-counting interceptor measured the commands CP-2's implementation actually issued and found three, not two — a genuine NFR-1 shortfall introduced in CP-2 and invisible until this checkpoint's dedicated verification. Fixed within T-54's scope by replacing the separate existence check + Stages query with one `Requisitions.Include(r => r.Stages.OrderBy(...)).FirstOrDefaultAsync(...)` call that serves both purposes — `Requisition.Stages` was already a mapped navigation (`RequisitionConfiguration.HasMany`), so no schema or DTO change was needed. Re-ran the full `TransitionEndpointsTests`/`PipelineServiceTests` suites afterward; all still green. | Yes — `lld.md` §3.2 and its Deviation Log |
+
+**Verification run**
+
+```
+$ cd backend && dotnet build
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+$ dotnet test tests/Ats.ArchitectureTests --no-build
+Passed!  - Failed: 0, Passed: 4, Skipped: 0, Total: 4, Duration: 39 ms
+
+$ dotnet test tests/Ats.UnitTests --no-build
+Passed!  - Failed: 0, Passed: 161, Skipped: 0, Total: 161, Duration: 2 s
+
+$ dotnet test tests/Ats.IntegrationTests --no-build
+Passed!  - Failed: 0, Passed: 99, Skipped: 0, Total: 99, Duration: 16 s
+```
+
+```
+$ cd frontend && npm test
+
+ Test Files  15 passed (15)
+      Tests  59 passed (59)
+
+$ npm run build
+
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+ ✓ Generating static pages (9/9)
+
+$ npm run lint
+✔ No ESLint warnings or errors
+```
+
+99 backend integration tests = 95 pre-existing (CP-1–CP-3) + 4 new (T-54: 1, T-55: 2, T-56: 1) in
+`TransitionEndpointsTests.cs`. 161 unit tests and 59 frontend tests are unchanged from CP-2/CP-3 —
+no unit or component test was added or modified this checkpoint, and none regressed from the
+`GetPipelineBoardAsync` fix (`PipelineServiceTests`' board tests still pass against the new
+implementation). The four new integration tests were also each run three times in isolation to
+rule out timing flakiness in the query counter, the transaction-window interceptor, and the
+`Task.WhenAll` concurrent-move race — stable at 19/19 passing every run.
+
+`dotnet format --verify-no-changes` was run as a courtesy check (not part of CP-4's stated exit
+condition, which names `dotnet build`/lint, not `format`). It reports the same pre-existing
+repo-wide CRLF/LF and charset condition already documented in CP-1's changelog, spanning nearly
+every backend file including ones this checkpoint touched (`PipelineService.cs`,
+`TransitionEndpointsTests.cs`) — the errors are `ENDOFLINE`/`CHARSET` line-ending findings
+consistent with every other file in the repository at the same line, not something this
+checkpoint's edits introduced (the `Edit` tool preserves a file's existing line-ending
+convention). Not remediated, as a repo-wide CRLF→LF conversion is out of this checkpoint's scope
+and would touch hundreds of files across specs 0001–0005.
+
+**Meta updates applied**
+
+- `architecture.md`: Component Map's `ui/portal`/`ui/staff` rows gained `0005` in Owning specs
+  (both were named Modified by this spec's Impacted Components table but the column was never
+  updated when CP-3 shipped their actual UI surface) plus a short responsibility-text amendment;
+  `api/pipeline`/`service/pipeline`/`db/pipeline` rows and the `Stage`/`Application`/
+  `StageTransition` ER diagram deltas were already correct as of CP-1/CP-2 — verified against
+  spec.md's frontmatter `components`/`entities` lists, no further edit needed. Two Change Log
+  rows appended: a backfilled CP-3 row (that checkpoint's own report said "no change this
+  checkpoint" for architecture.md and never added its row, which `meta-maintenance.md` §3.4
+  requires one-per-checkpoint) and this CP-4 row. File is 185 lines — within the 200-line hard
+  ceiling, above the 150-line target (a pre-existing condition since CP-2; not compressed here,
+  as none of this checkpoint's edits pushed it over the ceiling).
+- `tech-stack.md`: no change — no dependency, command, or required config key changed.
+- `coding-standards.md`: Project-Specific Rules gained one line documenting the
+  `Result.Extensions`/three-argument `Conflict` overload convention `(est. 0005)`, per T-58 —
+  this is exactly the kind of project-wide convention decision `meta-maintenance.md` §6 calls
+  for capturing (0005's `PipelineService.MoveApplicationAsync` is currently its only caller, but
+  the mechanism is generic on `Result`/`Result<T>` and available to every future spec).
+
+**Known gaps carried into the next checkpoint**
+
+None — this is the spec's final checkpoint. All 58 tasks in `plan/tasks.md` are complete, the
+full backend (4 + 161 + 99 = 264 tests) and frontend (59 tests) suites are green, both lint
+commands (`dotnet build`, `npm run lint`) are clean, NFR-1/NFR-2 are demonstrated by dedicated
+tests against the actual commands SQLite receives, and `meta/architecture.md`/
+`meta/coding-standards.md` reflect this spec's shipped shape. Spec status moves to `implemented`
+in `spec.md`'s frontmatter and `docs/specs/index.md`.
+
+---

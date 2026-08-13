@@ -402,17 +402,20 @@ public class PipelineService : IPipelineService
 
     public async Task<Result<PipelineBoardDto>> GetPipelineBoardAsync(Guid requisitionId, CancellationToken ct = default)
     {
-        var requisitionExists = await _dbContext.Requisitions.AsNoTracking().AnyAsync(r => r.Id == requisitionId, ct);
-        if (!requisitionExists)
+        // NFR-1: exactly two round trips for the whole board, regardless of Stage/Application
+        // count — this Requisition+Stages query doubles as the existence check (a missing
+        // Requisition materializes as null, a Requisition with zero Stages per R-1 still
+        // materializes with an empty Stages collection), so no separate AnyAsync is needed.
+        var requisition = await _dbContext.Requisitions
+            .AsNoTracking()
+            .Include(r => r.Stages.OrderBy(s => s.SortOrder))
+            .FirstOrDefaultAsync(r => r.Id == requisitionId, ct);
+        if (requisition == null)
         {
             return Result<PipelineBoardDto>.NotFound("requisition.pipeline.not-found", "Requisition not found.");
         }
 
-        var stages = await _dbContext.Stages
-            .AsNoTracking()
-            .Where(s => s.RequisitionId == requisitionId)
-            .OrderBy(s => s.SortOrder)
-            .ToListAsync(ct);
+        var stages = requisition.Stages.ToList();
 
         var apps = await _dbContext.Applications
             .AsNoTracking()

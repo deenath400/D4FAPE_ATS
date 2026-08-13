@@ -1,6 +1,6 @@
 # Architecture Snapshot
 
-**Updated:** 2026-08-06 · **Budget:** 150 lines target / 200 hard ceiling
+**Updated:** 2026-08-13 · **Budget:** 150 lines target / 200 hard ceiling
 
 > The orientation document. A developer or agent reads this file and nothing else, and knows
 > what exists and how it fits together. Detail belongs in the per-spec artifacts; see
@@ -63,9 +63,9 @@ graph TD
 | Component | Responsibility | Owning specs |
 |---|---|---|
 | `infra/build` | Repository build, version pinning, lockfile and lint/format infrastructure | 0001 |
-| `ui/portal` | Public candidate surface: landing page system status, registration, job search, apply, own Applications list | 0001, 0003, 0004 |
+| `ui/portal` | Public candidate surface: landing page system status, registration, job search, apply, own Applications list (now with current Stage name / Rejected badge, 0005) | 0001, 0003, 0004, 0005 |
 | `ui/bff` | Frontend BFF layer: proxy route handlers (binary-safe passthrough) and shared backend invoke function | 0001, 0002, 0004 |
-| `ui/staff` | Authenticated recruiter and hiring-manager workspace: requisitions, per-Requisition Applications list, pipeline, decisions | 0003, 0004 |
+| `ui/staff` | Authenticated recruiter and hiring-manager workspace: requisitions, per-Requisition Applications list, Stage configuration, pipeline board, move/reject controls, transition history | 0003, 0004, 0005 |
 | `api/system` | Backend HTTP boundary: system status & auth endpoints, composition root | 0001, 0002 |
 | `api/requisition` | Staff CRUD/lifecycle endpoints (`RecruiterOnly`/`StaffOnly`) plus anonymous public search/detail endpoints under `/api/public/requisitions` | 0003 |
 | `api/application` | Candidate submission (`CandidateOnly`, multipart), Candidate own-list/CV-download, Staff Requisition-scoped list (`StaffOnly`) | 0004 |
@@ -177,6 +177,8 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-06 | 0004 | CP-4: Hardening — dedicated NFR-1 (storage-write-failure atomicity) and NFR-3 (SQLite write-lock scope excludes the CV file write) verification tests, plus an E-1 concurrent-duplicate-submission regression test; spec closed out, all 46 tasks complete |
 | 2026-08-06 | 0005 | CP-1: `Stage` gained ordering/uniqueness (`SortOrder`, `NormalizedName`), `Application` gained a required current-Stage reference and rejected flag, new `db/pipeline` (`StageTransition`, schema-only), `AddPipelineProgression` migration with raw-SQL backfill for pre-existing Requisitions/Applications |
 | 2026-08-06 | 0005 | CP-2: New `service/pipeline`/`api/pipeline` (Stage CRUD/reorder/remove, Application move/reject with optimistic concurrency, staff pipeline board, transition history); `Result`/`ToProblemResult()` gained an `Extensions` mechanism for conflict-response context; `GET /api/applications/mine` now reports current Stage name / rejected outcome |
+| 2026-08-13 | 0005 | CP-3: Gave `ui/staff` a Stage-configuration screen, pipeline board, move/reject controls, and transition-history view; `ui/portal`'s "My Applications" list now shows a Stage name or Rejected badge |
+| 2026-08-13 | 0005 | CP-4: Hardening — dedicated NFR-1 (pipeline board issues exactly two queries, verified with a query-counting interceptor) and NFR-2 (move/reject's transaction spans only the Application/StageTransition writes) verification tests, plus an E-2 concurrent-move regression test; `GetPipelineBoardAsync` fixed to collapse its existence check and Stage fetch into one query, matching NFR-1's designed two-query budget; spec closed out, all 58 tasks complete |
 
 ## Related Specs
 
