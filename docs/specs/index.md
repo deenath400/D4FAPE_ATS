@@ -16,12 +16,13 @@ Status values: `specified` → `planned` → `implementing` → `implemented` �
 | 0004 | Application Submission and CV Upload | validated | api/application, service/application, db/application, shared/storage, ui/portal, ui/staff, ui/bff | Application, CvAttachment | Candidates submit a CV-backed Application to a published Requisition; Staff and the Candidate can each see a minimal list of what was submitted. |
 | 0005 | Pipeline Progression | validated | api/pipeline, service/pipeline, db/pipeline, service/requisition, db/requisition, api/application, service/application, db/application, ui/staff, ui/portal | Stage, Application, StageTransition | Recruiters configure a Requisition's pipeline and advance or reject Applications through it, with an audited history and real candidate-visible status. |
 | 0006 | Local Service Orchestration with Aspire | validated | infra/build, ui/bff, api/system, ui/portal | — | Developers start backend and frontend services together with a single Aspire orchestration command; independent run commands continue to work for backwards compatibility. |
+| 0007 | Seed Sample User Accounts per Role | specified | db/core, shared/auth | User, Role | Seeds one sample login per existing role (Candidate, Recruiter, HiringManager) via EF Core migration, sharing the password `Temp@123`. |
 
 ---
 
 ## Next id
 
-`0007`
+`0008`
 
 Update this after allocating an id, so `/specify` never has to scan the directory twice.
 
