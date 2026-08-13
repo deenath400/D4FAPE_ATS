@@ -2,8 +2,8 @@
 id: 0008
 slug: automated-candidate-screening
 title: Automated Candidate Screening
-status: specified
-components: [api/application, service/application, service/pipeline, db/application, db/pipeline, shared/storage, ui/staff]
+status: planned
+components: [api/application, service/application, service/pipeline, service/screening, db/application, db/pipeline, shared/storage, ui/staff]
 entities: [Application, CvAttachment, Requisition, Stage, StageTransition, ScreeningReport]
 depends_on: [0004, 0005]
 created: 2026-08-14
