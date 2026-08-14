@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 9 / 24 tasks · checkpoint CP-1 of 4 (completed)
+**Progress:** 19 / 24 tasks · checkpoint CP-2 of 4 (completed)
 
 ---
 
@@ -74,52 +74,52 @@ one checkpoint per invocation, then stops for review.
 *Exit condition: `dotnet build` succeeds, all unit tests pass including new screening
 orchestrator and mock service tests, all existing integration tests pass.*
 
-- [ ] **T-10** — Add PdfPig NuGet reference to `Ats.Service.csproj`
+- [x] **T-10** — Add PdfPig NuGet reference to `Ats.Service.csproj`
   - Files: `backend/src/Service/Ats.Service.csproj`
   - Covers: AC-1
   - Depends on: —
 
-- [ ] **T-11** — Create `PdfTextExtractor` static utility
+- [x] **T-11** — Create `PdfTextExtractor` static utility
   - Files: `backend/src/Service/Screening/PdfTextExtractor.cs`
   - Covers: AC-1, AC-4
   - Depends on: T-10
 
-- [ ] **T-12** — Create `IScreeningService` interface and `ScreeningResult` record
+- [x] **T-12** — Create `IScreeningService` interface and `ScreeningResult` record
   - Files: `backend/src/Service/Screening/IScreeningService.cs`, `backend/src/Service/Screening/ScreeningResult.cs`
   - Covers: AC-1, AC-10
   - Depends on: —
 
-- [ ] **T-13** — Create `MockScreeningService` implementation
+- [x] **T-13** — Create `MockScreeningService` implementation
   - Files: `backend/src/Service/Screening/MockScreeningService.cs`
   - Covers: AC-10
   - Depends on: T-12
 
-- [ ] **T-14** — Create `IScreeningOrchestrator` interface and `ScreeningOrchestrator` implementation
+- [x] **T-14** — Create `IScreeningOrchestrator` interface and `ScreeningOrchestrator` implementation
   - Files: `backend/src/Service/Screening/IScreeningOrchestrator.cs`, `backend/src/Service/Screening/ScreeningOrchestrator.cs`
   - Covers: AC-1, AC-2, AC-3, AC-4, AC-9
   - Depends on: T-03, T-08, T-11, T-13
 
-- [ ] **T-15** — Add `SystemMoveToNextStageAsync` to `IPipelineService` and `PipelineService`
+- [x] **T-15** — Add `SystemMoveToNextStageAsync` to `IPipelineService` and `PipelineService`
   - Files: `backend/src/Service/Pipeline/IPipelineService.cs`, `backend/src/Service/Pipeline/PipelineService.cs`
   - Covers: AC-2
   - Depends on: T-08
 
-- [ ] **T-16** — Create `ScreeningReportDto`
+- [x] **T-16** — Create `ScreeningReportDto`
   - Files: `backend/src/Service/Screening/Dtos/ScreeningReportDto.cs`
   - Covers: AC-7
   - Depends on: —
 
-- [ ] **T-17** — Modify `ApplicationService.SubmitAsync` to fire background screening
+- [x] **T-17** — Modify `ApplicationService.SubmitAsync` to fire background screening
   - Files: `backend/src/Service/Application/ApplicationService.cs`
   - Covers: AC-1
   - Depends on: T-14
 
-- [ ] **T-18** — Register screening services in DI
+- [x] **T-18** — Register screening services in DI
   - Files: `backend/src/Service/ServiceCollectionExtensions.cs`
   - Covers: AC-1, AC-10
   - Depends on: T-13, T-14
 
-- [ ] **T-19** — Unit tests: `MockScreeningService`, `PdfTextExtractor`, `ScreeningOrchestrator`
+- [x] **T-19** — Unit tests: `MockScreeningService`, `PdfTextExtractor`, `ScreeningOrchestrator`
   - Files: `backend/tests/Ats.UnitTests/Screening/MockScreeningServiceTests.cs`, `backend/tests/Ats.UnitTests/Screening/PdfTextExtractorTests.cs`, `backend/tests/Ats.UnitTests/Screening/ScreeningOrchestratorTests.cs`
   - Covers: AC-1, AC-2, AC-3, AC-4, AC-9, AC-10
   - Depends on: T-14, T-13, T-11

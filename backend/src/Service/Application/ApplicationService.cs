@@ -13,6 +13,7 @@ using Ats.Service.Common;
 using Ats.Shared.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using ApplicationEntity = Ats.Db.Applications.Application;
 using RequisitionStatus = Ats.Db.Requisitions.RequisitionStatus;
 
@@ -25,12 +26,18 @@ public class ApplicationService : IApplicationService
 
     private readonly AppDbContext _dbContext;
     private readonly IFileStorage _fileStorage;
+    private readonly Microsoft.Extensions.DependencyInjection.IServiceScopeFactory? _serviceScopeFactory;
     private readonly int _maxCvSizeBytes;
 
-    public ApplicationService(AppDbContext dbContext, IFileStorage fileStorage, IConfiguration configuration)
+    public ApplicationService(
+        AppDbContext dbContext,
+        IFileStorage fileStorage,
+        IConfiguration configuration,
+        Microsoft.Extensions.DependencyInjection.IServiceScopeFactory? serviceScopeFactory = null)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         _fileStorage = fileStorage ?? throw new ArgumentNullException(nameof(fileStorage));
+        _serviceScopeFactory = serviceScopeFactory;
         ArgumentNullException.ThrowIfNull(configuration);
 
         _maxCvSizeBytes = int.TryParse(configuration["Applications:MaxCvSizeBytes"], out var max)
@@ -149,6 +156,24 @@ public class ApplicationService : IApplicationService
             await _fileStorage.DeleteAsync(storageKey, ct);
             return Result<ApplicationDto>.Conflict(
                 "application.submit.duplicate", "You have already applied to this requisition.");
+        }
+
+        if (_serviceScopeFactory != null)
+        {
+            var submittedAppId = application.Id;
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    using var scope = _serviceScopeFactory.CreateScope();
+                    var orchestrator = scope.ServiceProvider.GetRequiredService<Ats.Service.Screening.IScreeningOrchestrator>();
+                    await orchestrator.RunScreeningAsync(submittedAppId, CancellationToken.None);
+                }
+                catch
+                {
+                    // Do not bubble unhandled exception to background worker thread
+                }
+            }, CancellationToken.None);
         }
 
         return Result<ApplicationDto>.Ok(ToDto(application, cv));

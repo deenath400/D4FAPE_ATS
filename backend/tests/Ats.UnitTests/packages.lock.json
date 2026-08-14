@@ -380,6 +380,11 @@
         "resolved": "13.0.1",
         "contentHash": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A=="
       },
+      "PdfPig": {
+        "type": "Transitive",
+        "resolved": "0.1.9",
+        "contentHash": "VU27oq5O0rpD+zWiD639xXkSHtsNXqbPpYV0pzYg9VPhDibH1cq1i67f9DuW2WnzDVEti0HipLcZxDhdayIzGg=="
+      },
       "SQLitePCLRaw.bundle_e_sqlite3": {
         "type": "Transitive",
         "resolved": "2.1.11",
@@ -476,7 +481,8 @@
           "Ats.Db": "[1.0.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.10, )",
           "Microsoft.Extensions.Configuration.Abstractions": "[10.0.10, )",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.10, )"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.10, )",
+          "PdfPig": "[0.1.9, )"
         }
       },
       "ats.shared": {

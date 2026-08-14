@@ -391,7 +391,9 @@ the new table. No data loss to other tables since no existing table references `
 
 ## 11. Deviation Log
 
-*Empty — Stage 3 appends here when the implementation diverges from this LLD.*
+| Section | Designed | Actual | Reason |
+|---|---|---|---|
+| §1 / §3.3 | Static `PdfTextExtractor` | `IPdfTextExtractor` interface + instance implementation in DI | Enables mock extraction in orchestrator unit tests without generating binary PDF payloads |
 
 ## Related Specs
 

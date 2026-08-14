@@ -37,6 +37,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IFileStorage, LocalDiskFileStorage>();
         services.AddScoped<IApplicationService, ApplicationService>();
         services.AddScoped<IPipelineService, PipelineService>();
+        services.AddScoped<Ats.Service.Screening.IScreeningService, Ats.Service.Screening.MockScreeningService>();
+        services.AddSingleton<Ats.Service.Screening.IPdfTextExtractor, Ats.Service.Screening.PdfTextExtractor>();
+        services.AddScoped<Ats.Service.Screening.IScreeningOrchestrator, Ats.Service.Screening.ScreeningOrchestrator>();
 
         return services;
     }

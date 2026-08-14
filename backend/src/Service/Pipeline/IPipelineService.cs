@@ -37,4 +37,7 @@ public interface IPipelineService
 
     Task<Result<IReadOnlyList<StageTransitionDto>>> GetTransitionHistoryAsync(
         Guid applicationId, CancellationToken ct = default);
+
+    Task<Result> SystemMoveToNextStageAsync(
+        Guid applicationId, string? note = null, CancellationToken ct = default);
 }

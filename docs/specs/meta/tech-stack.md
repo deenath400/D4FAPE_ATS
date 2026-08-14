@@ -23,6 +23,7 @@ section literally, so it must stay accurate.
 | Validation | TBD | — | First API spec picks the library |
 | Auth | ASP.NET Core Identity + `JwtBearer` | — | Deferred to spec 0002 |
 | Logging | `Microsoft.Extensions.Logging` | 10.0.10 | Built in; structured logging |
+| PDF processing | `PdfPig` | 0.1.9 | PDF text extraction for candidate screening (est. 0008) |
 | Testing | xUnit | 2.9.3 | Unit, integration & architecture tests |
 
 ## Frontend

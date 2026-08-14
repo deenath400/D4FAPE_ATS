@@ -505,6 +505,70 @@ public class PipelineService : IPipelineService
         };
     }
 
+    public async Task<Result> SystemMoveToNextStageAsync(
+        Guid applicationId, string? note = null, CancellationToken ct = default)
+    {
+        var application = await _dbContext.Applications.FirstOrDefaultAsync(a => a.Id == applicationId, ct);
+        if (application == null)
+        {
+            return Result.NotFound("application.move.not-found", "Application not found.");
+        }
+
+        if (application.IsRejected)
+        {
+            return Result.Conflict(
+                "application.move.already-rejected", "This application has already been rejected.");
+        }
+
+        var requisition = await _dbContext.Requisitions
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Id == application.RequisitionId, ct);
+        if (requisition != null && requisition.Status == RequisitionStatus.Closed)
+        {
+            return Result.Conflict(
+                "application.move.requisition-closed", "This requisition is closed.");
+        }
+
+        var stages = await _dbContext.Stages
+            .AsNoTracking()
+            .Where(s => s.RequisitionId == application.RequisitionId)
+            .OrderBy(s => s.SortOrder)
+            .ToListAsync(ct);
+
+        var currentIndex = stages.FindIndex(s => s.Id == application.CurrentStageId);
+        if (currentIndex < 0 || currentIndex >= stages.Count - 1)
+        {
+            // No subsequent stage exists (e.g. single-stage requisition or already in final stage)
+            return Result.Ok();
+        }
+
+        var currentStage = stages[currentIndex];
+        var nextStage = stages[currentIndex + 1];
+
+        application.MoveToStage(nextStage.Id);
+        var transition = StageTransition.CreateSystemMove(
+            application.Id,
+            currentStage.Id,
+            currentStage.Name,
+            nextStage.Id,
+            nextStage.Name,
+            "AI Screening Agent",
+            note ?? "Automated screening: recommendation Advance");
+
+        _dbContext.StageTransitions.Add(transition);
+
+        try
+        {
+            await _dbContext.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return Result.Conflict("application.move.conflict", "This application has already moved.");
+        }
+
+        return Result.Ok();
+    }
+
     private static Dictionary<string, string[]>? ValidateName(string name)
     {
         var errors = new Dictionary<string, string[]>();

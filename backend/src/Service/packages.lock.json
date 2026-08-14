@@ -26,6 +26,12 @@
         "resolved": "10.0.10",
         "contentHash": "z/2xXlFw2aLGjHyEm6E0tQ+In6VfzQzTrtArbQ2c0TQE16ZbyDCMGPvaUT9I0s8rgy9sRWlU2P9waW37qV04qA=="
       },
+      "PdfPig": {
+        "type": "Direct",
+        "requested": "[0.1.9, )",
+        "resolved": "0.1.9",
+        "contentHash": "VU27oq5O0rpD+zWiD639xXkSHtsNXqbPpYV0pzYg9VPhDibH1cq1i67f9DuW2WnzDVEti0HipLcZxDhdayIzGg=="
+      },
       "Microsoft.AspNetCore.Cryptography.Internal": {
         "type": "Transitive",
         "resolved": "10.0.10",

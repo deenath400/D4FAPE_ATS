@@ -238,6 +238,11 @@
         "resolved": "13.0.3",
         "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
       },
+      "PdfPig": {
+        "type": "Transitive",
+        "resolved": "0.1.9",
+        "contentHash": "VU27oq5O0rpD+zWiD639xXkSHtsNXqbPpYV0pzYg9VPhDibH1cq1i67f9DuW2WnzDVEti0HipLcZxDhdayIzGg=="
+      },
       "SQLitePCLRaw.bundle_e_sqlite3": {
         "type": "Transitive",
         "resolved": "2.1.11",
@@ -339,7 +344,8 @@
         "type": "Project",
         "dependencies": {
           "Ats.Db": "[1.0.0, )",
-          "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.10, )"
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.10, )",
+          "PdfPig": "[0.1.9, )"
         }
       },
       "ats.shared": {

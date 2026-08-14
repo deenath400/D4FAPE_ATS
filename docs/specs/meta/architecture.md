@@ -75,6 +75,7 @@ graph TD
 | `service/requisition` | Requisition lifecycle state machine (draft/published/closed transition guards), content validation, keyword search + pagination; creation also seeds the Requisition's default 4-Stage set (0005) | 0003, 0005 |
 | `service/application` | Submission eligibility (Requisition must be `published`), one-Application-per-Candidate-per-Requisition rule, CV type/size/magic-byte validation, CV-access authorization; submission also assigns the Requisition's first Stage, own-list now reports current Stage name/rejected outcome (0005) | 0004, 0005 |
 | `service/pipeline` | Stage config rules (uniqueness, occupied-removal guard), move/reject transition logic with optimistic concurrency (FR-22), closed-Requisition guard, pipeline board and transition-history queries | 0005 |
+| `service/screening` | AI evaluation abstraction (`IScreeningService`), text extraction (`IPdfTextExtractor`), and orchestrator (`IScreeningOrchestrator`) coordinating CV analysis and auto-advance | 0008 |
 | `service/<area>` | Business rules and transaction boundaries. The only caller of `db/*` | — |
 | `db/core` | EF Core context, SQLite WAL/busy-timeout interceptor, health check, migrations | 0001, 0002 |
 | `db/requisition` | `Requisition`/`Stage` entities, EF Core configurations, migration — each Requisition owns an independent, ordered Stage set (FR-14; `SortOrder`/`NormalizedName` and per-Requisition name uniqueness added 0005) | 0003, 0005 |
@@ -186,6 +187,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-14 | 0007 | CP-2: Built login integration tests for all three seeded accounts, password hash verification unit test, and duplicate candidate registration conflict test |
 | 2026-08-14 | 0007 | CP-3: Hardening — full-suite regression pass verifying no existing migration or auth test broke; spec closed out, all 9 tasks complete |
 | 2026-08-14 | 0008 | CP-1: Added ScreeningReport entity, EF Core mapping, AddScreeningReport migration, StageTransition.CreateSystemMove factory method |
+| 2026-08-14 | 0008 | CP-2: Built `service/screening` (IScreeningService, MockScreeningService, IPdfTextExtractor, ScreeningOrchestrator), extended PipelineService with SystemMoveToNextStageAsync, added background screening trigger in ApplicationService |
 
 ## Related Specs
 
