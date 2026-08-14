@@ -211,4 +211,83 @@ Passed!  - Failed:     0, Passed:   121, Skipped:     0, Total:   121, Duration:
 
 **Known gaps carried into the next checkpoint**
 
-- Frontend components and hardening (T-24) scheduled for CP-4.
+- None from CP-3.
+
+---
+
+## CP-4 — Frontend Components and Hardening · 2026-08-14
+
+**Tasks completed:** T-24
+
+**Files created**
+
+| Path | Purpose |
+|---|---|
+| `frontend/src/lib/types/screening.ts` | Frontend TypeScript types (`ScreeningStatus`, `ScreeningRecommendation`, `ScreeningReportDto`) |
+| `frontend/src/components/staff/ScreeningBadge.tsx` | Visual badge for candidate screening score, recommendation (`Advance` = emerald, `Review` = amber), and status |
+| `frontend/src/components/staff/ScreeningReportModal.tsx` | Interactive modal showing full AI analysis, strengths, concerns, failure reason, and Re-screen action |
+| `frontend/src/components/staff/ScreeningReportCard.tsx` | Embedded screening report panel for staff application detail page |
+| `frontend/tests/staff/screening-badge.test.tsx` | Unit tests for `ScreeningBadge` rendering variants and click handling |
+| `frontend/tests/staff/screening-report-modal.test.tsx` | Unit tests for `ScreeningReportModal` fetch lifecycle and close handling |
+
+**Files modified**
+
+| Path | Change |
+|---|---|
+| `frontend/src/lib/types/application.ts` | Added optional screening fields to `StaffApplicationListItemDto` |
+| `frontend/src/lib/types/pipeline.ts` | Added optional screening fields to `PipelineBoardApplicationDto` |
+| `frontend/src/components/staff/PipelineBoard.tsx` | Integrated `ScreeningBadge` on applicant cards with interactive report modal |
+| `frontend/src/components/staff/ApplicationsTable.tsx` | Added AI Screening column with `ScreeningBadge` and report modal |
+| `frontend/src/app/staff/applications/[id]/page.tsx` | Embedded `ScreeningReportCard` on the staff application detail page |
+| `frontend/src/app/staff/requisitions/[id]/applications/page.tsx` | Passed `canReScreen` permission to `ApplicationsTable` |
+
+**Decisions made during implementation**
+
+| # | Decision | Why |
+|---|---|---|
+| I-4 | Added `ScreeningReportCard` to the staff application detail page (`/staff/applications/[id]`) | Gives staff a comprehensive dedicated view of the AI evaluation alongside the audit transition history |
+
+**Deviations from the LLD**
+
+| LLD section | Designed | Actual | Reason | LLD patched? |
+|---|---|---|---|---|
+| — | — | — | None. Component design and presentation match specifications. | Yes |
+
+**Verification run**
+
+```
+$ dotnet build
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+$ dotnet test tests/Ats.UnitTests
+Passed!  - Failed:     0, Passed:   201, Skipped:     0, Total:   201, Duration: 2 s - Ats.UnitTests.dll (net10.0)
+
+$ dotnet test tests/Ats.ArchitectureTests
+Passed!  - Failed:     0, Passed:     4, Skipped:     0, Total:     4, Duration: 85 ms - Ats.ArchitectureTests.dll (net10.0)
+
+$ dotnet test tests/Ats.IntegrationTests
+Passed!  - Failed:     0, Passed:   121, Skipped:     0, Total:   121, Duration: 21 s - Ats.IntegrationTests.dll (net10.0)
+
+$ npm test
+Test Files  17 passed (17)
+     Tests  68 passed (68)
+
+$ npm run lint
+✔ No ESLint warnings or errors
+
+$ npm run build
+✓ Compiled successfully
+✓ Generating static pages (9/9)
+```
+
+**Meta updates applied**
+
+- `architecture.md`: updated Component Map (`ui/staff` includes screening badges and reports); appended change log row for 0008 CP-4.
+- `tech-stack.md`: no change.
+- `coding-standards.md`: no change.
+
+**Known gaps carried into the next checkpoint**
+
+- None. All 24 tasks completed; spec is fully implemented and ready for `/validate`.

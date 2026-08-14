@@ -1,6 +1,8 @@
 import React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { isRecruiter } from "@/lib/auth-guards";
 import { invokeBackend, BackendInvokeError } from "@/lib/server/backend-invoke";
 import type { StaffApplicationListItemDto } from "@/lib/types/application";
 import { ApplicationsTable } from "@/components/staff/ApplicationsTable";
@@ -33,6 +35,9 @@ export default async function StaffApplicationsPage({
     throw err;
   }
 
+  const session = await auth();
+  const canReScreen = isRecruiter(session?.user?.roles);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -45,7 +50,7 @@ export default async function StaffApplicationsPage({
         </Link>
       </div>
 
-      <ApplicationsTable items={applications} />
+      <ApplicationsTable items={applications} canReScreen={canReScreen} />
     </div>
   );
 }

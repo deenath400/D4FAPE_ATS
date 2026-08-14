@@ -48,6 +48,9 @@ export type PipelineBoardApplicationDto = {
   candidateLastName: string;
   candidateEmail: string;
   submittedAtUtc: string;
+  screeningScore?: number | null;
+  screeningRecommendation?: "Advance" | "Review" | null;
+  screeningStatus?: "Pending" | "Completed" | "Failed" | null;
 };
 
 export type PipelineStageGroupDto = {

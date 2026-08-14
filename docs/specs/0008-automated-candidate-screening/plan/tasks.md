@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 23 / 24 tasks · checkpoint CP-3 of 4 (completed)
+**Progress:** 24 / 24 tasks · checkpoint CP-4 of 4 (completed)
 
 ---
 
@@ -96,7 +96,7 @@ orchestrator and mock service tests, all existing integration tests pass.*
 
 - [x] **T-14** — Create `IScreeningOrchestrator` interface and `ScreeningOrchestrator` implementation
   - Files: `backend/src/Service/Screening/IScreeningOrchestrator.cs`, `backend/src/Service/Screening/ScreeningOrchestrator.cs`
-  - Covers: AC-1, AC-2, AC-3, AC-4, AC-9
+  - Covers: AC-1, AC-2, AC-3, AC-4, AC-9, AC-10
   - Depends on: T-03, T-08, T-11, T-13
 
 - [x] **T-15** — Add `SystemMoveToNextStageAsync` to `IPipelineService` and `PipelineService`
@@ -154,7 +154,7 @@ endpoint tests), `dotnet test` full suite green.*
 *Exit condition: full suite green (`dotnet test`, `npm test`, `npm run build`), lint clean,
 architecture snapshot updated.*
 
-- [ ] **T-24** — Update `docs/specs/meta/architecture.md`
+- [x] **T-24** — Update `docs/specs/meta/architecture.md`
   - Files: `docs/specs/meta/architecture.md`
   - Covers: —
   - Depends on: all

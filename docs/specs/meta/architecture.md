@@ -65,7 +65,7 @@ graph TD
 | `infra/build` | Repository build, version pinning, lockfile and lint/format infrastructure; `src/AppHost` (.NET Aspire) orchestrates both deployables for local development only | 0001, 0006 |
 | `ui/portal` | Public candidate surface: landing page system status, registration, job search, apply, own Applications list (now with current Stage name / Rejected badge, 0005) | 0001, 0003, 0004, 0005 |
 | `ui/bff` | Frontend BFF layer: proxy route handlers (binary-safe passthrough) and shared backend invoke function | 0001, 0002, 0004 |
-| `ui/staff` | Authenticated recruiter and hiring-manager workspace: requisitions, per-Requisition Applications list, Stage configuration, pipeline board, move/reject controls, transition history | 0003, 0004, 0005 |
+| `ui/staff` | Authenticated recruiter and hiring-manager workspace: requisitions, per-Requisition Applications list, Stage configuration, pipeline board, move/reject controls, transition history, screening score/recommendation badges and report modal/card | 0003, 0004, 0005, 0008 |
 | `api/system` | Backend HTTP boundary: system status & auth endpoints, composition root | 0001, 0002 |
 | `api/requisition` | Staff CRUD/lifecycle endpoints (`RecruiterOnly`/`StaffOnly`) plus anonymous public search/detail endpoints under `/api/public/requisitions` | 0003 |
 | `api/application` | Candidate submission (`CandidateOnly`, multipart), Candidate own-list/CV-download, Staff Requisition-scoped list (`StaffOnly`), Staff screening report retrieval (`StaffOnly`) and re-screening (`RecruiterOnly`) | 0004, 0008 |
@@ -189,6 +189,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-14 | 0008 | CP-1: Added ScreeningReport entity, EF Core mapping, AddScreeningReport migration, StageTransition.CreateSystemMove factory method |
 | 2026-08-14 | 0008 | CP-2: Built `service/screening` (IScreeningService, MockScreeningService, IPdfTextExtractor, ScreeningOrchestrator), extended PipelineService with SystemMoveToNextStageAsync, added background screening trigger in ApplicationService |
 | 2026-08-14 | 0008 | CP-3: Added `GET .../screening-report` (StaffOnly) and `POST .../screen` (RecruiterOnly) endpoints to ApplicationEndpoints, added screening fields to PipelineBoardApplicationDto and StaffApplicationListItemDto, added Screening configuration, and built integration test suite |
+| 2026-08-14 | 0008 | CP-4: Added `ui/staff` screening components (`ScreeningBadge`, `ScreeningReportModal`, `ScreeningReportCard`), integrated into PipelineBoard, ApplicationsTable, and ApplicationDetail pages; full-suite regression pass green; spec closed out, all 24 tasks complete |
 
 ## Related Specs
 

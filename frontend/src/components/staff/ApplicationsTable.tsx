@@ -1,13 +1,19 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import type { StaffApplicationListItemDto } from "@/lib/types/application";
+import { ScreeningBadge } from "@/components/staff/ScreeningBadge";
+import { ScreeningReportModal } from "@/components/staff/ScreeningReportModal";
 
 export type ApplicationsTableProps = {
   items: StaffApplicationListItemDto[];
+  canReScreen?: boolean;
 };
 
 // Presentational — staff per-Requisition Applications list (LLD §5.1, AC-16, AC-17, AC-18).
-// No stage grouping or decisioning UI — out of scope for this spec (Clarification C-2).
-export function ApplicationsTable({ items }: ApplicationsTableProps) {
+export function ApplicationsTable({ items, canReScreen = false }: ApplicationsTableProps) {
+  const [selectedApp, setSelectedApp] = useState<{ id: string; name: string } | null>(null);
+
   if (items.length === 0) {
     return (
       <div className="p-6 rounded-lg border border-slate-700 bg-slate-800/50 text-center text-slate-400">
@@ -17,38 +23,64 @@ export function ApplicationsTable({ items }: ApplicationsTableProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-700">
-      <table className="w-full text-sm text-left">
-        <thead className="bg-slate-800 text-slate-400 uppercase text-xs">
-          <tr>
-            <th className="px-4 py-3">Candidate</th>
-            <th className="px-4 py-3">Email</th>
-            <th className="px-4 py-3">Submitted</th>
-            <th className="px-4 py-3">CV</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-800 bg-slate-900">
-          {items.map((application) => (
-            <tr key={application.id} className="hover:bg-slate-800/60">
-              <td className="px-4 py-3 text-slate-100 font-medium">
-                {application.candidate.firstName} {application.candidate.lastName}
-              </td>
-              <td className="px-4 py-3 text-slate-400">{application.candidate.email}</td>
-              <td className="px-4 py-3 text-slate-400">
-                {new Date(application.submittedAtUtc).toLocaleString()}
-              </td>
-              <td className="px-4 py-3">
-                <a
-                  href={`/api/bff/proxy${application.cvDownloadUrl}`}
-                  className="text-emerald-400 hover:text-emerald-300 font-medium"
-                >
-                  Download
-                </a>
-              </td>
+    <>
+      <div className="overflow-hidden rounded-lg border border-slate-700">
+        <table className="w-full text-sm text-left">
+          <thead className="bg-slate-800 text-slate-400 uppercase text-xs">
+            <tr>
+              <th className="px-4 py-3">Candidate</th>
+              <th className="px-4 py-3">Email</th>
+              <th className="px-4 py-3">Submitted</th>
+              <th className="px-4 py-3">AI Screening</th>
+              <th className="px-4 py-3">CV</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody className="divide-y divide-slate-800 bg-slate-900">
+            {items.map((application) => (
+              <tr key={application.id} className="hover:bg-slate-800/60">
+                <td className="px-4 py-3 text-slate-100 font-medium">
+                  {application.candidate.firstName} {application.candidate.lastName}
+                </td>
+                <td className="px-4 py-3 text-slate-400">{application.candidate.email}</td>
+                <td className="px-4 py-3 text-slate-400">
+                  {new Date(application.submittedAtUtc).toLocaleString()}
+                </td>
+                <td className="px-4 py-3">
+                  <ScreeningBadge
+                    score={application.screeningScore}
+                    recommendation={application.screeningRecommendation}
+                    status={application.screeningStatus}
+                    onClick={() =>
+                      setSelectedApp({
+                        id: application.id,
+                        name: `${application.candidate.firstName} ${application.candidate.lastName}`,
+                      })
+                    }
+                  />
+                </td>
+                <td className="px-4 py-3">
+                  <a
+                    href={`/api/bff/proxy${application.cvDownloadUrl}`}
+                    className="text-emerald-400 hover:text-emerald-300 font-medium"
+                  >
+                    Download
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {selectedApp && (
+        <ScreeningReportModal
+          applicationId={selectedApp.id}
+          candidateName={selectedApp.name}
+          isOpen={true}
+          onClose={() => setSelectedApp(null)}
+          canReScreen={canReScreen}
+        />
+      )}
+    </>
   );
 }

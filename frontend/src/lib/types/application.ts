@@ -24,4 +24,7 @@ export type StaffApplicationListItemDto = {
   candidate: { id: string; firstName: string; lastName: string; email: string };
   submittedAtUtc: string;
   cvDownloadUrl: string;
+  screeningScore?: number | null;
+  screeningRecommendation?: "Advance" | "Review" | null;
+  screeningStatus?: "Pending" | "Completed" | "Failed" | null;
 };
