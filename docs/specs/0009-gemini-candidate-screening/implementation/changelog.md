@@ -200,4 +200,67 @@ $ npm run build (frontend)
 
 **Known gaps carried into the next checkpoint**
 
-- Provider registration integration tests and architecture update are planned for CP-4.
+- None. All checkpoints completed.
+
+---
+
+## CP-4 — Hardening and integration tests · 2026-08-14
+
+**Tasks completed:** T-17, T-18
+
+**Files created**
+
+| Path | Purpose |
+|---|---|
+| `backend/tests/Ats.IntegrationTests/Screening/GeminiProviderRegistrationTests.cs` | Integration tests verifying DI registration of `GeminiScreeningService` vs `MockScreeningService` under all configuration permutations |
+
+**Files modified**
+
+| Path | Change |
+|---|---|
+| `docs/specs/meta/architecture.md` | Updated `service/screening` component map row and appended Change Log entries for CP-1 through CP-4 |
+| `docs/specs/meta/tech-stack.md` | Added `Screening:Provider` and `Gemini:ApiKey` configuration keys |
+
+**Decisions made during implementation**
+
+| # | Decision | Why |
+|---|---|---|
+| I-5 | Verified fallback behavior with both missing and empty `Gemini:ApiKey` configuration | Ensures graceful local development and testing experience without unexpected crashes |
+
+**Deviations from the LLD**
+
+| LLD section | Designed | Actual | Reason | LLD patched? |
+|---|---|---|---|---|
+| — | — | — | None. | N/A |
+
+**Verification run**
+
+```
+$ dotnet test tests/Ats.UnitTests
+Test run for C:\D_Drive\D4FAPE-_ATS\backend\tests\Ats.UnitTests\bin\Debug\net10.0\Ats.UnitTests.dll (.NETCoreApp,Version=v10.0)
+Passed!  - Failed:     0, Passed:   213, Skipped:     0, Total:   213, Duration: 3 s - Ats.UnitTests.dll (net10.0)
+
+$ dotnet test tests/Ats.ArchitectureTests
+Test run for C:\D_Drive\D4FAPE-_ATS\backend\tests\Ats.ArchitectureTests\bin\Debug\net10.0\Ats.ArchitectureTests.dll (.NETCoreApp,Version=v10.0)
+Passed!  - Failed:     0, Passed:     4, Skipped:     0, Total:     4, Duration: 94 ms - Ats.ArchitectureTests.dll (net10.0)
+
+$ dotnet test tests/Ats.IntegrationTests
+Test run for C:\D_Drive\D4FAPE-_ATS\backend\tests\Ats.IntegrationTests\bin\Debug\net10.0\Ats.IntegrationTests.dll (.NETCoreApp,Version=v10.0)
+Passed!  - Failed:     0, Passed:   125, Skipped:     0, Total:   125, Duration: 23 s - Ats.IntegrationTests.dll (net10.0)
+
+$ npm test (frontend)
+Test Files  18 passed (18)
+     Tests  71 passed (71)
+  Duration  6.17s
+```
+
+**Meta updates applied**
+
+- `docs/specs/meta/architecture.md`: Updated `service/screening` description and added Change Log rows.
+- `tech-stack.md`: Added `Screening:Provider` and `Gemini:ApiKey` configuration keys.
+- `coding-standards.md`: no change.
+
+**Known gaps carried into the next checkpoint**
+
+- None — spec implementation complete.
+

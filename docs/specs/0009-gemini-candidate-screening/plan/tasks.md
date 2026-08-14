@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 16 / 18 tasks · checkpoint CP-3 of 4 completed
+**Progress:** 18 / 18 tasks · all 4 checkpoints completed
 
 ---
 
@@ -115,12 +115,12 @@ one checkpoint per invocation, then stops for review.
 
 *Exit condition: full backend test suite green, full frontend test suite green, provider registration integration tests pass, existing screening integration tests pass with updated assertions, `docs/specs/meta/architecture.md` updated.*
 
-- [ ] **T-17** — Integration tests for provider registration and fallback logic
+- [x] **T-17** — Integration tests for provider registration and fallback logic
   - Files: `backend/tests/Ats.IntegrationTests/Screening/GeminiProviderRegistrationTests.cs`
   - Covers: AC-2, AC-9
   - Depends on: T-12
 
-- [ ] **T-18** — Update `docs/specs/meta/architecture.md` and `docs/specs/meta/tech-stack.md`
+- [x] **T-18** — Update `docs/specs/meta/architecture.md` and `docs/specs/meta/tech-stack.md`
   - Files: `docs/specs/meta/architecture.md`, `docs/specs/meta/tech-stack.md`
   - Covers: —
   - Depends on: all

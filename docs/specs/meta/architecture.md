@@ -75,7 +75,7 @@ graph TD
 | `service/requisition` | Requisition lifecycle state machine (draft/published/closed transition guards), content validation, keyword search + pagination; creation also seeds the Requisition's default 4-Stage set (0005) | 0003, 0005 |
 | `service/application` | Submission eligibility (Requisition must be `published`), one-Application-per-Candidate-per-Requisition rule, CV type/size/magic-byte validation, CV-access authorization; submission also assigns the Requisition's first Stage, own-list now reports current Stage name/rejected outcome (0005) | 0004, 0005 |
 | `service/pipeline` | Stage config rules (uniqueness, occupied-removal guard), move/reject transition logic with optimistic concurrency (FR-22), closed-Requisition guard, pipeline board and transition-history queries | 0005 |
-| `service/screening` | AI evaluation abstraction (`IScreeningService`), text extraction (`IPdfTextExtractor`), and orchestrator (`IScreeningOrchestrator`) coordinating CV analysis and auto-advance | 0008 |
+| `service/screening` | AI evaluation (Gemini 2.0 Flash REST API / Mock provider), text extraction, and orchestrator coordinating CV analysis, category scores, and auto-advance | 0008, 0009 |
 | `service/<area>` | Business rules and transaction boundaries. The only caller of `db/*` | — |
 | `db/core` | EF Core context, SQLite WAL/busy-timeout interceptor, health check, migrations | 0001, 0002 |
 | `db/requisition` | `Requisition`/`Stage` entities, EF Core configurations, migration — each Requisition owns an independent, ordered Stage set (FR-14; `SortOrder`/`NormalizedName` and per-Requisition name uniqueness added 0005) | 0003, 0005 |
@@ -161,11 +161,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | Date | Spec | Change |
 |---|---|---|
 | 2026-08-05 | — | Blueprint initialised by /initialize-project |
-| 2026-08-05 | 0001 | CP-1: Scaffolded repository tooling, backend project topology, and db/core layer |
-| 2026-08-05 | 0001 | CP-2: Built backend service & API layers, system status endpoint, unit & integration tests |
-| 2026-08-05 | 0001 | CP-3: Scaffolded frontend Next.js application, ESLint FR-16 rules, BFF proxy route & shared invoke function |
-| 2026-08-05 | 0001 | CP-4: Built portal landing page, ServerStatusSection, ClientStatusPanel, and Vitest component tests |
-| 2026-08-05 | 0001 | CP-5: Hardened tech stack commands, updated architecture snapshot and coding standards |
+| 2026-08-05 | 0001 | CP-1..5: Initialised solution, EF Core SQLite core, system status API/service, Next.js frontend with BFF proxy and portal landing page |
 | 2026-08-05 | 0002 | CP-1: Added ASP.NET Core Identity domain entities, RefreshToken schema, and EF Core migration |
 | 2026-08-05 | 0002 | CP-2: Implemented AuthService, JwtTokenGenerator, AuthEndpoints (/register, /login, /refresh, /logout, /me), and JWT Bearer auth policies |
 | 2026-08-05 | 0002 | CP-3: Configured NextAuth v5 session provider, JWT callback refresh flow, and BFF proxy route |
@@ -193,6 +189,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-14 | 0009 | CP-1: Added category scores (`SkillsScore`, `ExperienceScore`, `EducationScore`) to `ScreeningReport`, EF Core mapping, `AddScreeningCategoryScores` migration, and expanded `ScreeningResult`/`ScreeningReportDto` |
 | 2026-08-14 | 0009 | CP-2: Built `GeminiScreeningService` (typed `HttpClient` with structured JSON schema) and DI provider selection with graceful `MockScreeningService` fallback |
 | 2026-08-14 | 0009 | CP-3: Added category breakdown progress bars (Skills Fit, Experience Fit, Education Fit) to `ScreeningReportCard` and `ScreeningReportModal` in `ui/staff` |
+| 2026-08-14 | 0009 | CP-4: Hardening — provider registration and fallback integration tests; full test suite pass; spec closed out, all 18 tasks complete |
 
 ## Related Specs
 
