@@ -102,4 +102,40 @@ describe("ScreeningReportModal", () => {
 
     expect(handleClose).toHaveBeenCalledTimes(1);
   });
+
+  it("renders category breakdown scores when provided", async () => {
+    const reportWithCategories: ScreeningReportDto = {
+      ...mockReport,
+      skillsScore: 92,
+      experienceScore: 84,
+      educationScore: 78,
+    };
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(reportWithCategories),
+      })
+    );
+
+    render(
+      <ScreeningReportModal
+        applicationId="app-123"
+        candidateName="Jane Doe"
+        isOpen={true}
+        onClose={vi.fn()}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Evaluation Breakdown")).toBeInTheDocument();
+      expect(screen.getByText("Skills Fit")).toBeInTheDocument();
+      expect(screen.getByText("92%")).toBeInTheDocument();
+      expect(screen.getByText("Experience Fit")).toBeInTheDocument();
+      expect(screen.getByText("84%")).toBeInTheDocument();
+      expect(screen.getByText("Education Fit")).toBeInTheDocument();
+      expect(screen.getByText("78%")).toBeInTheDocument();
+    });
+  });
 });

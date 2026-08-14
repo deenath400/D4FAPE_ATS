@@ -141,4 +141,63 @@ Passed!  - Failed:     0, Passed:   121, Skipped:     0, Total:   121, Duration:
 
 **Known gaps carried into the next checkpoint**
 
-- `ui/staff` category score rendering in `ScreeningReportCard` and `ScreeningReportModal` is planned for CP-3.
+- None for frontend. Integration tests and hardening are planned for CP-4.
+
+---
+
+## CP-3 — Frontend category score rendering · 2026-08-14
+
+**Tasks completed:** T-14, T-15, T-16
+
+**Files created**
+
+| Path | Purpose |
+|---|---|
+| `frontend/tests/staff/screening-report-card.test.tsx` | Unit test suite for `ScreeningReportCard` category breakdown rendering |
+
+**Files modified**
+
+| Path | Change |
+|---|---|
+| `frontend/src/lib/types/screening.ts` | Added `skillsScore`, `experienceScore`, and `educationScore` nullable properties to `ScreeningReportDto` |
+| `frontend/src/components/staff/ScreeningReportCard.tsx` | Added progress bars displaying Skills Fit, Experience Fit, and Education Fit scores when present |
+| `frontend/src/components/staff/ScreeningReportModal.tsx` | Added progress bars displaying Skills Fit, Experience Fit, and Education Fit scores when present |
+| `frontend/tests/staff/screening-report-modal.test.tsx` | Added test case verifying category scores rendering |
+
+**Decisions made during implementation**
+
+| # | Decision | Why |
+|---|---|---|
+| I-4 | Render category score breakdown section conditionally | When scores are null (e.g. legacy/mock reports without category scores), the section is hidden cleanly |
+
+**Deviations from the LLD**
+
+| LLD section | Designed | Actual | Reason | LLD patched? |
+|---|---|---|---|---|
+| — | — | — | None. | N/A |
+
+**Verification run**
+
+```
+$ npm test (frontend)
+Test Files  18 passed (18)
+     Tests  71 passed (71)
+  Duration  5.94s
+
+$ npm run build (frontend)
+✓ Compiled successfully
+✓ Linting and checking validity of types
+✓ Collecting page data
+✓ Generating static pages (9/9)
+✓ Finalizing page optimization
+```
+
+**Meta updates applied**
+
+- `docs/specs/meta/architecture.md`: Appended Change Log row for CP-3.
+- `tech-stack.md`: no change.
+- `coding-standards.md`: no change.
+
+**Known gaps carried into the next checkpoint**
+
+- Provider registration integration tests and architecture update are planned for CP-4.

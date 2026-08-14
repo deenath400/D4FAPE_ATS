@@ -96,6 +96,57 @@ export function ScreeningReportCard({
         </div>
       )}
 
+      {/* Category Breakdown Scores (0009) */}
+      {(report.skillsScore != null || report.experienceScore != null || report.educationScore != null) && (
+        <div className="space-y-2 pt-1 pb-1">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Evaluation Breakdown</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {report.skillsScore != null && (
+              <div className="p-2 rounded bg-slate-800/50 border border-slate-800 space-y-1">
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-400">Skills Fit</span>
+                  <span className="font-semibold text-slate-200">{report.skillsScore}%</span>
+                </div>
+                <div className="w-full bg-slate-700/60 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className="bg-indigo-500 h-1.5 rounded-full transition-all"
+                    style={{ width: `${Math.min(100, Math.max(0, report.skillsScore))}%` }}
+                  />
+                </div>
+              </div>
+            )}
+            {report.experienceScore != null && (
+              <div className="p-2 rounded bg-slate-800/50 border border-slate-800 space-y-1">
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-400">Experience Fit</span>
+                  <span className="font-semibold text-slate-200">{report.experienceScore}%</span>
+                </div>
+                <div className="w-full bg-slate-700/60 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className="bg-emerald-500 h-1.5 rounded-full transition-all"
+                    style={{ width: `${Math.min(100, Math.max(0, report.experienceScore))}%` }}
+                  />
+                </div>
+              </div>
+            )}
+            {report.educationScore != null && (
+              <div className="p-2 rounded bg-slate-800/50 border border-slate-800 space-y-1">
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-400">Education Fit</span>
+                  <span className="font-semibold text-slate-200">{report.educationScore}%</span>
+                </div>
+                <div className="w-full bg-slate-700/60 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className="bg-amber-500 h-1.5 rounded-full transition-all"
+                    style={{ width: `${Math.min(100, Math.max(0, report.educationScore))}%` }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Summary */}
       {report.summary && (
         <div className="space-y-1">
@@ -141,7 +192,7 @@ export function ScreeningReportCard({
 
       {/* Footer / Re-screen */}
       <div className="pt-2 flex items-center justify-between text-xs text-slate-500">
-        <span>Evaluated {new Date(report.screenedAtUtc).toLocaleString()}</span>
+        <span>Evaluated {new Date(report.evaluatedAtUtc || report.screenedAtUtc || "").toLocaleString()}</span>
         {canReScreen && (
           <button
             type="button"

@@ -2,6 +2,7 @@ export type ScreeningStatus = "Pending" | "Completed" | "Failed";
 export type ScreeningRecommendation = "Advance" | "Review";
 
 export type ScreeningReportDto = {
+  id?: string;
   applicationId: string;
   score: number;
   recommendation: ScreeningRecommendation;
@@ -10,5 +11,9 @@ export type ScreeningReportDto = {
   concerns: string[];
   status: ScreeningStatus;
   failureReason: string | null;
-  screenedAtUtc: string;
+  evaluatedAtUtc?: string;
+  screenedAtUtc?: string;
+  skillsScore?: number | null;
+  experienceScore?: number | null;
+  educationScore?: number | null;
 };

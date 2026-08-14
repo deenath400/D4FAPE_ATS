@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 13 / 18 tasks · checkpoint CP-2 of 4 completed
+**Progress:** 16 / 18 tasks · checkpoint CP-3 of 4 completed
 
 ---
 
@@ -96,17 +96,17 @@ one checkpoint per invocation, then stops for review.
 
 *Exit condition: `ScreeningReportCard` and `ScreeningReportModal` render category scores when present and gracefully hide them when null, `npm run build` succeeds, `npm test` passes.*
 
-- [ ] **T-14** — Update TypeScript `ScreeningReportDto` type with category score fields
+- [x] **T-14** — Update TypeScript `ScreeningReportDto` type with category score fields
   - Files: `frontend/src/lib/types/screening.ts`
   - Covers: AC-8
   - Depends on: T-05
 
-- [ ] **T-15** — Update `ScreeningReportCard` to display category score progress bars
+- [x] **T-15** — Update `ScreeningReportCard` to display category score progress bars
   - Files: `frontend/src/components/staff/ScreeningReportCard.tsx`
   - Covers: AC-8
   - Depends on: T-14
 
-- [ ] **T-16** — Update `ScreeningReportModal` to display category score progress bars
+- [x] **T-16** — Update `ScreeningReportModal` to display category score progress bars
   - Files: `frontend/src/components/staff/ScreeningReportModal.tsx`
   - Covers: AC-8
   - Depends on: T-14

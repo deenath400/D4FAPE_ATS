@@ -131,7 +131,7 @@ export function ScreeningReportModal({
                     status={report.status}
                   />
                   <span className="text-xs text-slate-500">
-                    Screened {new Date(report.screenedAtUtc).toLocaleString()}
+                    Screened {new Date(report.evaluatedAtUtc || report.screenedAtUtc || "").toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -146,6 +146,57 @@ export function ScreeningReportModal({
               <div className="p-4 rounded-lg bg-rose-950/30 border border-rose-900/50 space-y-1">
                 <h4 className="text-xs font-bold text-rose-300 uppercase tracking-wider">Failure Details</h4>
                 <p className="text-sm text-rose-400">{report.failureReason}</p>
+              </div>
+            )}
+
+            {/* Category Breakdown Scores (0009) */}
+            {(report.skillsScore != null || report.experienceScore != null || report.educationScore != null) && (
+              <div className="space-y-2 p-4 rounded-lg bg-slate-800/40 border border-slate-700/80">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Evaluation Breakdown</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {report.skillsScore != null && (
+                    <div className="p-2.5 rounded bg-slate-900/60 border border-slate-800 space-y-1.5">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-slate-400">Skills Fit</span>
+                        <span className="font-semibold text-slate-200">{report.skillsScore}%</span>
+                      </div>
+                      <div className="w-full bg-slate-700/60 rounded-full h-2 overflow-hidden">
+                        <div
+                          className="bg-indigo-500 h-2 rounded-full transition-all"
+                          style={{ width: `${Math.min(100, Math.max(0, report.skillsScore))}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {report.experienceScore != null && (
+                    <div className="p-2.5 rounded bg-slate-900/60 border border-slate-800 space-y-1.5">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-slate-400">Experience Fit</span>
+                        <span className="font-semibold text-slate-200">{report.experienceScore}%</span>
+                      </div>
+                      <div className="w-full bg-slate-700/60 rounded-full h-2 overflow-hidden">
+                        <div
+                          className="bg-emerald-500 h-2 rounded-full transition-all"
+                          style={{ width: `${Math.min(100, Math.max(0, report.experienceScore))}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {report.educationScore != null && (
+                    <div className="p-2.5 rounded bg-slate-900/60 border border-slate-800 space-y-1.5">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-slate-400">Education Fit</span>
+                        <span className="font-semibold text-slate-200">{report.educationScore}%</span>
+                      </div>
+                      <div className="w-full bg-slate-700/60 rounded-full h-2 overflow-hidden">
+                        <div
+                          className="bg-amber-500 h-2 rounded-full transition-all"
+                          style={{ width: `${Math.min(100, Math.max(0, report.educationScore))}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
