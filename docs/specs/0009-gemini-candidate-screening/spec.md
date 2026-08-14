@@ -2,7 +2,7 @@
 id: 0009
 slug: gemini-candidate-screening
 title: Google Gemini 2.0 Flash Candidate Screening Integration
-status: implemented
+status: validated
 components: [api/application, service/application, service/screening, db/application, ui/staff]
 entities: [Application, CvAttachment, Requisition, Stage, StageTransition, ScreeningReport]
 depends_on: [0008]
