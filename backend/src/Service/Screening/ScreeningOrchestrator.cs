@@ -167,7 +167,10 @@ public class ScreeningOrchestrator : IScreeningOrchestrator
             screeningResult.Recommendation,
             screeningResult.Summary,
             screeningResult.Strengths,
-            screeningResult.Concerns);
+            screeningResult.Concerns,
+            screeningResult.SkillsScore,
+            screeningResult.ExperienceScore,
+            screeningResult.EducationScore);
 
         await _dbContext.SaveChangesAsync(ct);
 
@@ -247,6 +250,9 @@ public class ScreeningOrchestrator : IScreeningOrchestrator
             concerns,
             report.Status.ToString(),
             report.FailureReason,
-            report.EvaluatedAtUtc);
+            report.EvaluatedAtUtc,
+            report.SkillsScore,
+            report.ExperienceScore,
+            report.EducationScore);
     }
 }

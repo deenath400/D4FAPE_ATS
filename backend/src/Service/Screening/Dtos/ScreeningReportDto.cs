@@ -12,4 +12,7 @@ public record ScreeningReportDto(
     string[] Concerns,
     string Status,
     string? FailureReason,
-    DateTime EvaluatedAtUtc);
+    DateTime EvaluatedAtUtc,
+    int? SkillsScore = null,
+    int? ExperienceScore = null,
+    int? EducationScore = null);

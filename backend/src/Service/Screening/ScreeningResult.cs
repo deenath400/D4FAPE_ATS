@@ -7,4 +7,7 @@ public record ScreeningResult(
     ScreeningRecommendation Recommendation,
     string Summary,
     string Strengths,
-    string Concerns);
+    string Concerns,
+    int? SkillsScore = null,
+    int? ExperienceScore = null,
+    int? EducationScore = null);

@@ -24,6 +24,9 @@ public class ScreeningReportConfiguration : IEntityTypeConfiguration<ScreeningRe
             .HasConversion<string>();
         builder.Property(s => s.FailureReason).IsRequired(false);
         builder.Property(s => s.EvaluatedAtUtc).IsRequired();
+        builder.Property(s => s.SkillsScore).IsRequired(false);
+        builder.Property(s => s.ExperienceScore).IsRequired(false);
+        builder.Property(s => s.EducationScore).IsRequired(false);
 
         builder.HasIndex(s => s.ApplicationId).IsUnique();
 

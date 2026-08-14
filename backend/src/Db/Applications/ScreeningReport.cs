@@ -14,6 +14,9 @@ public class ScreeningReport
     public ScreeningStatus Status { get; private set; }
     public string? FailureReason { get; private set; }
     public DateTime EvaluatedAtUtc { get; private set; }
+    public int? SkillsScore { get; private set; }
+    public int? ExperienceScore { get; private set; }
+    public int? EducationScore { get; private set; }
 
     private ScreeningReport() { } // EF Core
 
@@ -35,7 +38,10 @@ public class ScreeningReport
             Concerns = "[]",
             Status = ScreeningStatus.Pending,
             FailureReason = null,
-            EvaluatedAtUtc = DateTime.UtcNow
+            EvaluatedAtUtc = DateTime.UtcNow,
+            SkillsScore = null,
+            ExperienceScore = null,
+            EducationScore = null
         };
     }
 
@@ -44,7 +50,10 @@ public class ScreeningReport
         ScreeningRecommendation recommendation,
         string summary,
         string strengths,
-        string concerns)
+        string concerns,
+        int? skillsScore = null,
+        int? experienceScore = null,
+        int? educationScore = null)
     {
         if (Status != ScreeningStatus.Pending)
         {
@@ -56,6 +65,9 @@ public class ScreeningReport
         Summary = summary ?? string.Empty;
         Strengths = string.IsNullOrWhiteSpace(strengths) ? "[]" : strengths;
         Concerns = string.IsNullOrWhiteSpace(concerns) ? "[]" : concerns;
+        SkillsScore = skillsScore.HasValue ? Math.Clamp(skillsScore.Value, 0, 100) : null;
+        ExperienceScore = experienceScore.HasValue ? Math.Clamp(experienceScore.Value, 0, 100) : null;
+        EducationScore = educationScore.HasValue ? Math.Clamp(educationScore.Value, 0, 100) : null;
         Status = ScreeningStatus.Completed;
         FailureReason = null;
         EvaluatedAtUtc = DateTime.UtcNow;

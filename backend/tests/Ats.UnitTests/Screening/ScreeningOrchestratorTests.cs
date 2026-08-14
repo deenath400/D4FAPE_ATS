@@ -129,6 +129,39 @@ public class ScreeningOrchestratorTests : IDisposable
     }
 
     [Fact]
+    public async Task RunScreeningAsync_WithCategoryScores_PersistsAndReturnsCategoryScores()
+    {
+        // Arrange
+        var (_, _, _, app) = await SeedApplicationAsync();
+        _fileStorageMock
+            .Setup(f => f.OpenReadAsync("key123.pdf", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new MemoryStream(Encoding.UTF8.GetBytes("Readable text")));
+
+        _screeningServiceMock
+            .Setup(s => s.EvaluateAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ScreeningResult(
+                88, ScreeningRecommendation.Advance, "Strong fit", "[\"C#\"]", "[]",
+                SkillsScore: 92, ExperienceScore: 85, EducationScore: 80));
+
+        // Act
+        var result = await _orchestrator.RunScreeningAsync(app.Id);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal(88, result.Value!.Score);
+        Assert.Equal(92, result.Value.SkillsScore);
+        Assert.Equal(85, result.Value.ExperienceScore);
+        Assert.Equal(80, result.Value.EducationScore);
+
+        var report = await _dbContext.ScreeningReports.SingleOrDefaultAsync(r => r.ApplicationId == app.Id);
+        Assert.NotNull(report);
+        Assert.Equal(88, report.Score);
+        Assert.Equal(92, report.SkillsScore);
+        Assert.Equal(85, report.ExperienceScore);
+        Assert.Equal(80, report.EducationScore);
+    }
+
+    [Fact]
     public async Task RunScreeningAsync_AdvanceScore_MovesToNextStage()
     {
         // Arrange

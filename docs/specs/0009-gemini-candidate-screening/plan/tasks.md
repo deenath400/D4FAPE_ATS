@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 0 / 18 tasks · checkpoint CP-1 of 4
+**Progress:** 7 / 18 tasks · checkpoint CP-1 of 4 completed
 
 ---
 
@@ -23,37 +23,37 @@ one checkpoint per invocation, then stops for review.
 
 *Exit condition: migration applies cleanly, `ScreeningReport.Complete()` accepts category scores, `ScreeningResult` record has new fields, `dotnet build` succeeds, existing unit tests updated and green.*
 
-- [ ] **T-01** — Add `SkillsScore`, `ExperienceScore`, `EducationScore` to `ScreeningReport` entity
+- [x] **T-01** — Add `SkillsScore`, `ExperienceScore`, `EducationScore` to `ScreeningReport` entity
   - Files: `backend/src/Db/Applications/ScreeningReport.cs`
   - Covers: AC-1
   - Depends on: —
 
-- [ ] **T-02** — Update `ScreeningReportConfiguration` to map three new nullable columns
+- [x] **T-02** — Update `ScreeningReportConfiguration` to map three new nullable columns
   - Files: `backend/src/Db/Configurations/ScreeningReportConfiguration.cs`
   - Covers: AC-1
   - Depends on: T-01
 
-- [ ] **T-03** — Add EF Core migration `AddScreeningCategoryScores`
+- [x] **T-03** — Add EF Core migration `AddScreeningCategoryScores`
   - Files: `backend/src/Db/Migrations/*_AddScreeningCategoryScores.cs`
   - Covers: AC-1
   - Depends on: T-02
 
-- [ ] **T-04** — Expand `ScreeningResult` record with optional category score fields
+- [x] **T-04** — Expand `ScreeningResult` record with optional category score fields
   - Files: `backend/src/Service/Screening/ScreeningResult.cs`
   - Covers: AC-1, AC-9
   - Depends on: —
 
-- [ ] **T-05** — Update `ScreeningReportDto` to include category score fields
+- [x] **T-05** — Update `ScreeningReportDto` to include category score fields
   - Files: `backend/src/Service/Screening/Dtos/ScreeningReportDto.cs`
   - Covers: AC-7, AC-8
   - Depends on: —
 
-- [ ] **T-06** — Update `ScreeningOrchestrator.Complete()` call and `ToDto()` mapping for category scores
+- [x] **T-06** — Update `ScreeningOrchestrator.Complete()` call and `ToDto()` mapping for category scores
   - Files: `backend/src/Service/Screening/ScreeningOrchestrator.cs`
   - Covers: AC-1, AC-7
   - Depends on: T-01, T-04, T-05
 
-- [ ] **T-07** — Update existing `ScreeningOrchestratorTests` to construct `ScreeningResult` with new fields
+- [x] **T-07** — Update existing `ScreeningOrchestratorTests` to construct `ScreeningResult` with new fields
   - Files: `backend/tests/Ats.UnitTests/Screening/ScreeningOrchestratorTests.cs`
   - Covers: AC-9
   - Depends on: T-04, T-06
