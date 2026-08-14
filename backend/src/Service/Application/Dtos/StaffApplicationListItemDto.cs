@@ -7,7 +7,10 @@ public record StaffApplicationListItemDto(
     Guid Id,
     StaffApplicationCandidateDto Candidate,
     DateTime SubmittedAtUtc,
-    string CvDownloadUrl);
+    string CvDownloadUrl,
+    int? ScreeningScore = null,
+    string? ScreeningRecommendation = null,
+    string? ScreeningStatus = null);
 
 /// <summary>Applying Candidate's identity, embedded in <see cref="StaffApplicationListItemDto"/>.</summary>
 public record StaffApplicationCandidateDto(

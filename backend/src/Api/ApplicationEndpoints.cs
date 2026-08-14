@@ -112,6 +112,26 @@ public static class ApplicationEndpoints
             return Results.File(download.Content, download.ContentType, download.FileName);
         }).RequireAuthorization();
 
+        var staffApplicationGroup = app.MapGroup("/api/staff/applications");
+
+        staffApplicationGroup.MapGet("/{id:guid}/screening-report", async (
+            Guid id,
+            Ats.Service.Screening.IScreeningOrchestrator orchestrator,
+            CancellationToken ct) =>
+        {
+            var result = await orchestrator.GetScreeningReportAsync(id, ct);
+            return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemResult();
+        }).RequireAuthorization(AuthConstants.Policies.StaffOnly);
+
+        staffApplicationGroup.MapPost("/{id:guid}/screen", async (
+            Guid id,
+            Ats.Service.Screening.IScreeningOrchestrator orchestrator,
+            CancellationToken ct) =>
+        {
+            var result = await orchestrator.RunScreeningAsync(id, ct);
+            return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemResult();
+        }).RequireAuthorization(AuthConstants.Policies.RecruiterOnly);
+
         return app;
     }
 

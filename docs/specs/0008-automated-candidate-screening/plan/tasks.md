@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 19 / 24 tasks · checkpoint CP-2 of 4 (completed)
+**Progress:** 23 / 24 tasks · checkpoint CP-3 of 4 (completed)
 
 ---
 
@@ -129,22 +129,22 @@ orchestrator and mock service tests, all existing integration tests pass.*
 *Exit condition: `dotnet build` succeeds, all integration tests pass (including new screening
 endpoint tests), `dotnet test` full suite green.*
 
-- [ ] **T-20** — Add screening endpoints to `ApplicationEndpoints.cs`
+- [x] **T-20** — Add screening endpoints to `ApplicationEndpoints.cs`
   - Files: `backend/src/Api/ApplicationEndpoints.cs`
   - Covers: AC-5, AC-6, AC-7, AC-8
   - Depends on: T-14, T-16
 
-- [ ] **T-21** — Add screening badge fields to pipeline board and staff application list DTOs
+- [x] **T-21** — Add screening badge fields to pipeline board and staff application list DTOs
   - Files: `backend/src/Service/Pipeline/Dtos/PipelineBoardApplicationDto.cs` (or equivalent), `backend/src/Service/Application/Dtos/StaffApplicationListItemDto.cs`
   - Covers: AC-7
   - Depends on: T-06
 
-- [ ] **T-22** — Add `Screening` configuration section to `appsettings.json`
+- [x] **T-22** — Add `Screening` configuration section to `appsettings.json`
   - Files: `backend/src/Api/appsettings.json`
   - Covers: AC-1, AC-10
   - Depends on: —
 
-- [ ] **T-23** — Integration tests for screening endpoints
+- [x] **T-23** — Integration tests for screening endpoints
   - Files: `backend/tests/Ats.IntegrationTests/Screening/ScreeningEndpointTests.cs`
   - Covers: AC-5, AC-6, AC-7, AC-8
   - Depends on: T-20

@@ -145,4 +145,70 @@ Passed!  - Failed:     0, Passed:   113, Skipped:     0, Total:   113, Duration:
 
 **Known gaps carried into the next checkpoint**
 
-- HTTP endpoints in `ApplicationEndpoints.cs` and pipeline board DTO badge fields scheduled for CP-3.
+- None from CP-2.
+
+---
+
+## CP-3 — API Layer and Integration Tests · 2026-08-14
+
+**Tasks completed:** T-20, T-21, T-22, T-23
+
+**Files created**
+
+| Path | Purpose |
+|---|---|
+| `backend/tests/Ats.IntegrationTests/Screening/ScreeningEndpointsTests.cs` | Integration tests for GET screening report, POST screen, role authorization policies, and candidate data isolation |
+
+**Files modified**
+
+| Path | Change |
+|---|---|
+| `backend/src/Api/ApplicationEndpoints.cs` | Added `GET /api/staff/applications/{id}/screening-report` (`StaffOnly`) and `POST /api/staff/applications/{id}/screen` (`RecruiterOnly`) |
+| `backend/src/Service/Pipeline/Dtos/PipelineBoardApplicationDto.cs` | Added optional `ScreeningScore`, `ScreeningRecommendation`, `ScreeningStatus` fields |
+| `backend/src/Service/Application/Dtos/StaffApplicationListItemDto.cs` | Added optional `ScreeningScore`, `ScreeningRecommendation`, `ScreeningStatus` fields |
+| `backend/src/Service/Pipeline/PipelineService.cs` | Projected screening fields in `GetPipelineBoardAsync` |
+| `backend/src/Service/Application/ApplicationService.cs` | Projected screening fields in `ListForRequisitionAsync` |
+| `backend/src/Api/appsettings.json` | Added `"Screening": { "AdvanceScoreThreshold": 75 }` configuration |
+
+**Decisions made during implementation**
+
+| # | Decision | Why |
+|---|---|---|
+| I-3 | Set default `null` values for optional screening fields on `PipelineBoardApplicationDto` and `StaffApplicationListItemDto` | Preserves constructor and record compatibility with existing callers while exposing screening badge metadata to staff |
+
+**Deviations from the LLD**
+
+| LLD section | Designed | Actual | Reason | LLD patched? |
+|---|---|---|---|---|
+| — | — | — | None. Endpoints and DTOs match LLD design. | Yes |
+
+**Verification run**
+
+```
+$ dotnet build
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+$ dotnet test tests/Ats.UnitTests
+Test run for C:\D_Drive\D4FAPE-_ATS\backend\tests\Ats.UnitTests\bin\Debug\net10.0\Ats.UnitTests.dll (.NETCoreApp,Version=v10.0)
+Passed!  - Failed:     0, Passed:   201, Skipped:     0, Total:   201, Duration: 2 s - Ats.UnitTests.dll (net10.0)
+
+$ dotnet test tests/Ats.ArchitectureTests
+Test run for C:\D_Drive\D4FAPE-_ATS\backend\tests\Ats.ArchitectureTests\bin\Debug\net10.0\Ats.ArchitectureTests.dll (.NETCoreApp,Version=v10.0)
+Passed!  - Failed:     0, Passed:     4, Skipped:     0, Total:     4, Duration: 61 ms - Ats.ArchitectureTests.dll (net10.0)
+
+$ dotnet test tests/Ats.IntegrationTests
+Test run for C:\D_Drive\D4FAPE-_ATS\backend\tests\Ats.IntegrationTests\bin\Debug\net10.0\Ats.IntegrationTests.dll (.NETCoreApp,Version=v10.0)
+Passed!  - Failed:     0, Passed:   121, Skipped:     0, Total:   121, Duration: 19 s - Ats.IntegrationTests.dll (net10.0)
+```
+
+**Meta updates applied**
+
+- `architecture.md`: updated Component Map (`api/application` includes screening endpoints); appended change log row for 0008 CP-3.
+- `tech-stack.md`: added `Screening:AdvanceScoreThreshold` under Required Configuration.
+- `coding-standards.md`: no change.
+
+**Known gaps carried into the next checkpoint**
+
+- Frontend components and hardening (T-24) scheduled for CP-4.

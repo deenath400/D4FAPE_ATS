@@ -433,7 +433,10 @@ public class PipelineService : IPipelineService
                     u.FirstName,
                     u.LastName,
                     Email = u.Email ?? "",
-                    a.SubmittedAtUtc
+                    a.SubmittedAtUtc,
+                    ScreeningScore = a.ScreeningReport != null ? (int?)a.ScreeningReport.Score : null,
+                    ScreeningRecommendation = a.ScreeningReport != null ? a.ScreeningReport.Recommendation.ToString() : null,
+                    ScreeningStatus = a.ScreeningReport != null ? a.ScreeningReport.Status.ToString() : null
                 })
             .ToListAsync(ct);
 
@@ -447,7 +450,8 @@ public class PipelineService : IPipelineService
                     stage.SortOrder,
                     group.Count,
                     group.Select(a => new PipelineBoardApplicationDto(
-                        a.ApplicationId, a.CandidateId, a.FirstName, a.LastName, a.Email, a.SubmittedAtUtc)).ToList());
+                        a.ApplicationId, a.CandidateId, a.FirstName, a.LastName, a.Email, a.SubmittedAtUtc,
+                        a.ScreeningScore, a.ScreeningRecommendation, a.ScreeningStatus)).ToList());
             })
             .ToList();
 
@@ -455,7 +459,8 @@ public class PipelineService : IPipelineService
         var rejectedGroup = new PipelineRejectedGroupDto(
             rejected.Count,
             rejected.Select(a => new PipelineBoardApplicationDto(
-                a.ApplicationId, a.CandidateId, a.FirstName, a.LastName, a.Email, a.SubmittedAtUtc)).ToList());
+                a.ApplicationId, a.CandidateId, a.FirstName, a.LastName, a.Email, a.SubmittedAtUtc,
+                a.ScreeningScore, a.ScreeningRecommendation, a.ScreeningStatus)).ToList());
 
         return Result<PipelineBoardDto>.Ok(new PipelineBoardDto(requisitionId, stageGroups, rejectedGroup));
     }

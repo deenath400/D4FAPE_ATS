@@ -9,4 +9,7 @@ public record PipelineBoardApplicationDto(
     string CandidateFirstName,
     string CandidateLastName,
     string CandidateEmail,
-    DateTime SubmittedAtUtc);
+    DateTime SubmittedAtUtc,
+    int? ScreeningScore = null,
+    string? ScreeningRecommendation = null,
+    string? ScreeningStatus = null);

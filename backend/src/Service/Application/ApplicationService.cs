@@ -236,7 +236,10 @@ public class ApplicationService : IApplicationService
                     u.FirstName,
                     u.LastName,
                     u.Email,
-                    a.SubmittedAtUtc
+                    a.SubmittedAtUtc,
+                    ScreeningScore = a.ScreeningReport != null ? (int?)a.ScreeningReport.Score : null,
+                    ScreeningRecommendation = a.ScreeningReport != null ? a.ScreeningReport.Recommendation.ToString() : null,
+                    ScreeningStatus = a.ScreeningReport != null ? a.ScreeningReport.Status.ToString() : null
                 })
             .OrderByDescending(x => x.SubmittedAtUtc)
             .ToListAsync(ct);
@@ -246,7 +249,10 @@ public class ApplicationService : IApplicationService
                 x.ApplicationId,
                 new StaffApplicationCandidateDto(x.CandidateId, x.FirstName, x.LastName, x.Email ?? string.Empty),
                 x.SubmittedAtUtc,
-                $"/api/applications/{x.ApplicationId}/cv"))
+                $"/api/applications/{x.ApplicationId}/cv",
+                x.ScreeningScore,
+                x.ScreeningRecommendation,
+                x.ScreeningStatus))
             .ToList();
 
         return Result<IReadOnlyList<StaffApplicationListItemDto>>.Ok(dtos);
