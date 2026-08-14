@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 7 / 18 tasks · checkpoint CP-1 of 4 completed
+**Progress:** 13 / 18 tasks · checkpoint CP-2 of 4 completed
 
 ---
 
@@ -62,32 +62,32 @@ one checkpoint per invocation, then stops for review.
 
 *Exit condition: `GeminiScreeningService` compiles, `MockScreeningService` updated, `ServiceCollectionExtensions` handles provider selection, unit tests for Gemini service pass with mocked HTTP handler, `dotnet build` and `dotnet test tests/Ats.UnitTests` succeed.*
 
-- [ ] **T-08** — Create `GeminiOptions` configuration model
+- [x] **T-08** — Create `GeminiOptions` configuration model
   - Files: `backend/src/Service/Screening/GeminiOptions.cs`
   - Covers: AC-2
   - Depends on: —
 
-- [ ] **T-09** — Create `GeminiModels` request/response DTOs
+- [x] **T-09** — Create `GeminiModels` request/response DTOs
   - Files: `backend/src/Service/Screening/GeminiModels.cs`
   - Covers: AC-1
   - Depends on: —
 
-- [ ] **T-10** — Create `GeminiScreeningService` with structured JSON schema, retry, and error handling
+- [x] **T-10** — Create `GeminiScreeningService` with structured JSON schema, retry, and error handling
   - Files: `backend/src/Service/Screening/GeminiScreeningService.cs`
   - Covers: AC-1, AC-5, AC-6
   - Depends on: T-04, T-08, T-09
 
-- [ ] **T-11** — Update `MockScreeningService` to return category breakdown scores
+- [x] **T-11** — Update `MockScreeningService` to return category breakdown scores
   - Files: `backend/src/Service/Screening/MockScreeningService.cs`
   - Covers: AC-9
   - Depends on: T-04
 
-- [ ] **T-12** — Update `ServiceCollectionExtensions` for provider selection with fallback
+- [x] **T-12** — Update `ServiceCollectionExtensions` for provider selection with fallback
   - Files: `backend/src/Service/ServiceCollectionExtensions.cs`, `backend/src/Api/appsettings.json`
   - Covers: AC-2
   - Depends on: T-08, T-10, T-11
 
-- [ ] **T-13** — Unit tests for `GeminiScreeningService` (valid response, auth failure, rate limit, malformed JSON, CV truncation)
+- [x] **T-13** — Unit tests for `GeminiScreeningService` (valid response, auth failure, rate limit, malformed JSON, CV truncation)
   - Files: `backend/tests/Ats.UnitTests/Screening/GeminiScreeningServiceTests.cs`
   - Covers: AC-1, AC-5, AC-6, E-1, E-2, E-3, E-5
   - Depends on: T-10

@@ -4,7 +4,7 @@ using System;
 using Ats.Db.Applications;
 using Xunit;
 
-public class ScreeningReportEntityTests
+public sealed class ScreeningReportEntityTests
 {
     [Fact]
     public void CreatePending_SetsInitialValues_CategoryScoresAreNull()

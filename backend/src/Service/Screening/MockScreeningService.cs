@@ -70,12 +70,19 @@ public class MockScreeningService : IScreeningService
         var strengthsJson = JsonSerializer.Serialize(strengthsList);
         var concernsJson = JsonSerializer.Serialize(new[] { "Mock provider — no real AI evaluation performed" });
 
+        var skillsScore = Math.Clamp(matchCount * 12, 0, 100);
+        var experienceScore = Math.Clamp(matchCount * 10, 0, 100);
+        var educationScore = Math.Clamp(matchCount * 8, 0, 100);
+
         var result = new ScreeningResult(
             score,
             recommendation,
             summary,
             strengthsJson,
-            concernsJson);
+            concernsJson,
+            skillsScore,
+            experienceScore,
+            educationScore);
 
         return Task.FromResult(result);
     }

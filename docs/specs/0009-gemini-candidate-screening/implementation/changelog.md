@@ -74,4 +74,71 @@ Test Files  17 passed (17)
 
 **Known gaps carried into the next checkpoint**
 
-- `GeminiScreeningService`, `GeminiOptions`, `GeminiModels`, `MockScreeningService` update, and provider DI registration are planned for CP-2.
+- None for data and screening backend logic. Frontend category score rendering is planned for CP-3.
+
+---
+
+## CP-2 — Gemini service implementation and provider selection · 2026-08-14
+
+**Tasks completed:** T-08, T-09, T-10, T-11, T-12, T-13
+
+**Files created**
+
+| Path | Purpose |
+|---|---|
+| `backend/src/Service/Screening/GeminiOptions.cs` | Strongly-typed configuration options for Gemini API |
+| `backend/src/Service/Screening/GeminiModels.cs` | Request and response schema models for Gemini 2.0 Flash REST API structured output |
+| `backend/src/Service/Screening/GeminiScreeningService.cs` | Typed `HttpClient` implementation of `IScreeningService` calling Gemini 2.0 Flash with retry and schema enforcement |
+| `backend/tests/Ats.UnitTests/Screening/GeminiScreeningServiceTests.cs` | Unit tests for `GeminiScreeningService` covering success, auth failure, rate limit, service unavailable, malformed JSON, and CV truncation |
+
+**Files modified**
+
+| Path | Change |
+|---|---|
+| `backend/src/Service/Screening/MockScreeningService.cs` | Updated keyword-matching evaluator to return computed category breakdown scores |
+| `backend/src/Service/ServiceCollectionExtensions.cs` | Added conditional `IScreeningService` provider selection (`Gemini` vs `Mock`) with fallback if API key is missing |
+| `backend/src/Api/appsettings.json` | Added `Screening:Provider` and `Gemini` configuration sections |
+
+**Decisions made during implementation**
+
+| # | Decision | Why |
+|---|---|---|
+| I-2 | Marked internal Gemini request/response models as `sealed` | Adheres to Roslyn code quality rule CA1852 |
+| I-3 | Implemented exponential backoff for HTTP 429 / 503 within `GeminiScreeningService` | Handles transient rate limits and server hiccups before bubbling to outer orchestrator retry |
+
+**Deviations from the LLD**
+
+| LLD section | Designed | Actual | Reason | LLD patched? |
+|---|---|---|---|---|
+| — | — | — | None. | N/A |
+
+**Verification run**
+
+```
+$ dotnet build
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+$ dotnet test tests/Ats.UnitTests
+Test run for C:\D_Drive\D4FAPE-_ATS\backend\tests\Ats.UnitTests\bin\Debug\net10.0\Ats.UnitTests.dll (.NETCoreApp,Version=v10.0)
+Passed!  - Failed:     0, Passed:   213, Skipped:     0, Total:   213, Duration: 3 s - Ats.UnitTests.dll (net10.0)
+
+$ dotnet test tests/Ats.ArchitectureTests
+Test run for C:\D_Drive\D4FAPE-_ATS\backend\tests\Ats.ArchitectureTests\bin\Debug\net10.0\Ats.ArchitectureTests.dll (.NETCoreApp,Version=v10.0)
+Passed!  - Failed:     0, Passed:     4, Skipped:     0, Total:     4, Duration: 46 ms - Ats.ArchitectureTests.dll (net10.0)
+
+$ dotnet test tests/Ats.IntegrationTests
+Test run for C:\D_Drive\D4FAPE-_ATS\backend\tests\Ats.IntegrationTests\bin\Debug\net10.0\Ats.IntegrationTests.dll (.NETCoreApp,Version=v10.0)
+Passed!  - Failed:     0, Passed:   121, Skipped:     0, Total:   121, Duration: 22 s - Ats.IntegrationTests.dll (net10.0)
+```
+
+**Meta updates applied**
+
+- `docs/specs/meta/architecture.md`: Appended Change Log row for CP-2.
+- `tech-stack.md`: Added `Screening:Provider` and `Gemini:ApiKey` configuration keys.
+- `coding-standards.md`: no change.
+
+**Known gaps carried into the next checkpoint**
+
+- `ui/staff` category score rendering in `ScreeningReportCard` and `ScreeningReportModal` is planned for CP-3.

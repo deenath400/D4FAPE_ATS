@@ -77,6 +77,8 @@ section literally, so it must stay accurate.
 | `Storage:CvBasePath` | Local-disk base path CV attachments are written to/read from | No | `./app-data/cv-attachments` |
 | `Applications:MaxCvSizeBytes` | Maximum accepted CV upload size, in bytes | No | `5242880` (5 MB) |
 | `Screening:AdvanceScoreThreshold` | Minimum screening score to trigger automated stage advance | No | `75` |
+| `Screening:Provider` | Active AI screening provider (`Gemini` or `Mock`) | No | `Mock` |
+| `Gemini:ApiKey` | Google Gemini API key for automated screening | No (when Mock) | `""` |
 
 Secrets are never committed. Record the key name and where the value comes from, not the value.
 

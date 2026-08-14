@@ -191,6 +191,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-14 | 0008 | CP-3: Added `GET .../screening-report` (StaffOnly) and `POST .../screen` (RecruiterOnly) endpoints to ApplicationEndpoints, added screening fields to PipelineBoardApplicationDto and StaffApplicationListItemDto, added Screening configuration, and built integration test suite |
 | 2026-08-14 | 0008 | CP-4: Added `ui/staff` screening components (`ScreeningBadge`, `ScreeningReportModal`, `ScreeningReportCard`), integrated into PipelineBoard, ApplicationsTable, and ApplicationDetail pages; full-suite regression pass green; spec closed out, all 24 tasks complete |
 | 2026-08-14 | 0009 | CP-1: Added category scores (`SkillsScore`, `ExperienceScore`, `EducationScore`) to `ScreeningReport`, EF Core mapping, `AddScreeningCategoryScores` migration, and expanded `ScreeningResult`/`ScreeningReportDto` |
+| 2026-08-14 | 0009 | CP-2: Built `GeminiScreeningService` (typed `HttpClient` with structured JSON schema) and DI provider selection with graceful `MockScreeningService` fallback |
 
 ## Related Specs
 

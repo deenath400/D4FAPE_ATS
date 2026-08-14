@@ -37,7 +37,31 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IFileStorage, LocalDiskFileStorage>();
         services.AddScoped<IApplicationService, ApplicationService>();
         services.AddScoped<IPipelineService, PipelineService>();
-        services.AddScoped<Ats.Service.Screening.IScreeningService, Ats.Service.Screening.MockScreeningService>();
+
+        services.Configure<Ats.Service.Screening.GeminiOptions>(configuration.GetSection(Ats.Service.Screening.GeminiOptions.SectionName));
+
+        var screeningProvider = configuration["Screening:Provider"] ?? "Mock";
+        if (string.Equals(screeningProvider, "Gemini", StringComparison.OrdinalIgnoreCase))
+        {
+            var apiKey = configuration["Gemini:ApiKey"];
+            if (!string.IsNullOrWhiteSpace(apiKey))
+            {
+                var timeoutSeconds = configuration.GetValue("Gemini:TimeoutSeconds", 30);
+                services.AddHttpClient<Ats.Service.Screening.IScreeningService, Ats.Service.Screening.GeminiScreeningService>(client =>
+                {
+                    client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
+                });
+            }
+            else
+            {
+                services.AddScoped<Ats.Service.Screening.IScreeningService, Ats.Service.Screening.MockScreeningService>();
+            }
+        }
+        else
+        {
+            services.AddScoped<Ats.Service.Screening.IScreeningService, Ats.Service.Screening.MockScreeningService>();
+        }
+
         services.AddSingleton<Ats.Service.Screening.IPdfTextExtractor, Ats.Service.Screening.PdfTextExtractor>();
         services.AddScoped<Ats.Service.Screening.IScreeningOrchestrator, Ats.Service.Screening.ScreeningOrchestrator>();
 
