@@ -23,6 +23,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
     public DbSet<Application> Applications => Set<Application>();
     public DbSet<CvAttachment> CvAttachments => Set<CvAttachment>();
     public DbSet<StageTransition> StageTransitions => Set<StageTransition>();
+    public DbSet<ScreeningReport> ScreeningReports => Set<ScreeningReport>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -33,6 +34,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
         builder.ApplyConfiguration(new ApplicationConfiguration());
         builder.ApplyConfiguration(new CvAttachmentConfiguration());
         builder.ApplyConfiguration(new StageTransitionConfiguration());
+        builder.ApplyConfiguration(new ScreeningReportConfiguration());
 
         SeedRoles(builder);
         SeedUsers(builder);

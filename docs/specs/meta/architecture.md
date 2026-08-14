@@ -102,6 +102,7 @@ erDiagram
   Requisition ||--o{ Application : receives
   ApplicationUser ||--o{ Application : submits
   Application ||--|| CvAttachment : has
+  Application ||--o| ScreeningReport : has
   Stage ||--o{ Application : "is current stage of"
   Application ||--o{ StageTransition : records
   Stage ||--o{ StageTransition : "referenced by"
@@ -184,6 +185,7 @@ The constraints `/validate` checks against. Keep to five or fewer.
 | 2026-08-14 | 0007 | CP-1: Added `AuthConstants.SeedAccounts` and `AppDbContext.SeedUsers`, seeding one fixed `ApplicationUser` + role assignment per existing role (Candidate, Recruiter, HiringManager, shared password `Temp@123`) via the `AddSeedSampleAccounts` migration — no new component or entity, `db/core`/`shared/auth` and `User`/`Role` already covered these |
 | 2026-08-14 | 0007 | CP-2: Built login integration tests for all three seeded accounts, password hash verification unit test, and duplicate candidate registration conflict test |
 | 2026-08-14 | 0007 | CP-3: Hardening — full-suite regression pass verifying no existing migration or auth test broke; spec closed out, all 9 tasks complete |
+| 2026-08-14 | 0008 | CP-1: Added ScreeningReport entity, EF Core mapping, AddScreeningReport migration, StageTransition.CreateSystemMove factory method |
 
 ## Related Specs
 

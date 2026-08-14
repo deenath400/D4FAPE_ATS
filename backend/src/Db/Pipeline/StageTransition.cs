@@ -88,6 +88,62 @@ public class StageTransition
         };
     }
 
+    public static StageTransition CreateSystemMove(
+        Guid applicationId,
+        Guid fromStageId,
+        string fromStageName,
+        Guid toStageId,
+        string toStageName,
+        string actorDisplayLabel,
+        string? note)
+    {
+        if (applicationId == Guid.Empty)
+        {
+            throw new ArgumentException("ApplicationId cannot be empty.", nameof(applicationId));
+        }
+
+        if (fromStageId == Guid.Empty)
+        {
+            throw new ArgumentException("FromStageId cannot be empty.", nameof(fromStageId));
+        }
+
+        if (string.IsNullOrWhiteSpace(fromStageName))
+        {
+            throw new ArgumentException("FromStageName cannot be empty.", nameof(fromStageName));
+        }
+
+        if (toStageId == Guid.Empty)
+        {
+            throw new ArgumentException("ToStageId cannot be empty.", nameof(toStageId));
+        }
+
+        if (string.IsNullOrWhiteSpace(toStageName))
+        {
+            throw new ArgumentException("ToStageName cannot be empty.", nameof(toStageName));
+        }
+
+        if (string.IsNullOrWhiteSpace(actorDisplayLabel))
+        {
+            throw new ArgumentException("ActorDisplayLabel cannot be empty.", nameof(actorDisplayLabel));
+        }
+
+        return new StageTransition
+        {
+            Id = Guid.NewGuid(),
+            ApplicationId = applicationId,
+            FromStageId = fromStageId,
+            FromStageName = fromStageName,
+            ToStageId = toStageId,
+            ToStageName = toStageName,
+            Kind = StageTransitionKind.Move,
+            ActorKind = StageTransitionActorKind.System,
+            ActorUserId = null,
+            ActorDisplayLabel = actorDisplayLabel,
+            Note = note,
+            OccurredAtUtc = DateTime.UtcNow
+        };
+    }
+
     public static StageTransition CreateRejection(
         Guid applicationId,
         Guid fromStageId,

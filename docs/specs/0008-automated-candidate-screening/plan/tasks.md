@@ -5,7 +5,7 @@
 Execution order for `/implement`. Tasks are grouped into **checkpoints**; `/implement` runs
 one checkpoint per invocation, then stops for review.
 
-**Progress:** 0 / 24 tasks · checkpoint CP-1 of 4
+**Progress:** 9 / 24 tasks · checkpoint CP-1 of 4 (completed)
 
 ---
 
@@ -24,47 +24,47 @@ one checkpoint per invocation, then stops for review.
 *Exit condition: migration applies cleanly, entity unit tests pass, `dotnet build` succeeds,
 `dotnet test tests/Ats.UnitTests` and `dotnet test tests/Ats.IntegrationTests` pass.*
 
-- [ ] **T-01** — Add `ScreeningStatus` enum
+- [x] **T-01** — Add `ScreeningStatus` enum
   - Files: `backend/src/Db/Applications/ScreeningStatus.cs`
   - Covers: AC-1
   - Depends on: —
 
-- [ ] **T-02** — Add `ScreeningRecommendation` enum
+- [x] **T-02** — Add `ScreeningRecommendation` enum
   - Files: `backend/src/Db/Applications/ScreeningRecommendation.cs`
   - Covers: AC-1
   - Depends on: —
 
-- [ ] **T-03** — Add `ScreeningReport` entity
+- [x] **T-03** — Add `ScreeningReport` entity
   - Files: `backend/src/Db/Applications/ScreeningReport.cs`
   - Covers: AC-1, AC-4
   - Depends on: T-01, T-02
 
-- [ ] **T-04** — Add `ScreeningReportConfiguration` (EF Core)
+- [x] **T-04** — Add `ScreeningReportConfiguration` (EF Core)
   - Files: `backend/src/Db/Configurations/ScreeningReportConfiguration.cs`
   - Covers: AC-1
   - Depends on: T-03
 
-- [ ] **T-05** — Add optional `ScreeningReport?` navigation to `Application` entity
+- [x] **T-05** — Add optional `ScreeningReport?` navigation to `Application` entity
   - Files: `backend/src/Db/Applications/Application.cs`
   - Covers: AC-1
   - Depends on: T-03
 
-- [ ] **T-06** — Register `DbSet<ScreeningReport>` and configuration in `AppDbContext`
+- [x] **T-06** — Register `DbSet<ScreeningReport>` and configuration in `AppDbContext`
   - Files: `backend/src/Db/AppDbContext.cs`
   - Covers: AC-1
   - Depends on: T-04, T-05
 
-- [ ] **T-07** — Create `AddScreeningReport` migration
+- [x] **T-07** — Create `AddScreeningReport` migration
   - Files: `backend/src/Db/Migrations/*_AddScreeningReport.cs`
   - Covers: AC-1
   - Depends on: T-06
 
-- [ ] **T-08** — Add `StageTransition.CreateSystemMove` factory method
+- [x] **T-08** — Add `StageTransition.CreateSystemMove` factory method
   - Files: `backend/src/Db/Pipeline/StageTransition.cs`
   - Covers: AC-2
   - Depends on: —
 
-- [ ] **T-09** — Unit tests for `ScreeningReport` state machine and `StageTransition.CreateSystemMove`
+- [x] **T-09** — Unit tests for `ScreeningReport` state machine and `StageTransition.CreateSystemMove`
   - Files: `backend/tests/Ats.UnitTests/Screening/ScreeningReportTests.cs`, `backend/tests/Ats.UnitTests/Pipeline/StageTransitionSystemMoveTests.cs`
   - Covers: AC-1, AC-2, AC-4
   - Depends on: T-03, T-08

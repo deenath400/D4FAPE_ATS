@@ -11,6 +11,7 @@ public class Application
     public Guid CurrentStageId { get; private set; }
     public bool IsRejected { get; private set; }
     public CvAttachment? CvAttachment { get; private set; }
+    public ScreeningReport? ScreeningReport { get; private set; }
 
     private Application() { } // EF Core
 
